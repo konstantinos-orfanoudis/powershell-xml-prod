@@ -2878,6 +2878,7 @@ function psSingleQuoted(s: string) {
  /** -------------- logger block -------------- */
 function buildLoggerBlock(nlog: string) {
   const dll = psSingleQuoted(nlog);
+
   return [
     "#Logger code starting here.",
     `Add-Type -Path ${dll}`,
@@ -2885,81 +2886,103 @@ function buildLoggerBlock(nlog: string) {
     "function global:Get-FunctionName ([int]$StackNumber = 1) {return [string]$(Get-PSCallStack)[$StackNumber].FunctionName}",
     "",
     "function global:Get-Logger() {",
-    "\tparam ([parameter(mandatory=$false)] [System.String]$Object ) ",
-    "\t$method = Get-FunctionName -StackNumber 2",
-    "",
-    "\t$logCfg\t\t\t\t\t= Get-NewLogConfig",
-    "\t$debugLog \t\t\t\t= Get-NewLogTarget -targetType \"file\"",
-    "\t$debugLog.archiveEvery \t\t= \"Day\"",
-    "\t$debugLog.ArchiveNumbering \t= \"Rolling\"\t",
-    "\t$debugLog.CreateDirs\t\t= $true\t",
-    "\t$debugLog.FileName \t\t= "+ dll.replace("NLog.dll","debugLog.log"),
-    "\t#$debugLog.Encoding \t\t\t= [System.Text.Encoding]::GetEncoding(\"utf-8\")",
-    "\t$debugLog.KeepFileOpen \t\t= $false",
-    "\t$debugLog.Layout \t\t\t= Get-LogMessageLayout -layoutId 3 -method $method -Object $Object",
-    "\t$debugLog.maxArchiveFiles \t= 31",
-    "    $debugLog.archiveFileName   = "+dll.replace("NLog.dll","Debug.{#}.log"),
-    "\t$logCfg.AddTarget(\"file\", $debugLog)",
-    "\t",
-    "\t$console \t\t\t\t\t= Get-NewLogTarget -targetType \"console\"",
-    "\t$console.Layout \t\t\t= Get-LogMessageLayout -layoutId 3 -method $method -Object $Object",
-    "\t$logCfg.AddTarget(\"console\", $console)",
-    "\t",
-    "\tIf ($NLogLevel -eq \"Trace\") { ",
-    "\t\t$rule1 = New-Object NLog.Config.LoggingRule(\"Logger\", [NLog.LogLevel]::Trace, $debugLog)",
-    "\t    $logCfg.LoggingRules.Add($rule1)",
-    "    }else",
-    "    { ",
-    "        $rule1 = New-Object NLog.Config.LoggingRule(\"Logger\", [NLog.LogLevel]::Info, $console)",
-    "\t    $logCfg.LoggingRules.Add($rule1)",
-    "    }",
-    "\t",
-    "\t$rule2 = New-Object NLog.Config.LoggingRule(\"Logger\", [NLog.LogLevel]::Info, $debugLog)",
-    "\t$logCfg.LoggingRules.Add($rule2)",
-    "    ",
-    "    If ($NLogLevel -eq \"Debug\") { ",
-    "\t    $rule3 = New-Object NLog.Config.LoggingRule(\"Logger\", [NLog.LogLevel]::Debug, $debugLog)",
-    "\t    $logCfg.LoggingRules.Add($rule3)",
-    "    }",
-    "\t",
-    "\t[NLog.LogManager]::Configuration = $logCfg",
-    "",
-    "\t$Log = Get-NewLogger -loggerName \"Logger\"",
-    "    ",
-    "    return $Log",
+    "   param ( [parameter(mandatory=$true)] [System.String]$instanceName) ",
+    "   $method = Get-FunctionName -StackNumber 2",
+    "   $NLogLevel = \"Info\" #Setup log level(Valid Values Info,Debug,Trace)",
+    "   $logCfg                      = Get-NewLogConfig",
+    "   ",
+    "   $debugLog                    = Get-NewLogTarget -targetType \"file\"",
+    "   $debugLog.archiveEvery       = \"Day\"",
+    "   $debugLog.ArchiveNumbering   = \"Rolling\"",
+    "   $debugLog.CreateDirs         = $true",
+    "   $debugLog.FileName           = \"F:\\Logs\\Connectors\\$($instanceName)\\$($instanceName).log\" #Setup logfile path",
+    "   $debugLog.Encoding           = [System.Text.Encoding]::GetEncoding(\"utf-8\")",
+    "   $debugLog.KeepFileOpen       = $false",
+    "   $debugLog.Layout             = Get-LogMessageLayout -layoutId 3 -method $method",
+    "   $debugLog.maxArchiveFiles    = 7",
+    "   $debugLog.archiveFileName    = \"F:\\Logs\\Connectors\\$($instanceName)\\$($instanceName).{#}.log\" #Setup logfile path",
+    "   $logCfg.AddTarget(\"file\", $debugLog)",
+    "   ",
+    "   $console                     = Get-NewLogTarget -targetType \"console\"",
+    "   $console.Layout              = Get-LogMessageLayout -layoutId 2 -method $method",
+    "   $logCfg.AddTarget(\"console\", $console)",
+    "   ",
+    "   If ($NLogLevel -eq \"Trace\") { ",
+    "       $rule1 = New-Object NLog.Config.LoggingRule(\"Logger\", [NLog.LogLevel]::Trace, $debugLog)",
+    "       $logCfg.LoggingRules.Add($rule1)",
+    "   }else",
+    "   { ",
+    "       $rule1 = New-Object NLog.Config.LoggingRule(\"Logger\", [NLog.LogLevel]::Trace, $console)",
+    "       $logCfg.LoggingRules.Add($rule1)",
+    "   }",
+    "   ",
+    "   $rule2 = New-Object NLog.Config.LoggingRule(\"Logger\", [NLog.LogLevel]::Info, $debugLog)",
+    "   $logCfg.LoggingRules.Add($rule2)",
+    "   ",
+    "   If ($NLogLevel -eq \"Debug\") { ",
+    "       $rule3 = New-Object NLog.Config.LoggingRule(\"Logger\", [NLog.LogLevel]::Debug, $debugLog)",
+    "       $logCfg.LoggingRules.Add($rule3)",
+    "   }",
+    "   ",
+    "   [NLog.LogManager]::Configuration = $logCfg",
+    "   ",
+    "   $Log = Get-NewLogger -loggerName \"Logger\"",
+    "   ",
+    "   return $Log",
     "}",
     "",
     "function global:Get-NewLogger() {",
-    "    param ( [parameter(mandatory=$true)] [System.String]$loggerName ) ",
-    "    [NLog.LogManager]::GetLogger($loggerName) ",
+    "   param ( [parameter(mandatory=$true)] [System.String]$loggerName ) ",
+    "   ",
+    "   [NLog.LogManager]::GetLogger($loggerName) ",
     "}",
     "",
-    "function global:Get-NewLogConfig() { New-Object NLog.Config.LoggingConfiguration }",
+    "function global:Get-NewLogConfig() {",
+    "   New-Object NLog.Config.LoggingConfiguration ",
+    "}",
     "",
     "function global:Get-NewLogTarget() {",
-    "\tparam ( [parameter(mandatory=$true)] [System.String]$targetType ) ",
-    "\tswitch ($targetType) {",
-    "\t\t\"console\" { New-Object NLog.Targets.ColoredConsoleTarget }",
-    "\t\t\"file\"    { New-Object NLog.Targets.FileTarget }",
-    "\t\t\"mail\"    { New-Object NLog.Targets.MailTarget }",
-    "\t}",
+    "   param ( [parameter(mandatory=$true)] [System.String]$targetType ) ",
+    "   ",
+    "   switch ($targetType) {",
+    "       \"console\" {",
+    "           New-Object NLog.Targets.ColoredConsoleTarget",
+    "       }",
+    "       \"file\" {",
+    "           New-Object NLog.Targets.FileTarget",
+    "       }",
+    "       \"mail\" {",
+    "           New-Object NLog.Targets.MailTarget",
+    "       }",
+    "   }",
     "}",
     "",
     "function global:Get-LogMessageLayout() {",
-    "\tparam ( ",
-    "        [parameter(mandatory=$true)] [System.Int32]$layoutId,",
-    "        [parameter(mandatory=$false)] [String]$method,",
-    "\t\t[parameter(mandatory=$false)] [String]$Object",
-    "    ) ",
-    "\tswitch ($layoutId) {",
-    "\t\t1 { $layout = '${longdate} | ${machinename} | ${processid} | ${processname} | ${level} | ${logger} | ${message}' }",
-    "\t\t2 { $layout = '${longdate} | ${machinename} | ${processid} | ${processname} | ${level} | ${logger} | ${message}' }",
-    "        3 { $layout = '${longdate} [${level}] (${processid}) ' + $($method) +' | '  + $($Object) +' ${message}' }",
-    "\t}",
-    "\treturn $layout",
+    "   param ( ",
+    "       [parameter(mandatory=$true)] ",
+    "       [System.Int32]$layoutId,",
+    "       [parameter(mandatory=$false)] ",
+    "       [String]$method,",
+    "       [parameter(mandatory=$false)] ",
+    "       [String]$Object",
+    "   ) ",
+    "   ",
+    "   switch ($layoutId) {",
+    "       1 {",
+    "           $layout = '${longdate} | ${machinename} | ${processid} | ${processname} | ${level} | ${logger} | ${message}'",
+    "       }",
+    "       2 {",
+    "           $layout = '${longdate} | ${machinename} | ${processid} | ${processname} | ${level} | ${logger} | ${message}'",
+    "       }",
+    "       3 {",
+    "           $layout = '${longdate} [${level}] (${processid}) ' + $($method) +' | '  + $($Object) +' ${message}'",
+    "       }",
+    "   }",
+    "   return $layout",
     "}",
   ].join("\n");
 }
+
 
 
   function cleanFn(ps?: string) {
@@ -2969,13 +2992,24 @@ function buildLoggerBlock(nlog: string) {
   }
 
   function extractPester(text?: string): string[] {
-    const src = text || "";
-    const out: string[] = [];
-    const re = /(^|\s)Describe\s+['"][\s\S]*?\{[\s\S]*?\}\s*$/gmi;
-    let m: RegExpExecArray | null;
-    while ((m = re.exec(src))) out.push(m[0].trim());
-    return out;
+  const src = text ?? "";
+  const out: string[] = [];
+
+  // Matches blocks like:
+  // <#
+  // --- Tests ---
+  // ...anything...
+  // #>
+  const re = /<#\s*(?:\r?\n)?---\s*Tests\s*---[\s\S]*?#>/gmi;
+
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(src)) !== null) {
+    out.push(m[0].trim());
   }
+
+  return out;
+}
+
 
   function buildCombinedPs(allFns: Fn[]): string {
     const fnParts = allFns.map((f) => cleanFn(f.script)).filter(Boolean);
