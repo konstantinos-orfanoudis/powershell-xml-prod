@@ -27,13 +27,13 @@ function DataflowSteps() {
       description:
         "Build connector functions and XML file from the schema; tweak params & connection/security.",
     },
-    {
-      key: "XMLValidation",
-      label: "Validate your XML",
-      href: "/powershell-XML",
-      description:
-        "Upload your XML and your PS Script to validate your XML.",
-    },
+    // {
+    //   key: "XMLValidation",
+    //   label: "Validate your XML",
+    //   href: "/powershell-XML",
+    //   description:
+    //     "Upload your XML and your PS Script to validate your XML.",
+    // },
     
   ];
 
@@ -140,7 +140,7 @@ export default function DataflowPage() {
             Generate Powershell and XML
           </a>
         </div>
-        <div className="rounded-2xl border border-slate-200 bg-white p-5">
+        {/* <div className="rounded-2xl border border-slate-200 bg-white p-5">
           <h2 className="text-lg font-semibold text-slate-900">3) Validate XML</h2>
           <p className="mt-2 text-sm text-slate-600">
             Upload your XML and your PS Script to validate your XML.
@@ -151,7 +151,7 @@ export default function DataflowPage() {
           >
             Validate your XML
           </a>
-        </div>
+        </div> */}
       </section>
     </main>
   );
