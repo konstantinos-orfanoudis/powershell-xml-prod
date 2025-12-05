@@ -499,7 +499,7 @@ export default function UploadPage() {
         <h1 className="text-lg font-semibold text-slate-900">Upload &amp; Submit</h1>
         <p className="mt-1 text-sm text-slate-600">
           You can <b>build a schema from scratch</b> below or upload files and let us parse them.
-          Supported files: <b>JSON, XML, WSDL, XSD, PDF</b>.
+          Supported files: <b>JSON, XML</b>.
         </p>
 
         <div className="mt-4 flex flex-wrap items-center gap-3">
