@@ -3841,6 +3841,15 @@ ${selected!.script || ""}`;
             className="hidden"
             onChange={handleUploadPwChange}
           />
+          <a
+  href="/"
+  className="rounded-md border border-white/20 bg-white/10 px-4 py-2 text-sm text-white
+             hover:bg-white hover:text-slate-900 hover:border-white
+             focus:outline-none focus:ring-2 focus:ring-white/40"
+>
+  Home
+</a>
+
           <button
   onClick={() => {
     window.location.href = "/.auth/logout?post_logout_redirect_uri=/";

@@ -527,6 +527,12 @@ export default function UploadPage() {
           >
             Clear
           </button>
+          <a
+  href="/"
+  className="rounded-md border border-slate-300 px-4 py-2 text-sm hover:bg-slate-50"
+>
+  Home
+</a>
           <button
             onClick={() => {
               window.location.href = "/.auth/logout?post_logout_redirect_uri=/";
