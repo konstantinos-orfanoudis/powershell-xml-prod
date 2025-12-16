@@ -60,6 +60,7 @@ type SchemaAttr = {
   IsKey?: boolean;        // from schema.json
   MultiValue?: boolean;   // from schema.json
   AutoFill?: boolean;     // <-- NEW: from schema.json
+  Mandatory?: boolean;
 };
 type SchemaEntity = { name: string; attributes?: SchemaAttr[] };
 function getKeyName(attrs: Array<{ name: string; type?: string; IsKey?: boolean }>): string {
@@ -429,6 +430,7 @@ function seedPropMetaWithRBs(schema: { entities: SchemaEntity[] }) {
       IsKey: !!a.IsKey,
       MultiValue: !!a.MultiValue,
       AutoFill: !!a.AutoFill,
+      Mandatory: !!a.Mandatory,
     }));
 
     const keyName = getKeyName(e.attributes || []);
@@ -455,7 +457,7 @@ function seedPropMetaWithRBs(schema: { entities: SchemaEntity[] }) {
         isDisplay: isKey || a.name === display,
         isMultiValue: !!a.MultiValue,
         isAutoFill: !!a.AutoFill,
-        isMandatory: !a.AutoFill,
+        isMandatory: !!a.Mandatory,
         access: "None",
         returnBinds: [{ commandResultOf: listFn, path: a.name }],
         referenceTargets: [],
@@ -1918,7 +1920,7 @@ function applyAutoFillAndKeyModSections(xmlIn: string): string {
   let xml = xmlIn || "";
   const meta = JSON.parse(localStorage.getItem("prop.meta.v1") || "{}") as Record<
     string,
-    Record<string, { isAutoFill?: boolean; isUnique?: boolean }>
+    Record<string, { isAutoFill?: boolean; isUnique?: boolean; isMandatory?: boolean }>
   >;
 
   if (!meta || typeof meta !== "object") return xml;
@@ -1939,13 +1941,16 @@ function applyAutoFillAndKeyModSections(xmlIn: string): string {
         const pMeta = entMeta[propName] || {};
 
         // 1) Remove any existing IsUniqueKey="…"
-        let attrs = attrStr.replace(/\bIsUniqueKey\s*=\s*"(?:true|false)"/gi, "").trim();
+        let attrs = attrStr.replace(/\bIsUniqueKey\s*=\s*"(?:true|false)"/gi, "").replace(/\bIsMandatory\s*=\s*"(?:true|false)"/gi, "").trim();
 
         // 2) Re-add ONLY if meta says it's unique (i.e., IsKey true)
         if (pMeta.isUnique) {
           attrs = attrs ? `${attrs} IsUniqueKey="true"` : `IsUniqueKey="true"`;
         }
 
+        if (pMeta.isMandatory) {
+          attrs = attrs ? `${attrs} IsMandatory="true"` : `IsMandatory="true"`;
+        }
         // 3) AutoFill → drop ModifiedBy block
         let body = inner;
         if (pMeta.isAutoFill) {

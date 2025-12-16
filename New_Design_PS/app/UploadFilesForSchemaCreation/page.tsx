@@ -46,6 +46,7 @@ type Attribute = {
   MultiValue: boolean;
   IsKey?: boolean;
   AutoFill?: boolean; // NEW
+  Mandatory?: boolean;
 };
 type Entity = { __id?: string; name: string; attributes: Attribute[] };
 type Schema = { name: string; version: string; entities: Entity[] };
@@ -93,6 +94,7 @@ function withStableIds(s: Schema): Schema {
           MultiValue: !!a.MultiValue,
           IsKey: !!val,
           AutoFill: !!(a as any).AutoFill, // NEW
+          Mandatory: !!(a as any).Mandatory, // NEW (supports legacy "mandatory")
         };
       }),
     })),
@@ -363,6 +365,7 @@ export default function UploadPage() {
       MultiValue: false,
       IsKey: false,
       AutoFill: false, // NEW
+      Mandatory: false, // NEW
     });
     setSchema(withStableIds(s));
   }
@@ -384,7 +387,7 @@ export default function UploadPage() {
       name,
       attributes: [
         // default attribute is NOT a key anymore
-        { __id: newId(), name: "id", type: "String", MultiValue: false, IsKey: false, AutoFill: false }, // NEW
+        { __id: newId(), name: "id", type: "String", MultiValue: false, IsKey: false, AutoFill: false, Mandatory: false }, // NEW
       ],
     });
     setSchema(withStableIds(s));
@@ -435,6 +438,15 @@ export default function UploadPage() {
     s.entities[ei].attributes[ai].MultiValue = mv;
     setSchema(withStableIds(s));
   }
+
+  function updateAttrMandatory(ei: number, ai: number, val: boolean) {
+  const current = schema ?? { name: "Connector", version: "1.0.0", entities: [] };
+  if (!current.entities[ei]?.attributes[ai]) return;
+  const s = structuredClone(current);
+  s.entities[ei].attributes[ai].Mandatory = val;
+  setSchema(withStableIds(s));
+}
+
   function toggleKey(ei: number, ai: number, makeKey: boolean) {
     const current = schema ?? { name: "Connector", version: "1.0.0", entities: [] };
     if (!current.entities[ei]?.attributes[ai]) return;
@@ -680,63 +692,71 @@ export default function UploadPage() {
                   No entities yet. Click <b>+ Add entity</b> to get started.
                 </div>
               ) : (
-                <div className="space-y-2">
+                <div className="space-y-4">
                   {currentEntity!.attributes.map((a, ai) => (
-                    <div key={a.__id || ai} className="grid grid-cols-12 gap-2 items-center">
-                      {/* Name */}
-                      <input
-                        className="col-span-3 rounded-md border border-slate-300 px-3 py-1.5 text-sm"
-                        value={a.name}
-                        onChange={(e) => updateAttrName(selectedEntity, ai, e.target.value)}
-                      />
-                      {/* Type */}
-                      <select
-                        className="col-span-2 rounded-md border border-slate-300 px-2 py-1.5 text-sm"
-                        value={a.type}
-                        onChange={(e) => updateAttrType(selectedEntity, ai, e.target.value as AttrType)}
-                      >
-                        {TYPE_OPTIONS.map((t) => (
-                          <option key={t} value={t}>
-                            {t}
-                          </option>
-                        ))}
-                      </select>
-                      {/* MultiValue */}
-                      <label className="col-span-2 inline-flex items-center gap-2 text-sm">
-                        <input
-                          type="checkbox"
-                          checked={!!a.MultiValue}
-                          onChange={(e) => updateAttrMV(selectedEntity, ai, e.target.checked)}
-                        />
-                        <span>MultiValue</span>
-                      </label>
-                      <label className="col-span-2 inline-flex items-center gap-2 text-sm">
-    <input
-      type="checkbox"
-      checked={!!a.AutoFill}
-      onChange={(e) => updateAttrAutoFill(selectedEntity, ai, e.target.checked)}
-    />
-    <span>AutoFill</span>
-  </label>
-                      {/* Key (single per entity) */}
-                      <label className="col-span-1 inline-flex items-center gap-1 text-sm">
-                        <input
-                          type="checkbox"
-                          checked={!!a.IsKey}
-                          onChange={(e) => toggleKey(selectedEntity, ai, e.target.checked)}
-                        />
-                        <span>Key</span>
-                      </label>
-                      
-                      {/* Remove */}
-                      <button
-                        className="col-span-1 text-xs text-rose-700 hover:text-rose-900"
-                        onClick={() => removeAttribute(selectedEntity, ai)}
-                        title="Remove attribute"
-                      >
-                        ✕
-                      </button>
-                    </div>
+                    <div key={a.__id || ai} className="grid grid-cols-12 gap-3 items-center">
+  {/* Name */}
+  <textarea
+    rows={1}
+    wrap="off"
+    className="col-span-5 min-w-0 w-full h-10 resize-none rounded-md border border-slate-300
+               px-3 py-2 text-sm whitespace-nowrap overflow-x-auto"
+    value={a.name}
+    title={a.name} // hover shows full name too
+    onChange={(e) => updateAttrName(selectedEntity, ai, e.target.value)}
+    onInput={(e) => {
+      // optional: keep end visible while typing
+      const el = e.currentTarget;
+      el.scrollLeft = el.scrollWidth;
+    }}
+  />
+
+  {/* Type */}
+  <select
+    className="col-span-2 min-w-0 w-full h-10 rounded-md border border-slate-300 px-2 text-sm"
+    value={a.type}
+    onChange={(e) => updateAttrType(selectedEntity, ai, e.target.value as AttrType)}
+  >
+    {TYPE_OPTIONS.map((t) => (
+      <option key={t} value={t}>{t}</option>
+    ))}
+  </select>
+
+  {/* Toggles (2x2) */}
+  <div className="col-span-4 grid grid-cols-2 gap-x-10 gap-y-2">
+    <label className="flex items-center gap-2 text-xs whitespace-nowrap">
+      <input type="checkbox" checked={!!a.Mandatory} onChange={(e) => updateAttrMandatory(selectedEntity, ai, e.target.checked)} />
+      <span>Mandatory</span>
+    </label>
+
+    <label className="flex items-center gap-2 text-xs whitespace-nowrap">
+      <input type="checkbox" checked={!!a.MultiValue} onChange={(e) => updateAttrMV(selectedEntity, ai, e.target.checked)} />
+      <span>MultiValue</span>
+    </label>
+
+    <label className="flex items-center gap-2 text-xs whitespace-nowrap">
+      <input type="checkbox" checked={!!a.AutoFill} onChange={(e) => updateAttrAutoFill(selectedEntity, ai, e.target.checked)} />
+      <span>AutoFill</span>
+    </label>
+
+    <label className="flex items-center gap-2 text-xs whitespace-nowrap">
+      <input type="checkbox" checked={!!a.IsKey} onChange={(e) => toggleKey(selectedEntity, ai, e.target.checked)} />
+      <span>Key</span>
+    </label>
+  </div>
+
+  {/* Remove */}
+  <button
+    className="col-span-1 justify-self-end self-center text-xs text-rose-700 hover:text-rose-900"
+    onClick={() => removeAttribute(selectedEntity, ai)}
+    title="Remove attribute"
+  >
+    ✕
+  </button>
+</div>
+
+
+
                   ))}
                 </div>
               )}
