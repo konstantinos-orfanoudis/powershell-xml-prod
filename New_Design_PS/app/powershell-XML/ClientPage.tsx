@@ -903,9 +903,7 @@ function ensureReadConfigurationForSingleEntity(
 
   const connParams = getConnParamsForFunction(functions, listFn);
   const setLines = connParams.map(p =>
-    `    <SetParameter Value="${p.name}" Source="ConnectionParameter" Param="${p.name}"${
-      p.secure ? ' ConversionMode="SecureString"' : ""
-    }/>`
+    `    <SetParameter Value="${p.name}" Source="ConnectionParameter" Param="${p.name}"/>`
   ).join("\n");
 
   const listingXml =
@@ -973,9 +971,7 @@ function ensureReadConfigurationPerEntityForAllClasses(
       const connParams = getConnParamsForFunction(functions, listFn);
       const setLines = connParams
         .map(p =>
-          `    <SetParameter Value="${p.name}" Source="ConnectionParameter" Param="${p.name}"${
-            p.secure ? ' ConversionMode="SecureString"' : ""
-          }/>`
+          `    <SetParameter Value="${p.name}" Source="ConnectionParameter" Param="${p.name}"/>`
         )
         .join("\n");
 
@@ -1068,9 +1064,7 @@ function ensureReadConfigurationFromFns(
   const listFn = pickListFnFromFunctions(functions);
   const connParams = getConnParamsForFunction(functions, listFn); // ← only this fn’s connection params
   const setParamLines = connParams.map(p =>
-    `    <SetParameter Value="${p.name}" Source="ConnectionParameter" Param="${p.name}"${
-      p.secure ? ' ConversionMode="SecureString"' : ""
-    }/>`
+    `    <SetParameter Value="${p.name}" Source="ConnectionParameter" Param="${p.name}"/>`
   );
   const setBlock = setParamLines.length ? setParamLines.join("\n") + "\n" : "";
 
@@ -1209,9 +1203,7 @@ ${setBlock}    </Item>
   const connParams = getConnParamsFallback();
   const setParamLines = connParams
     .map(({ name, secure }) =>
-      `    <SetParameter Value="${name}" Source="ConnectionParameter" Param="${name}"${
-        secure ? ' ConversionMode="SecureString"' : ""
-      }/>`
+      `    <SetParameter Value="${name}" Source="ConnectionParameter" Param="${name}"/>`
     )
     .join("\n");
 
@@ -1342,9 +1334,7 @@ function normalizeReadConfiguration(xmlIn: string): string {
   const name = String(g?.name || "").trim();
   if (!name) return "";
   const secure = !!g?.secure || !!g?.sensitive || /password|token|secret/i.test(name);
-  return `    <SetParameter Value="${name}" Source="ConnectionParameter" Param="${name}"${
-    secure ? ' ConversionMode="SecureString"' : ""
-  }/>`;
+  return `    <SetParameter Value="${name}" Source="ConnectionParameter" Param="${name}"/>`;
 }
 
  function insertSetParamsIntoCommands(xmlIn: string): string {
@@ -1354,9 +1344,7 @@ function normalizeReadConfiguration(xmlIn: string): string {
   if (!connParams.length) return xml;
 
   const spLine = ({ name, secure }: { name: string; secure?: boolean }) =>
-    `    <SetParameter Value="${name}" Source="ConnectionParameter" Param="${name}"${
-      secure ? ' ConversionMode="SecureString"' : ""
-    }/>`;
+    `    <SetParameter Value="${name}" Source="ConnectionParameter" Param="${name}"/>`;
 
   // ListingCommand: add any missing
   xml = xml.replace(
@@ -1582,7 +1570,7 @@ function _setParamLine(g: { name?: string; type?: string; secure?: boolean; sens
   if (!name) return "";
   const secure = !!g?.secure || !!g?.sensitive || /password|token|secret/i.test(name);
   const conv = secure ? ' ConversionMode="SecureString"' : "";
-  return `          <SetParameter Value="${name}" Source="ConnectionParameter" Param="${name}"${conv}/>`;
+  return `          <SetParameter Value="${name}" Source="ConnectionParameter" Param="${name}"/>`;
 }
 
 function _buildSetParamsBlock(): string {
@@ -1747,7 +1735,7 @@ function _buildCanonicalRC(className: string, harvested: string[]): string {
       if (!nm) return "";
       const secure = !!g?.secure || !!g?.sensitive || /password|token|secret/i.test(nm);
       const conv = secure ? ` ConversionMode="SecureString"` : "";
-      return `        <SetParameter Value="${nm}" Source="ConnectionParameter" Param="${nm}"${conv}/>`;
+      return `        <SetParameter Value="${nm}" Source="ConnectionParameter" Param="${nm}"/>`;
     };
 
     setLines = globals.map(buildLine).filter(Boolean);
