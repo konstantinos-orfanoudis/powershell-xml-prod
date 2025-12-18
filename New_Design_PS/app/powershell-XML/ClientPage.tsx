@@ -714,9 +714,7 @@ function _setParamsForFn(
 ): string {
   const connParams = getConnParamsForFunction(functions, fnName); // you already have this helper
   return connParams.map(p =>
-    `        <SetParameter Value="${p.name}" Source="ConnectionParameter" Param="${p.name}"${
-      p.secure ? ' ConversionMode="SecureString"' : ""
-    }/>`
+    `        <SetParameter Value="${p.name}" Source="ConnectionParameter" Param="${p.name}"/>`
   ).join("\n");
 }
 /**
