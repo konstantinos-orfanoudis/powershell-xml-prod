@@ -21,7 +21,7 @@ export async function GET(req: NextRequest) {
   if (HDR_NAME && HDR_VALUE) headers[HDR_NAME] = HDR_VALUE;
 
   // Backoff schedule (ms). Adjust as you like.
-  const tries = [70000, 40000, 15000];
+  const tries = [35000, 40000, 15000];
 
   for (let i = 0; i < tries.length; i++) {
     // Sleep before each try (including first)
