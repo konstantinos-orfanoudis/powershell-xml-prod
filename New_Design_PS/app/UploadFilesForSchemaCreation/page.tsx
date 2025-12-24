@@ -5,16 +5,28 @@ import { buildSchemaFromSoap } from "@/lib/soap/buildSchemaFromSoap";
 import { detectUploadKind } from "@/lib/detectUpload";
 import { scimToSchema } from "@/lib/scim/scimToConnectorSchema";
 import { detectFormat } from "@/lib/detect/detectFormat";
+import { openApiToConnectorSchemaFromText } from "@/lib/openapitoconnectorschema/openapiToConnectorSchema";
 
 /* ---------------- Upload types ---------------- */
-type Status = "pending" | "uploading" | "done" | "error" | "processing";
+
+
+
+type FileRole = "auto" | "spec" | "sample" | "other";
+type SpecKind = "auto" | "openapi" | "scim" | "soap";
+
 type Item = {
   id: string;
   file: File;
   status: Status;
   statusCode?: number;
   message?: string;
+  specKind?: SpecKind;
+  role: FileRole;          // NEW
+  roleHint?: string;       // NEW (for UX)
+  roleError?: string;      // NEW (for UX validation)
 };
+type Status = "pending" | "uploading" | "done" | "error" | "processing";
+
 
 function isPdfFile(f: File) {
   return f.type === "application/pdf" || /\.pdf$/i.test(f.name);
@@ -167,7 +179,38 @@ export default function UploadPage() {
     setSchemaText(JSON.stringify(normalized, replacer, 2));
     if (selectedEntity >= normalized.entities.length) setSelectedEntity(0);
   }
+  function isXmlLike(file: File): boolean {
+  const name = file.name.toLowerCase();
+  const ext = name.split(".").pop() ?? "";
+  const type = (file.type || "").toLowerCase();
+  return ext === "xml" || ext === "wsdl" || ext === "xsd" || type.includes("xml");
+}
 
+function validateSpecFile(file: File, specKind: SpecKind): string | null {
+  if (specKind === "openapi" || specKind === "scim") {
+    return isJsonOrYaml(file) ? null : "OpenAPI/SCIM specs must be JSON or YAML (.json/.yaml/.yml).";
+  }
+  if (specKind === "soap") {
+    return isXmlLike(file) ? null : "SOAP specs must be XML/WSDL/XSD (.xml/.wsdl/.xsd).";
+  }
+  // auto: allow for now; you’ll validate once you infer the kind
+  return null;
+}
+
+function isJsonOrYaml(file: File): boolean {
+  const name = file.name.toLowerCase();
+  const ext = name.split(".").pop() ?? "";
+  const type = (file.type || "").toLowerCase();
+
+  const byExt = ext === "json" || ext === "yaml" || ext === "yml";
+  const byMime =
+    type === "application/json" ||
+    type === "text/yaml" ||
+    type === "application/yaml" ||
+    type === "text/x-yaml";
+
+  return byExt || byMime;
+}
   /* ---------- file picking ---------- */
   function onPick(e: React.ChangeEvent<HTMLInputElement>) {
     const list = e.target.files;
@@ -176,6 +219,8 @@ export default function UploadPage() {
       id: `${f.name}-${f.size}-${f.lastModified}-${crypto.randomUUID()}`,
       file: f,
       status: "pending",
+      role: "auto",
+      specKind: "auto",
     }));
     setItems((prev) => {
       const map = new Map(prev.map((p) => [`${p.file.name}-${p.file.size}`, p]));
@@ -252,75 +297,224 @@ export default function UploadPage() {
   }
 
   /* ---------- submit ---------- */
-  async function submitAll() {
-    if (!items.length) return;
-    setSubmitting(true);
+ async function submitAll() {
+  if (!items.length) return;
+  setSubmitting(true);
 
-    const kind = await detectUploadKind(items.map((i) => i.file));
-    if (kind === "scim") {
-      const files = items.map((i) => i.file);
-      const { schemas, resourceTypes } = await readScimDocs(files);
-      if (schemas.length || resourceTypes.length) {
-        const schemaObj = scimToSchema(resourceTypes, schemas, {
-          schemaName: "Connector",
-          version: "1.0.0",
-          preferUserNameAsKey: true, // optional
-        });
-        applySchema(schemaObj);
-        setItems((prev) => prev.map((i) => ({ ...i, status: "done", message: "SCIM parsed" })));
-        setSubmitting(false);
+  try {
+    const specItems = items.filter((i) => i.role === "spec");
+    const nonSpecItems = items.filter((i) => i.role !== "spec");
+
+    // Decide what we are parsing
+    let kind: "openapi" | "scim" | "soap" | "unknown" = "unknown";
+    let parseItems: Item[] = [];
+
+    if (specItems.length > 0) {
+      // If user picked an explicit specKind, enforce only one
+      const explicitKinds = Array.from(
+        new Set(
+          specItems
+            .map((s) => s.specKind)
+            .filter((k): k is "openapi" | "scim" | "soap" => !!k && k !== "auto")
+        )
+      );
+
+      if (explicitKinds.length > 1) {
+        setItems((prev) =>
+          prev.map((i) => ({
+            ...i,
+            status: "error",
+            message: "Choose only ONE spec type per submission (OpenAPI OR SCIM OR SOAP).",
+          }))
+        );
         return;
       }
-    } else if (kind === "soap") {
-      const texts = await Promise.all(Array.from(items).map((i) => i.file.text()));
-      const schemaObj = buildSchemaFromSoap(texts, { scope: "union" });
-      applySchema(schemaObj);
-      setItems((prev) => prev.map((i) => ({ ...i, status: "done", message: "Completed" })));
-      setSubmitting(false);
-      return;
+
+      if (explicitKinds.length === 1) {
+        kind = explicitKinds[0];
+      } else {
+        // Auto-detect kind from spec files only
+        const detected = await detectUploadKind(specItems.map((s) => s.file));
+        kind = detected as any;
+      }
+
+      parseItems = specItems;
     } else {
-      const request_id = id30Base62();
+      // No spec tagged -> keep your old behavior (auto-detect on everything)
+      const detected = await detectUploadKind(items.map((i) => i.file));
+      kind = detected as any;
+      parseItems = items;
+    }
 
-      try {
-        await Promise.all(
-          items.map(async (it) => {
-            setStatus(it.id, "uploading");
-            const form = new FormData();
-            form.append("file", it.file);
-            form.append("request_id", request_id);
-            form.append("filename", it.file.name);
-            form.append("fileType", it.file.type || "application/octet-stream");
-            form.append("size", String(it.file.size));
-            try {
-              const res = await fetch("/api/ai/submitFile", { method: "POST", body: form });
-              if (!res.ok) {
-                setStatus(it.id, "error", `${res.status} ${res.statusText}`);
-                return;
-              }
-              await res.json().catch(() => ({} as any));
-              setStatus(it.id, "processing", "Queued");
-            } catch {
-              setStatus(it.id, "error", "Network error");
-            }
-          })
+    // Enforce: OpenAPI/SCIM specs must be JSON/YAML
+    if (kind === "openapi" || kind === "scim") {
+      const bad = parseItems.find((it) => !isJsonOrYaml(it.file));
+      if (bad) {
+        setItems((prev) =>
+          prev.map((i) =>
+            i.id === bad.id
+              ? {
+                  ...i,
+                  status: "error",
+                  message: "Spec files for OpenAPI/SCIM must be JSON or YAML (.json/.yaml/.yml).",
+                }
+              : i
+          )
         );
-        const out = await pollResultWithDelays(request_id);
-        if (out.ok) {
-          const text = typeof out.result === "string" ? out.result : JSON.stringify(out.result, null, 2);
-          const docs = JSON.parse(text);
-
-          const merged = withStableIds(mergeSchemas(docs));
-          applySchema(merged);
-          setItems((prev) => prev.map((i) => ({ ...i, status: "done", message: "Completed" })));
-        } else {
-          setSchemaText(out.error);
-          setItems((prev) => prev.map((i) => ({ ...i, status: "error", message: out.error })));
-        }
-      } finally {
-        setSubmitting(false);
+        return;
       }
     }
+
+    // -------------------------
+    // Parse: OpenAPI
+    // -------------------------
+    if (kind === "openapi") {
+      // Prefer the first JSON/YAML file
+      const openapiItem =
+        parseItems.find((i) => isJsonOrYaml(i.file)) ?? parseItems[0];
+
+      if (!openapiItem) {
+        setItems((prev) => prev.map((i) => ({ ...i, status: "error", message: "No OpenAPI spec file found." })));
+        return;
+      }
+
+      setStatus(openapiItem.id, "processing", "Parsing OpenAPI…");
+
+      const specText = await openapiItem.file.text();
+
+      // >>> Your converter call (adjust name/options if needed)
+      const schemaObj = await openApiToConnectorSchemaFromText(specText, {
+        schemaName: "Connector",
+        version: "1.0.0",
+        keyCandidates: ["id"],
+        flatten: true,
+      });
+
+      applySchema(schemaObj);
+
+      setItems((prev) =>
+        prev.map((i) => {
+          if (i.id === openapiItem.id) return { ...i, status: "done", message: "OpenAPI parsed" };
+          // mark other spec files as done/not used
+          if (specItems.length > 0 && i.role === "spec") return { ...i, status: "done", message: i.message ?? "Not used for parsing" };
+          return i;
+        })
+      );
+
+      return;
+    }
+
+    // -------------------------
+    // Parse: SCIM
+    // -------------------------
+    if (kind === "scim") {
+      const files = parseItems.map((i) => i.file);
+      const { schemas, resourceTypes } = await readScimDocs(files);
+
+      if (!schemas.length && !resourceTypes.length) {
+        setItems((prev) => prev.map((i) => ({ ...i, status: "error", message: "No SCIM schemas/resourceTypes found." })));
+        return;
+      }
+
+      const schemaObj = scimToSchema(resourceTypes, schemas, {
+        schemaName: "Connector",
+        version: "1.0.0",
+        preferUserNameAsKey: true,
+      });
+
+      applySchema(schemaObj);
+
+      setItems((prev) =>
+        prev.map((i) => {
+          if (specItems.length > 0 && i.role !== "spec") return i; // don't touch non-spec items
+          return { ...i, status: "done", message: "SCIM parsed" };
+        })
+      );
+
+      return;
+    }
+
+    // -------------------------
+    // Parse: SOAP
+    // -------------------------
+    if (kind === "soap") {
+      const texts = await Promise.all(parseItems.map((i) => i.file.text()));
+      const schemaObj = buildSchemaFromSoap(texts, { scope: "union" });
+      applySchema(schemaObj);
+
+      setItems((prev) =>
+        prev.map((i) => {
+          if (specItems.length > 0 && i.role !== "spec") return i;
+          return { ...i, status: "done", message: "SOAP parsed" };
+        })
+      );
+
+      return;
+    }
+
+    // -------------------------
+    // Fallback: AI pipeline
+    // If spec items exist, don't send them to AI—only send non-spec.
+    // -------------------------
+    const aiItems = specItems.length > 0 ? nonSpecItems : items;
+
+    if (!aiItems.length) {
+      setItems((prev) => prev.map((i) => ({ ...i, status: "error", message: "No files available for AI (only spec files uploaded)." })));
+      return;
+    }
+
+    const request_id = id30Base62();
+
+    await Promise.all(
+      aiItems.map(async (it) => {
+        setStatus(it.id, "uploading");
+
+        const form = new FormData();
+        form.append("file", it.file);
+        form.append("request_id", request_id);
+        form.append("filename", it.file.name);
+        form.append("fileType", it.file.type || "application/octet-stream");
+        form.append("size", String(it.file.size));
+
+        try {
+          const res = await fetch("/api/ai/submitFile", { method: "POST", body: form });
+          if (!res.ok) {
+            setStatus(it.id, "error", `${res.status} ${res.statusText}`);
+            return;
+          }
+          await res.json().catch(() => ({} as any));
+          setStatus(it.id, "processing", "Queued");
+        } catch {
+          setStatus(it.id, "error", "Network error");
+        }
+      })
+    );
+
+    const out = await pollResultWithDelays(request_id);
+    if (out.ok) {
+      const text = typeof out.result === "string" ? out.result : JSON.stringify(out.result, null, 2);
+      const docs = JSON.parse(text);
+
+      const merged = withStableIds(mergeSchemas(docs));
+      applySchema(merged);
+
+      setItems((prev) =>
+        prev.map((i) => {
+          // spec files remain untouched if present
+          if (specItems.length > 0 && i.role === "spec") return { ...i, status: "done", message: i.message ?? "Spec not sent to AI" };
+          return { ...i, status: "done", message: "Completed" };
+        })
+      );
+    } else {
+      setSchemaText(out.error);
+      setItems((prev) => prev.map((i) => ({ ...i, status: "error", message: out.error })));
+    }
+  } finally {
+    setSubmitting(false);
   }
+}
+
+
 
   function downloadSchemaFile(text: string, filename = "schema.json") {
     const blob = new Blob([text ?? ""], { type: "application/json;charset=utf-8" });
@@ -570,6 +764,9 @@ export default function UploadPage() {
                     {it.message && (
                       <div className="mt-1 text-[11px] text-slate-600 truncate max-w-[520px]">{it.message}</div>
                     )}
+                    {it.roleHint && <div className="mt-1 text-[11px] text-slate-500">{it.roleHint}</div>}
+                    {it.roleError && <div className="mt-1 text-[11px] text-rose-700">{it.roleError}</div>}
+
                   </div>
                   <div className="flex items-center gap-3">
                     <span
@@ -588,6 +785,76 @@ export default function UploadPage() {
                     >
                       {it.status}
                     </span>
+                    {/* Role selector */}
+<select
+  className="rounded-md border border-slate-300 px-2 py-1 text-xs"
+  value={it.role}
+  disabled={submitting}
+  onChange={(e) => {
+    const role = e.target.value as FileRole;
+
+    setItems((prev) =>
+      prev.map((x) => {
+        if (x.id !== it.id) return x;
+
+        // If switching to spec, keep/specify specKind
+        if (role === "spec") {
+          const specKind = x.specKind ?? "auto";
+          // If specKind already known and invalid, block the switch
+          const err = specKind !== "auto" ? validateSpecFile(x.file, specKind) : null;
+          if (err) {
+            return { ...x, roleError: err, roleHint: "Change spec type or upload JSON/YAML." };
+          }
+          return { ...x, role, specKind, roleError: undefined };
+        }
+
+        // Leaving spec clears specKind + errors
+        return { ...x, role, specKind: undefined, roleError: undefined };
+      })
+    );
+  }}
+>
+  <option value="auto">Auto</option>
+  <option value="spec">Spec</option>
+  <option value="sample">Sample</option>
+  <option value="other">Other</option>
+</select>
+
+{/* Spec kind selector (only when role=spec) */}
+{it.role === "spec" && (
+  <select
+    className="rounded-md border border-slate-300 px-2 py-1 text-xs"
+    value={it.specKind ?? "auto"}
+    disabled={submitting}
+    onChange={(e) => {
+      const specKind = e.target.value as SpecKind;
+
+      setItems((prev) =>
+        prev.map((x) => {
+          if (x.id !== it.id) return x;
+          const err = specKind !== "auto" ? validateSpecFile(x.file, specKind) : null;
+          return {
+            ...x,
+            specKind,
+            roleError: err ?? undefined,
+            roleHint:
+              specKind === "openapi" || specKind === "scim"
+                ? "Spec must be JSON/YAML."
+                : specKind === "soap"
+                ? "Spec must be XML/WSDL/XSD."
+                : undefined,
+          };
+        })
+      );
+    }}
+  >
+    <option value="auto">Auto-detect</option>
+    <option value="openapi">OpenAPI / Swagger</option>
+    <option value="scim">SCIM</option>
+    <option value="soap">SOAP</option>
+  </select>
+)}
+
                     <button
                       disabled={submitting || it.status === "uploading"}
                       onClick={() => removeOne(it.id)}
@@ -785,6 +1052,11 @@ export default function UploadPage() {
               Download schema.json
             </button>
           </div>
+          {parseError && (
+            <div className="px-4 py-2 text-xs text-rose-700 border-t border-rose-200 bg-rose-50">
+              JSON parse error: {parseError}
+            </div>
+          )}
           <textarea
             className="w-full h=[520px] h-[520px] font-mono text-xs leading-5 p-3 outline-none"
             value={schemaText}
@@ -792,11 +1064,7 @@ export default function UploadPage() {
             spellCheck={false}
             placeholder="Start building on the left, or paste/edit JSON here…"
           />
-          {parseError && (
-            <div className="px-4 py-2 text-xs text-rose-700 border-t border-rose-200 bg-rose-50">
-              JSON parse error: {parseError}
-            </div>
-          )}
+          
         </div>
       </div>
 
@@ -825,6 +1093,11 @@ export default function UploadPage() {
                 </button>
               </div>
             </div>
+            {parseError && (
+  <div className="px-4 py-2 text-xs text-rose-700 border-b border-rose-200 bg-rose-50">
+    JSON parse error: {parseError}
+  </div>
+)}
             <textarea
               className="w-full h-[calc(86vh-56px)] font-mono text-sm leading-6 p-3 outline-none"
               value={schemaText}
