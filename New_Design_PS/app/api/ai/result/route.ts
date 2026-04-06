@@ -1,73 +1,59 @@
 // app/api/ai/result/route.ts
-import { NextRequest, NextResponse } from "next/server";
+// Native replacement for the n8n "Powershell intragen" poll branch.
+// Mirrors: Webhook → Read id → init → If → Get row(s) → Switch → Respond 200/202
+// The receive/route.ts populates the resultbus after AI processing completes.
 
-const N8N_RESULT_URL = process.env.N8N_RESULT_URL;
-const HDR_NAME = process.env.N8N_AUTH_HEADER_NAME || "";
-const HDR_VALUE = process.env.N8N_AUTH_HEADER_VALUE || "";
+import { NextRequest, NextResponse } from "next/server";
+import { waitForResult } from "../../../../lib/resultbus";
+
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 function bad(msg: string, status = 400) {
   return NextResponse.json({ error: msg }, { status });
 }
-export const runtime = "nodejs";
-// Optional: make sure Next doesn’t cache this route
-export const dynamic = "force-dynamic";
 
 export async function GET(req: NextRequest) {
   const id = req.nextUrl.searchParams.get("id");
   if (!id) return bad("missing id", 400);
-  if (!N8N_RESULT_URL) return bad("server missing N8N_RESULT_URL", 500);
 
-  const headers: Record<string, string> = {};
-  if (HDR_NAME && HDR_VALUE) headers[HDR_NAME] = HDR_VALUE;
+  try {
+    // Wait up to 5 min — the assistant + parallel tests/description pipeline can take 60-180 s
+    const payload = await waitForResult(id, 300_000);
 
-  // Backoff schedule (ms). Adjust as you like.
-  const tries = [35000, 40000, 15000];
-
-  for (let i = 0; i < tries.length; i++) {
-    // Sleep before each try (including first)
-    const wait = tries[i];
-    if (wait > 0) await new Promise((r) => setTimeout(r, wait));
-
-    let res: Response;
-    try {
-      const url = new URL(N8N_RESULT_URL);
-      url.searchParams.set("id", id);
-      res = await fetch(url.toString(), { method: "GET", headers });
-    } catch (e: any) {
-      if (i === tries.length - 1) {
-        return bad(`n8n result failed: ${e?.message ?? String(e)}`, 502);
-      }
-      continue;
+    if (!payload.ok) {
+      console.error("[result] processing failed:", payload.error);
+      return NextResponse.json({ error: payload.error }, { status: 500 });
     }
 
-    const ct = res.headers.get("content-type") || "";
-    let body: any = null;
-    try {
-      body = ct.includes("application/json") ? await res.json() : await res.text();
-    } catch {
-      // ignore parse error; body stays null
-    }
+    // Mirror n8n "Prepare response" shape + "Respond 200" combined text
+    const result      = String(payload.result      ?? "");
+    const tests       = String(payload.tests       ?? "");
+    const description = String(payload.description ?? "");
+    const filename    = String(payload.filename     ?? "powershell-prototypes.ps1");
+    const testsFilename = String(payload.testsFilename ?? filename.replace(/\.ps1$/i, ".tests.ps1"));
 
-    // 404 → not ready yet, keep retrying (unless last try)
-    if (res.status === 404 && i < tries.length - 1) {
-      continue;
-    }
+    // Combined plain-text body (mirrors n8n Respond 200 content)
+    const combined =
+      result +
+      "\n\n<#\n--- Tests ---\n" + tests + "\n#>" +
+      "\n\n<# --- Description ---\n" + description + "\n#>";
 
-    // Forward whatever we got from n8n
-    if (!res.ok) {
-      const msg =
-        typeof body === "string"
-          ? body
-          : body?.error || `n8n result returned ${res.status}`;
-      return bad(msg, res.status);
+    // Return JSON — same shape the existing client expects from the old proxy
+    return NextResponse.json({
+      ok: true,
+      status: "done",
+      result: combined,   // backward-compat: full text in one field
+      filename,
+      testsFilename,
+      tests,
+      description,
+    });
+  } catch (e: any) {
+    if (e?.message === "timeout") {
+      // Mirror n8n Respond 202 pending
+      return NextResponse.json({ ok: true, status: "pending" }, { status: 202 });
     }
-
-    // Expect final JSON with { result, tests, ... }, but be tolerant
-    return NextResponse.json(
-      typeof body === "object" ? body : { ok: true, result: String(body ?? "") }
-    );
+    return bad(e?.message || "result fetch failed", 502);
   }
-
-  // Should not reach here normally
-  return bad("result not ready", 504);
 }
