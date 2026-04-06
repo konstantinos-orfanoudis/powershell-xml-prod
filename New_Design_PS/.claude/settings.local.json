@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node scripts/upload-ps1-to-vectorstore.mjs \"C:\\\\Users\\\\aiuser\\\\Desktop\\\\Powershell-connectors\")",
+      "Bash(node -e ':*)",
+      "Bash(node scripts/_patch-assistant.mjs)",
+      "Bash(node -e \"const p = require\\('./node_modules/openai/package.json'\\); console.log\\(p.version\\)\")",
+      "Bash(node -e \"const OpenAI = require\\('./node_modules/openai'\\).default; const o = new OpenAI\\({apiKey:'test'}\\); console.log\\('responses' in o, typeof o.responses\\)\")",
+      "Bash(npx tsc:*)"
+    ]
+  }
+}
