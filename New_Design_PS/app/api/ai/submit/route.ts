@@ -3,7 +3,7 @@
 // Accepts plain text + x-filename header (existing UI contract) or JSON.
 
 import { NextRequest, NextResponse } from 'next/server';
-import { generateId, processSubmission } from '../receive/route';
+import { generateId, processSubmission } from '../../../../lib/ai-processor';
 
 export const runtime = "nodejs";
 
