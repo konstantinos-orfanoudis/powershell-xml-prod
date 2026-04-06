@@ -1,8 +1,20 @@
 // lib/resultBus.ts
 type Payload = any;
 
-const cache = new Map<string, { ts: number; payload: Payload }>();
-const waiters = new Map<string, Array<(p: Payload) => void>>();
+// Anchored to globalThis so all route module instances share the same Map.
+// In Next.js dev mode each route is compiled separately, which would otherwise
+// give each a different Map instance and break the put/wait handshake.
+declare global {
+  // eslint-disable-next-line no-var
+  var __resultbus_cache: Map<string, { ts: number; payload: Payload }> | undefined;
+  // eslint-disable-next-line no-var
+  var __resultbus_waiters: Map<string, Array<(p: Payload) => void>> | undefined;
+}
+
+const cache: Map<string, { ts: number; payload: Payload }> =
+  (globalThis.__resultbus_cache ??= new Map());
+const waiters: Map<string, Array<(p: Payload) => void>> =
+  (globalThis.__resultbus_waiters ??= new Map());
 
 const TTL_MS = 15 * 60 * 1000; // keep results for 15 min
 

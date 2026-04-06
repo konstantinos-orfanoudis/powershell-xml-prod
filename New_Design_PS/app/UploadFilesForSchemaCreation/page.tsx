@@ -175,7 +175,7 @@ export default function UploadPage() {
     if (!obj || typeof obj !== "object") return;
     const normalized = withStableIds(obj as Schema);
     setSchema(normalized);
-    const replacer = (k: string, v: any) => (k.startsWith("__") ? undefined : v);
+    const replacer = (k: string, v: any) => (k.startsWith("__") || k === "MultiValue" ? undefined : v);
     setSchemaText(JSON.stringify(normalized, replacer, 2));
     if (selectedEntity >= normalized.entities.length) setSelectedEntity(0);
   }
@@ -668,7 +668,7 @@ function isJsonOrYaml(file: File): boolean {
   /* ---------- ONE-WAY SYNC: schema -> schemaText ---------- */
   useEffect(() => {
     if (!schema) return;
-    const replacer = (k: string, v: any) => (k.startsWith("__") ? undefined : v);
+    const replacer = (k: string, v: any) => (k.startsWith("__") || k === "MultiValue" ? undefined : v);
     setSchemaText(JSON.stringify(schema, replacer, 2));
   }, [schema]);
 
@@ -994,11 +994,6 @@ function isJsonOrYaml(file: File): boolean {
     <label className="flex items-center gap-2 text-xs whitespace-nowrap">
       <input type="checkbox" checked={!!a.Mandatory} onChange={(e) => updateAttrMandatory(selectedEntity, ai, e.target.checked)} />
       <span>Mandatory</span>
-    </label>
-
-    <label className="flex items-center gap-2 text-xs whitespace-nowrap">
-      <input type="checkbox" checked={!!a.MultiValue} onChange={(e) => updateAttrMV(selectedEntity, ai, e.target.checked)} />
-      <span>MultiValue</span>
     </label>
 
     <label className="flex items-center gap-2 text-xs whitespace-nowrap">

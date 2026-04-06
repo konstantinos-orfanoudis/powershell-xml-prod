@@ -815,8 +815,7 @@ export default function SchemaReviewPage() {
           const out = exportAttrShape(a);
           return {
             name: a.name,
-            type: out.type,       // always a string now
-            MultiValue: out.MultiValue,
+            type: out.type,
           };
         }),
       })),
