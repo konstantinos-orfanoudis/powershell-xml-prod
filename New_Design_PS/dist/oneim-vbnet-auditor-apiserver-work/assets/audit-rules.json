@@ -1,0 +1,1664 @@
+﻿{
+    "policy_version":  "2026-03-25",
+    "default_oneim_version":  "9.3.1",
+    "rules":  [
+                  {
+                      "id":  "VB001",
+                      "title":  "Option Explicit should be enabled",
+                      "category":  "correctness",
+                      "severity":  "medium",
+                      "confidence":  95,
+                      "enabled":  true,
+                      "state":  "disabled",
+                      "engine":  "coded",
+                      "detector_family":  "header",
+                      "why":  "Option Explicit reduces accidental late binding and misspelled identifiers in VB.NET.",
+                      "review_notes":  "Triggered when the first 40 lines do not contain \u0027Option Explicit On\u0027.",
+                      "test_ideas":  [
+                                         null
+                                     ],
+                      "surface_scope":  [
+                                            "any"
+                                        ],
+                      "match_confidence":  "medium",
+                      "source_ids":  [
+                                         "vb-option-explicit"
+                                     ]
+                  },
+                  {
+                      "id":  "VB002",
+                      "title":  "Option Strict should be enabled",
+                      "category":  "correctness",
+                      "severity":  "medium",
+                      "confidence":  95,
+                      "enabled":  true,
+                      "state":  "disabled",
+                      "engine":  "coded",
+                      "detector_family":  "header",
+                      "why":  "Option Strict prevents implicit narrowing conversions and late-bound behavior.",
+                      "review_notes":  "Triggered when the first 40 lines do not contain \u0027Option Strict On\u0027.",
+                      "test_ideas":  [
+                                         null
+                                     ],
+                      "surface_scope":  [
+                                            "any"
+                                        ],
+                      "match_confidence":  "medium",
+                      "source_ids":  [
+                                         "vb-option-strict"
+                                     ]
+                  },
+                  {
+                      "id":  "VB003",
+                      "title":  "Avoid obvious late binding and Object-heavy code",
+                      "category":  "correctness",
+                      "severity":  "medium",
+                      "confidence":  72,
+                      "enabled":  true,
+                      "state":  "disabled",
+                      "engine":  "coded",
+                      "detector_family":  "language-safety",
+                      "max_examples_per_file":  8,
+                      "why":  "Object-heavy and late-bound VB.NET code is harder to validate and easier to break at runtime.",
+                      "review_notes":  "Triggered by obvious \u0027As Object\u0027, CreateObject, or CallByName usage.",
+                      "remediation":  "Prefer compile-time-safe language features so null handling, conversions, parsing, and string semantics stay explicit.",
+                      "test_ideas":  [
+                                         "Exercise the invalid-input path and confirm the code now handles conversion, parsing, or null behavior explicitly."
+                                     ],
+                      "surface_scope":  [
+                                            "any"
+                                        ],
+                      "match_confidence":  "medium",
+                      "source_ids":  [
+                                         "vb-option-strict"
+                                     ]
+                  },
+                  {
+                      "id":  "SEC100",
+                      "title":  "Avoid string-built SQL or filter expressions",
+                      "category":  "security",
+                      "severity":  "high",
+                      "confidence":  88,
+                      "enabled":  true,
+                      "state":  "active",
+                      "engine":  "coded",
+                      "detector_family":  "sql-security",
+                      "why":  "String-built SQL is difficult to review safely and can lead to injection vulnerabilities.",
+                      "review_notes":  "Triggered by query-shaped text mixed with concatenation or interpolation.",
+                      "remediation":  "Replace string-built SQL or filter text with parameters or OneIM-safe query builders so variable data never changes the statement structure.",
+                      "test_ideas":  [
+                                         "Run the query path with delimiter-heavy input and confirm the final statement shape does not change."
+                                     ],
+                      "surface_scope":  [
+                                            "any"
+                                        ],
+                      "match_confidence":  "medium",
+                      "source_ids":  [
+                                         "ca2100",
+                                         "owasp-sql-injection"
+                                     ]
+                  },
+                  {
+                      "id":  "SEC110",
+                      "title":  "Avoid launching external processes from OneIM script logic",
+                      "category":  "security",
+                      "severity":  "high",
+                      "confidence":  92,
+                      "enabled":  true,
+                      "state":  "active",
+                      "engine":  "coded",
+                      "detector_family":  "process-execution",
+                      "why":  "External process execution expands the attack surface and complicates operational safety.",
+                      "review_notes":  "Triggered by Process.Start, Shell, cmd.exe, powershell.exe, or WScript shell usage.",
+                      "remediation":  "Remove OS process execution from the OneIM path or isolate it behind a reviewed service boundary with strict argument handling.",
+                      "test_ideas":  [
+                                         "Verify the scenario still works after replacing the OS command path with an internal API or reviewed service call."
+                                     ],
+                      "surface_scope":  [
+                                            "any"
+                                        ],
+                      "match_confidence":  "high",
+                      "source_ids":  [
+                                         "owasp-command-injection"
+                                     ]
+                  },
+                  {
+                      "id":  "SEC120",
+                      "title":  "Broad exception handling should not hide failures",
+                      "category":  "security",
+                      "severity":  "medium",
+                      "confidence":  74,
+                      "enabled":  true,
+                      "state":  "active",
+                      "engine":  "coded",
+                      "detector_family":  "exception-handling",
+                      "max_examples_per_file":  10,
+                      "why":  "Catching Exception without rethrowing or escalating can hide security and correctness failures.",
+                      "review_notes":  "Triggered by broad Catch Exception blocks without a nearby Throw.",
+                      "remediation":  "Catch only the expected exception types, log the useful context, and rethrow or fail fast when the code cannot safely continue.",
+                      "test_ideas":  [
+                                         "Trigger the failure path and confirm the error is surfaced with useful context instead of being silently swallowed."
+                                     ],
+                      "surface_scope":  [
+                                            "any"
+                                        ],
+                      "match_confidence":  "medium",
+                      "source_ids":  [
+                                         "ca1031"
+                                     ]
+                  },
+                  {
+                      "id":  "SEC130",
+                      "title":  "Avoid obsolete web request APIs",
+                      "category":  "security",
+                      "severity":  "medium",
+                      "confidence":  85,
+                      "enabled":  true,
+                      "state":  "active",
+                      "engine":  "coded",
+                      "detector_family":  "web-requests",
+                      "max_examples_per_file":  8,
+                      "why":  "Obsolete web APIs are harder to secure correctly and should be replaced with modern HttpClient usage.",
+                      "review_notes":  "Triggered by WebRequest, HttpWebRequest, or WebClient usage.",
+                      "remediation":  "Use HttpClient-era patterns, keep timeouts and certificate handling explicit, and validate any variable-driven destination before sending the request.",
+                      "test_ideas":  [
+                                         "Exercise timeout, bad-certificate, and variable-destination cases and confirm the request handling is explicit and safe."
+                                     ],
+                      "surface_scope":  [
+                                            "any"
+                                        ],
+                      "match_confidence":  "high",
+                      "source_ids":  [
+                                         "syslib0014",
+                                         "httpclient-guidelines"
+                                     ]
+                  },
+                  {
+                      "id":  "SEC131",
+                      "title":  "Review outbound web requests that appear to use variable-driven URLs",
+                      "category":  "security",
+                      "severity":  "medium",
+                      "confidence":  70,
+                      "enabled":  true,
+                      "state":  "active",
+                      "engine":  "coded",
+                      "detector_family":  "web-requests",
+                      "why":  "Variable-driven outbound requests can introduce SSRF risk without URL validation or allowlists.",
+                      "review_notes":  "Triggered by network calls that appear to use url, uri, or endpoint variables.",
+                      "remediation":  "Use HttpClient-era patterns, keep timeouts and certificate handling explicit, and validate any variable-driven destination before sending the request.",
+                      "test_ideas":  [
+                                         "Exercise timeout, bad-certificate, and variable-destination cases and confirm the request handling is explicit and safe."
+                                     ],
+                      "surface_scope":  [
+                                            "any"
+                                        ],
+                      "match_confidence":  "medium",
+                      "source_ids":  [
+                                         "httpclient-guidelines",
+                                         "owasp-ssrf"
+                                     ]
+                  },
+                  {
+                      "id":  "SEC140",
+                      "title":  "Review file I/O paths that appear to be variable-driven",
+                      "category":  "security",
+                      "severity":  "medium",
+                      "confidence":  70,
+                      "enabled":  true,
+                      "state":  "active",
+                      "engine":  "coded",
+                      "detector_family":  "file-io",
+                      "max_examples_per_file":  8,
+                      "why":  "Variable-driven file paths can introduce path traversal and unsafe file handling risks.",
+                      "review_notes":  "Triggered by file or directory APIs where the line does not obviously contain a fixed literal path.",
+                      "remediation":  "Normalize the path against an approved root and validate every user- or config-driven file name before the file-system call executes.",
+                      "test_ideas":  [
+                                         "Pass traversal-like path input and confirm the code refuses to read or write outside the approved root."
+                                     ],
+                      "surface_scope":  [
+                                            "any"
+                                        ],
+                      "match_confidence":  "medium",
+                      "source_ids":  [
+                                         "ca3003",
+                                         "owasp-path-traversal",
+                                         "owasp-file-upload"
+                                     ]
+                  },
+                  {
+                      "id":  "SEC150",
+                      "title":  "Review XML parsing for insecure DTD or external entity behavior",
+                      "category":  "security",
+                      "severity":  "medium",
+                      "confidence":  75,
+                      "enabled":  true,
+                      "state":  "active",
+                      "engine":  "coded",
+                      "detector_family":  "xml-security",
+                      "why":  "Insecure XML parsing can enable XXE or unsafe external entity resolution.",
+                      "review_notes":  "Triggered by XML parser or XML text-loading APIs that deserve XXE review.",
+                      "remediation":  "Use secure XML reader settings, keep DTD and external entity resolution disabled, and make safe parser configuration explicit in code.",
+                      "test_ideas":  [
+                                         "Load XML with external-entity style payloads in a safe harness and confirm the parser refuses them."
+                                     ],
+                      "surface_scope":  [
+                                            "any"
+                                        ],
+                      "match_confidence":  "medium",
+                      "source_ids":  [
+                                         "ca3075",
+                                         "owasp-xxe"
+                                     ]
+                  },
+                  {
+                      "id":  "SEC160",
+                      "title":  "Do not use insecure deserializers",
+                      "category":  "security",
+                      "severity":  "high",
+                      "confidence":  90,
+                      "enabled":  true,
+                      "state":  "active",
+                      "engine":  "coded",
+                      "detector_family":  "deserialization",
+                      "why":  "BinaryFormatter and NetDataContractSerializer are unsafe for untrusted data.",
+                      "review_notes":  "Triggered by known unsafe deserializer types.",
+                      "remediation":  "Replace unsafe deserializers with a safer format and validate the expected payload shape before reading data into objects.",
+                      "test_ideas":  [
+                                         "Attempt to process crafted input and verify the unsafe deserializer has been removed from the path."
+                                     ],
+                      "surface_scope":  [
+                                            "any"
+                                        ],
+                      "match_confidence":  "high",
+                      "source_ids":  [
+                                         "ca2300",
+                                         "ca2310"
+                                     ]
+                  },
+                  {
+                      "id":  "SEC170",
+                      "title":  "Review deprecated TLS or disabled certificate validation",
+                      "category":  "security",
+                      "severity":  "high",
+                      "confidence":  90,
+                      "enabled":  true,
+                      "state":  "active",
+                      "engine":  "coded",
+                      "detector_family":  "transport-security",
+                      "why":  "Weak TLS and disabled certificate validation undermine transport security.",
+                      "review_notes":  "Triggered by deprecated TLS protocol flags, weak hashes, or certificate-validation overrides.",
+                      "remediation":  "Use current TLS defaults, keep certificate validation enabled, and remove obsolete hashes or protocol flags from the code path.",
+                      "test_ideas":  [
+                                         "Run a connection test against a bad certificate or obsolete protocol endpoint and confirm the client rejects it."
+                                     ],
+                      "surface_scope":  [
+                                            "any"
+                                        ],
+                      "match_confidence":  "high",
+                      "source_ids":  [
+                                         "ca5359",
+                                         "ca5364",
+                                         "ca5350"
+                                     ]
+                  },
+                  {
+                      "id":  "REL200",
+                      "title":  "Dispose disposable objects before losing scope",
+                      "category":  "correctness",
+                      "severity":  "medium",
+                      "confidence":  72,
+                      "enabled":  true,
+                      "state":  "active",
+                      "engine":  "coded",
+                      "detector_family":  "resource-lifetime",
+                      "max_examples_per_file":  10,
+                      "why":  "Undisposed streams and commands leak resources and can destabilize long-running jobs.",
+                      "review_notes":  "Triggered by common disposable types created without nearby Using or Dispose logic.",
+                      "remediation":  "Wrap disposable resources in Using blocks or dispose them deterministically before the reference leaves scope.",
+                      "test_ideas":  [
+                                         "Run the code path repeatedly and confirm handles, sockets, or streams do not accumulate."
+                                     ],
+                      "surface_scope":  [
+                                            "any"
+                                        ],
+                      "match_confidence":  "medium",
+                      "source_ids":  [
+                                         "ca2000"
+                                     ]
+                  },
+                  {
+                      "id":  "REL210",
+                      "title":  "Use explicit StringComparison for identifier-sensitive comparisons",
+                      "category":  "correctness",
+                      "severity":  "medium",
+                      "confidence":  76,
+                      "enabled":  true,
+                      "state":  "active",
+                      "engine":  "coded",
+                      "detector_family":  "string-correctness",
+                      "max_examples_per_file":  12,
+                      "why":  "Culture-sensitive string comparisons can change behavior for identifiers and keys.",
+                      "review_notes":  "Triggered by identifier-like comparisons without StringComparison.",
+                      "remediation":  "Make identifier-sensitive comparisons explicit by choosing the intended StringComparison option instead of relying on culture defaults.",
+                      "test_ideas":  [
+                                         "Run the comparison under a non-default culture and confirm identifier matching still behaves as intended."
+                                     ],
+                      "surface_scope":  [
+                                            "any"
+                                        ],
+                      "match_confidence":  "medium",
+                      "source_ids":  [
+                                         "vb-string-culture"
+                                     ]
+                  },
+                  {
+                      "id":  "REL220",
+                      "title":  "Review GetTriggerValue-driven writes for Nothing or empty handling",
+                      "category":  "correctness",
+                      "severity":  "medium",
+                      "confidence":  68,
+                      "enabled":  true,
+                      "state":  "active",
+                      "engine":  "coded",
+                      "detector_family":  "trigger-handling",
+                      "max_examples_per_file":  8,
+                      "why":  "Trigger-driven writes without clear Nothing or empty handling are easy to get wrong in OneIM logic.",
+                      "review_notes":  "Triggered by PutValue or ExecuteTemplate statements that consume GetTriggerValue(...).String or .Text without a visible guard for the same trigger field.",
+                      "remediation":  "Guard trigger values explicitly before using them in write logic so Nothing and empty-string cases are handled on purpose.",
+                      "test_ideas":  [
+                                         "Test the write path with Nothing and empty trigger values and confirm the behavior is explicit and safe."
+                                     ],
+                      "surface_scope":  [
+                                            "template"
+                                        ],
+                      "match_confidence":  "medium",
+                      "source_ids":  [
+                                         "oneim-base-objects",
+                                         "oneim-test-scripts"
+                                     ]
+                  },
+                  {
+                      "id":  "OIM510",
+                      "title":  "Custom VI-KEY entries should use CCC-prefixed script names",
+                      "category":  "correctness",
+                      "severity":  "low",
+                      "confidence":  70,
+                      "enabled":  true,
+                      "state":  "active",
+                      "engine":  "coded",
+                      "detector_family":  "oneim-custom-naming",
+                      "why":  "Custom OneIM script keys and script names should stay aligned so exports and review workflows can distinguish custom entries from OOTB logic reliably.",
+                      "review_notes":  "Triggered by VI-KEY comments whose \u003cP\u003e payload starts with \u0027CCC-\u0027 while the script name after the comma does not start with \u0027CCC_\u0027 or \u0027CCC-\u0027.",
+                      "remediation":  "Keep custom OneIM key, script, and routine names aligned so exports and reviews can distinguish custom code from OOTB behavior reliably.",
+                      "test_ideas":  [
+                                         "Re-export the script artifact and confirm the custom naming still makes the code easy to classify during review."
+                                     ],
+                      "surface_scope":  [
+                                            "script"
+                                        ],
+                      "match_confidence":  "medium",
+                      "source_ids":  [
+                                         "oneim-create-edit-scripts",
+                                         "oneim-overriding-scripts"
+                                     ]
+                  },
+                  {
+                      "id":  "OIM511",
+                      "title":  "Custom VI-KEY entries should implement CCC-prefixed Function or Sub names",
+                      "category":  "correctness",
+                      "severity":  "low",
+                      "confidence":  72,
+                      "enabled":  true,
+                      "state":  "active",
+                      "engine":  "coded",
+                      "detector_family":  "oneim-custom-naming",
+                      "why":  "Custom OneIM script keys should stay aligned with CCC-prefixed routine names so custom implementations remain easy to identify during export, review, and promotion work.",
+                      "review_notes":  "Triggered when a VI-KEY comment whose \u003cP\u003e payload starts with \u0027CCC-\u0027 is followed by a Function or Sub declaration whose name does not start with \u0027CCC_\u0027 or \u0027CCC-\u0027.",
+                      "remediation":  "Keep custom OneIM key, script, and routine names aligned so exports and reviews can distinguish custom code from OOTB behavior reliably.",
+                      "test_ideas":  [
+                                         "Re-export the script artifact and confirm the custom naming still makes the code easy to classify during review."
+                                     ],
+                      "surface_scope":  [
+                                            "script"
+                                        ],
+                      "match_confidence":  "medium",
+                      "source_ids":  [
+                                         "oneim-create-edit-scripts",
+                                         "oneim-overriding-scripts"
+                                     ]
+                  },
+                  {
+                      "id":  "PER400",
+                      "title":  "Prefer Any over Count for emptiness checks",
+                      "category":  "performance",
+                      "severity":  "low",
+                      "confidence":  90,
+                      "enabled":  true,
+                      "state":  "active",
+                      "engine":  "coded",
+                      "detector_family":  "enumeration-performance",
+                      "why":  "Count scans more than needed when the intent is only to check whether a sequence has items.",
+                      "review_notes":  "Triggered by Count or LongCount comparisons against zero.",
+                      "remediation":  "Reduce repeated traversal or repeated single-row lookups by caching the result once and reusing it inside the hot path.",
+                      "test_ideas":  [
+                                         "Benchmark the hot path before and after caching or collapsing the repeated enumeration or single-row lookup."
+                                     ],
+                      "surface_scope":  [
+                                            "any"
+                                        ],
+                      "match_confidence":  "high",
+                      "source_ids":  [
+                                         "ca1827"
+                                     ]
+                  },
+                  {
+                      "id":  "PER410",
+                      "title":  "Avoid repeated string concatenation in loops",
+                      "category":  "performance",
+                      "severity":  "low",
+                      "confidence":  76,
+                      "enabled":  true,
+                      "state":  "active",
+                      "engine":  "coded",
+                      "detector_family":  "loop-performance",
+                      "max_examples_per_file":  8,
+                      "why":  "Repeated string concatenation in loops creates avoidable allocations and can slow hot paths.",
+                      "review_notes":  "Triggered by concatenation patterns while inside loop depth.",
+                      "remediation":  "Move expensive data access, allocation, or persistence work out of the loop, or batch it so one iteration does not cause another round-trip.",
+                      "test_ideas":  [
+                                         "Enable SQL logging or benchmark data collection and verify the loop no longer causes one expensive operation per iteration."
+                                     ],
+                      "surface_scope":  [
+                                            "any"
+                                        ],
+                      "match_confidence":  "medium",
+                      "source_ids":  [
+                                         "stringbuilder-guidance"
+                                     ]
+                  },
+                  {
+                      "id":  "PER420",
+                      "title":  "Review possible multiple enumeration of IEnumerable",
+                      "category":  "performance",
+                      "severity":  "low",
+                      "confidence":  70,
+                      "enabled":  true,
+                      "state":  "active",
+                      "engine":  "coded",
+                      "detector_family":  "enumeration-performance",
+                      "max_examples_per_file":  5,
+                      "why":  "Repeated enumeration can add avoidable overhead in hot paths.",
+                      "review_notes":  "Triggered when the same enumerable appears in multiple Count-style calls.",
+                      "remediation":  "Reduce repeated traversal or repeated single-row lookups by caching the result once and reusing it inside the hot path.",
+                      "test_ideas":  [
+                                         "Benchmark the hot path before and after caching or collapsing the repeated enumeration or single-row lookup."
+                                     ],
+                      "surface_scope":  [
+                                            "any"
+                                        ],
+                      "match_confidence":  "medium",
+                      "source_ids":  [
+                                         "ca1851"
+                                     ]
+                  },
+                  {
+                      "id":  "PER430",
+                      "title":  "Review repeated object or database access inside loops",
+                      "category":  "performance",
+                      "severity":  "low",
+                      "confidence":  66,
+                      "enabled":  true,
+                      "state":  "active",
+                      "engine":  "coded",
+                      "detector_family":  "loop-performance",
+                      "max_examples_per_file":  8,
+                      "why":  "Repeated session or database access inside loops can amplify cost in OneIM scripts.",
+                      "review_notes":  "Triggered by Session, Connection, UnitOfWork, or Source access inside loops.",
+                      "remediation":  "Move expensive data access, allocation, or persistence work out of the loop, or batch it so one iteration does not cause another round-trip.",
+                      "test_ideas":  [
+                                         "Enable SQL logging or benchmark data collection and verify the loop no longer causes one expensive operation per iteration."
+                                     ],
+                      "surface_scope":  [
+                                            "any"
+                                        ],
+                      "match_confidence":  "medium",
+                      "source_ids":  [
+                                         "oneim-system-debugger-context"
+                                     ]
+                  },
+                  {
+                      "id":  "OIM500",
+                      "title":  "Review PutValue or ExecuteTemplate usage for sync-time side effects",
+                      "category":  "correctness",
+                      "severity":  "low",
+                      "confidence":  60,
+                      "enabled":  true,
+                      "state":  "active",
+                      "engine":  "coded",
+                      "detector_family":  "oneim-side-effects",
+                      "max_examples_per_file":  8,
+                      "why":  "Powerful OneIM primitives deserve review when used without clear sync-time intent or guards.",
+                      "review_notes":  "Triggered by PutValue or ExecuteTemplate statements that appear to run without a nearby conditional guard such as FULLSYNC, change-level, or state-based intent.",
+                      "remediation":  "Make hidden OneIM side effects explicit with guards or dependency declarations so evaluation and recalculation happen when intended.",
+                      "test_ideas":  [
+                                         "Change the dependency inputs in a test environment and confirm the script recalculates only when intended."
+                                     ],
+                      "surface_scope":  [
+                                            "template"
+                                        ],
+                      "match_confidence":  "medium",
+                      "source_ids":  [
+                                         "oneim-base-objects",
+                                         "oneim-system-debugger-context"
+                                     ]
+                  },
+                  {
+                      "id":  "CNC600",
+                      "title":  "NOLOCK hint may yield dirty reads under concurrent writes",
+                      "category":  "concurrency",
+                      "severity":  "high",
+                      "confidence":  85,
+                      "enabled":  true,
+                      "state":  "active",
+                      "engine":  "declarative",
+                      "detector_family":  "concurrency",
+                      "why":  "NOLOCK reads uncommitted data, which can produce phantom rows or rolled-back values during concurrent provisioning writes.",
+                      "match_kind":  "line-pattern",
+                      "pattern":  "(?i)WITH\\s*\\(\\s*NOLOCK\\s*\\)",
+                      "triggering_scenario":  "A NOLOCK (READ UNCOMMITTED) hint on a table that receives concurrent inserts or updates may return uncommitted or partially-rolled-back rows, producing inconsistent provisioning decisions.",
+                      "remediation":  "Remove NOLOCK. If read-performance is the concern, enable READ_COMMITTED_SNAPSHOT isolation at the database level instead.",
+                      "test_ideas":  [
+                                         "SQL string containing WITH (NOLOCK); string without NOLOCK should not fire."
+                                     ],
+                      "surface_scope":  [
+                                            "script",
+                                            "process"
+                                        ],
+                      "match_confidence":  "high",
+                      "source_ids":  [
+                                         "vb-option-strict"
+                                     ]
+                  },
+                  {
+                      "id":  "CNC601",
+                      "title":  "BeginTransaction without visible Commit or Rollback in scope",
+                      "category":  "concurrency",
+                      "severity":  "high",
+                      "confidence":  70,
+                      "enabled":  true,
+                      "state":  "active",
+                      "engine":  "coded",
+                      "detector_family":  "concurrency",
+                      "max_examples_per_file":  8,
+                      "why":  "An unclosed transaction holds locks, blocking other sessions and risking data inconsistency if the script exits unexpectedly.",
+                      "review_notes":  "Triggered when BeginTransaction appears but no CommitTransaction, Commit, or Rollback is found within the next 60 lines.",
+                      "remediation":  "Remove lock-amplifying patterns, close transactions deterministically, and avoid thread-blocking or shared mutable state in multi-threaded OneIM paths.",
+                      "test_ideas":  [
+                                         "Run the path under concurrent load and confirm transactions close cleanly without shared-state bleed or blocking waits."
+                                     ],
+                      "surface_scope":  [
+                                            "script",
+                                            "process"
+                                        ],
+                      "match_confidence":  "high",
+                      "source_ids":  [
+                                         "oneim-base-objects"
+                                     ]
+                  },
+                  {
+                      "id":  "CNC602",
+                      "title":  "Possible nested transaction â€” BeginTransaction called more than once before Commit",
+                      "category":  "concurrency",
+                      "severity":  "high",
+                      "confidence":  65,
+                      "enabled":  true,
+                      "state":  "active",
+                      "engine":  "coded",
+                      "detector_family":  "concurrency",
+                      "max_examples_per_file":  4,
+                      "why":  "Most ADO.NET and OneIM providers do not support true nested transactions; a second BeginTransaction typically promotes the connection to an error state or silently becomes a no-op.",
+                      "review_notes":  "Triggered when two or more BeginTransaction calls are found without an intervening Commit or Rollback.",
+                      "remediation":  "Remove lock-amplifying patterns, close transactions deterministically, and avoid thread-blocking or shared mutable state in multi-threaded OneIM paths.",
+                      "test_ideas":  [
+                                         "Run the path under concurrent load and confirm transactions close cleanly without shared-state bleed or blocking waits."
+                                     ],
+                      "surface_scope":  [
+                                            "script",
+                                            "process"
+                                        ],
+                      "match_confidence":  "high",
+                      "source_ids":  [
+                                         "oneim-base-objects"
+                                     ]
+                  },
+                  {
+                      "id":  "CNC603",
+                      "title":  "Thread.Sleep blocks a OneIM sync thread",
+                      "category":  "concurrency",
+                      "severity":  "medium",
+                      "confidence":  90,
+                      "enabled":  true,
+                      "state":  "active",
+                      "engine":  "declarative",
+                      "detector_family":  "concurrency",
+                      "why":  "Thread.Sleep on a synchronisation thread blocks the entire slot, reducing throughput and risking timeout cascades during large provisioning runs.",
+                      "match_kind":  "line-pattern",
+                      "pattern":  "(?i)\\bThread\\.Sleep\\s*\\(",
+                      "triggering_scenario":  "Thread.Sleep in a synchronisation script blocks the entire sync thread, reducing throughput and potentially causing timeout cascades during large provisioning runs.",
+                      "remediation":  "Replace with event-based waits, polling with early exit, or move the delayed work to a scheduled process.",
+                      "test_ideas":  [
+                                         "Line containing Thread.Sleep(1000); line without should not fire."
+                                     ],
+                      "surface_scope":  [
+                                            "script",
+                                            "process"
+                                        ],
+                      "match_confidence":  "high",
+                      "source_ids":  [
+                                         "vb-option-strict"
+                                     ]
+                  },
+                  {
+                      "id":  "CNC604",
+                      "title":  "Unbounded loop (While True / Do While True)",
+                      "category":  "concurrency",
+                      "severity":  "medium",
+                      "confidence":  75,
+                      "enabled":  true,
+                      "state":  "active",
+                      "engine":  "declarative",
+                      "detector_family":  "concurrency",
+                      "why":  "An unbounded loop with no iteration cap or timeout guard can starve other sync threads indefinitely if its exit condition is never satisfied, blocking provisioning throughput.",
+                      "match_kind":  "line-pattern",
+                      "pattern":  "(?i)\\b(Do\\s+While\\s+True|While\\s+True)\\b",
+                      "triggering_scenario":  "An infinite loop in a OneIM template or script that relies solely on an internal Exit condition may run indefinitely if the exit condition is never met, starving other sync jobs.",
+                      "remediation":  "Add an explicit iteration counter or timeout guard as a secondary exit condition.",
+                      "test_ideas":  [
+                                         "Line containing \u0027While True\u0027; \u0027Do While True\u0027; \u0027While condition\u0027 should not fire."
+                                     ],
+                      "surface_scope":  [
+                                            "script",
+                                            "process"
+                                        ],
+                      "match_confidence":  "medium",
+                      "source_ids":  [
+                                         "vb-option-strict"
+                                     ]
+                  },
+                  {
+                      "id":  "VB004",
+                      "title":  "Use Is Nothing / IsNot Nothing instead of = Nothing / \u003c\u003e Nothing",
+                      "category":  "correctness",
+                      "severity":  "medium",
+                      "confidence":  88,
+                      "state":  "active",
+                      "engine":  "coded",
+                      "detector_family":  "language-safety",
+                      "max_examples_per_file":  10,
+                      "why":  "In VB.NET, = Nothing uses value-equality semantics rather than reference equality. For reference types the correct idiom is Is Nothing or IsNot Nothing; using = Nothing can silently misbehave when Option Strict is off.",
+                      "review_notes":  "Triggered when an If or ElseIf conditional, or a compound expression using AndAlso / OrElse, contains = Nothing or \u003c\u003e Nothing. Dim-initialisation (Dim x = Nothing) is excluded.",
+                      "remediation":  "Prefer compile-time-safe language features so null handling, conversions, parsing, and string semantics stay explicit.",
+                      "test_ideas":  [
+                                         "Exercise the invalid-input path and confirm the code now handles conversion, parsing, or null behavior explicitly."
+                                     ],
+                      "surface_scope":  [
+                                            "any"
+                                        ],
+                      "match_confidence":  "high",
+                      "source_ids":  [
+                                         "vb-option-strict"
+                                     ]
+                  },
+                  {
+                      "id":  "VB005",
+                      "title":  "Do not rethrow with Throw ex â€” bare Throw preserves the stack trace",
+                      "category":  "correctness",
+                      "severity":  "medium",
+                      "confidence":  85,
+                      "state":  "active",
+                      "engine":  "declarative",
+                      "detector_family":  "exception-handling",
+                      "why":  "Rethrowing an exception by variable name resets the stack trace to the rethrow line, hiding the original failure site. In OneIM sync scripts this makes debugging significantly harder because support personnel see the rethrow line rather than the root cause.",
+                      "match_kind":  "line-pattern",
+                      "pattern":  "(?i)^\\s*Throw\\s+(?!New\\b)[A-Za-z_][A-Za-z0-9_]*\\s*$",
+                      "triggering_scenario":  "A Catch block captures an exception as \u0027ex\u0027 and uses Throw ex to propagate it. The resulting stack trace points at the rethrow line, not the original failure, misleading anyone who inspects a crash report or system-debugger log.",
+                      "remediation":  "Replace Throw ex with bare Throw inside Catch blocks to preserve the original stack trace. If you need to wrap the exception use Throw New ExceptionType(\"message\", ex) so the original is available as InnerException.",
+                      "test_ideas":  [
+                                         "Line \u0027Throw ex\u0027 should fire; \u0027Throw e\u0027 should fire; \u0027Throw New InvalidOperationException()\u0027 should not fire; bare \u0027Throw\u0027 should not fire."
+                                     ],
+                      "surface_scope":  [
+                                            "any"
+                                        ],
+                      "match_confidence":  "high",
+                      "source_ids":  [
+                                         "ca2200",
+                                         "ca1031"
+                                     ]
+                  },
+                  {
+                      "id":  "REL230",
+                      "title":  "Empty Catch block silently swallows exceptions",
+                      "category":  "reliability",
+                      "severity":  "medium",
+                      "confidence":  85,
+                      "state":  "active",
+                      "engine":  "coded",
+                      "detector_family":  "exception-handling",
+                      "max_examples_per_file":  8,
+                      "why":  "A Catch block with no body discards the exception entirely. In OneIM sync scripts this can cause provisioning to silently produce wrong results without any log entry or failure signal.",
+                      "review_notes":  "Triggered when a Catch statement is immediately followed by End Try or another Catch with no intervening statements or comments.",
+                      "remediation":  "Catch only the expected exception types, log the useful context, and rethrow or fail fast when the code cannot safely continue.",
+                      "test_ideas":  [
+                                         "Trigger the failure path and confirm the error is surfaced with useful context instead of being silently swallowed."
+                                     ],
+                      "surface_scope":  [
+                                            "any"
+                                        ],
+                      "match_confidence":  "high",
+                      "source_ids":  [
+                                         "ca1031"
+                                     ]
+                  },
+                  {
+                      "id":  "SEC180",
+                      "title":  "Hardcoded credential or secret literal",
+                      "category":  "security",
+                      "severity":  "high",
+                      "confidence":  80,
+                      "state":  "active",
+                      "engine":  "declarative",
+                      "detector_family":  "secrets",
+                      "why":  "Hardcoded credential literals are committed to version control and exported with OneIM customisations, leaking secrets to anyone with access to the repository or the configuration export package.",
+                      "match_kind":  "line-pattern",
+                      "pattern":  "(?i)\\b(password|passwd|secret|apikey|api_key|clientsecret|client_secret|accesstoken|access_token)\\b[^\"\\n]*=\\s*\"[^\"]{3,}\"",
+                      "triggering_scenario":  "A password or API key is assigned as a string literal inside the script. When the customisation is exported and reviewed the credential is readable in plain text.",
+                      "remediation":  "Load credentials at runtime from the OneIM credential container, an environment-specific configuration store, or a secrets vault. Never embed credential values as literals in script code.",
+                      "test_ideas":  [
+                                         "Line \u0027password = \"abc123\"\u0027 should fire; \u0027apikey = \"sk-live-x\"\u0027 should fire; \u0027password = GetFromVault()\u0027 should not fire; \u0027secret = \"\"\u0027 (too short) should not fire."
+                                     ],
+                      "surface_scope":  [
+                                            "any"
+                                        ],
+                      "match_confidence":  "high",
+                      "source_ids":  [
+                                         "owasp-credential-storage"
+                                     ]
+                  },
+                  {
+                      "id":  "PER440",
+                      "title":  "Object allocation inside a loop body",
+                      "category":  "performance",
+                      "severity":  "low",
+                      "confidence":  65,
+                      "state":  "active",
+                      "engine":  "coded",
+                      "detector_family":  "loop-performance",
+                      "max_examples_per_file":  5,
+                      "why":  "Constructing a new object on every iteration increases GC pressure. In OneIM scripts that iterate over large provisioning sets this can noticeably degrade throughput and increase pause times.",
+                      "review_notes":  "Triggered by New \u003cType\u003e(...) constructor calls at loop depth greater than 0. Common cheap types (List, Dictionary, HashSet, Queue, Stack, StringBuilder) are suppressed to reduce noise.",
+                      "remediation":  "Move expensive data access, allocation, or persistence work out of the loop, or batch it so one iteration does not cause another round-trip.",
+                      "test_ideas":  [
+                                         "Enable SQL logging or benchmark data collection and verify the loop no longer causes one expensive operation per iteration."
+                                     ],
+                      "surface_scope":  [
+                                            "any"
+                                        ],
+                      "match_confidence":  "medium",
+                      "source_ids":  [
+                                         "oneim-system-debugger-context"
+                                     ]
+                  },
+                  {
+                      "id":  "CNC605",
+                      "title":  "Shared (static) mutable field risks race conditions across concurrent sync threads",
+                      "category":  "concurrency",
+                      "severity":  "medium",
+                      "confidence":  72,
+                      "state":  "active",
+                      "engine":  "declarative",
+                      "detector_family":  "concurrency",
+                      "why":  "OneIM runs multiple sync threads simultaneously. A Shared (static) field without synchronisation is a race condition: two provisioning threads may read and write the field simultaneously, producing torn or stale values.",
+                      "match_kind":  "line-pattern",
+                      "pattern":  "(?i)^\\s*((?:Private|Public|Friend|Protected)\\s+)?Shared\\s+(?!(ReadOnly|Const|Function|Sub|Property|Event)\\b)[A-Za-z_]",
+                      "triggering_scenario":  "A Shared mutable field is declared in a class used by sync scripts. Under concurrent provisioning two threads write the field at the same time, yielding non-deterministic results that are very difficult to reproduce.",
+                      "remediation":  "Replace the shared field with a per-call parameter, a ThreadLocal value, or a properly synchronised pattern. If shared state is unavoidable use Interlocked operations or a SyncLock block.",
+                      "test_ideas":  [
+                                         "\u0027Private Shared _counter As Integer\u0027 should fire; \u0027Public Shared ReadOnly MAX As Integer = 5\u0027 should not fire; \u0027Private Shared Function GetData()\u0027 should not fire; \u0027Shared Const LIMIT = 10\u0027 should not fire."
+                                     ],
+                      "surface_scope":  [
+                                            "script",
+                                            "process"
+                                        ],
+                      "match_confidence":  "high",
+                      "source_ids":  [
+                                         "dotnet-threading"
+                                     ]
+                  },
+                  {
+                      "id":  "OIM520",
+                      "title":  "Expensive OneIM lookup (GetListFor / GetSingleProperty) inside a loop",
+                      "category":  "performance",
+                      "severity":  "medium",
+                      "confidence":  72,
+                      "state":  "active",
+                      "engine":  "coded",
+                      "detector_family":  "loop-performance",
+                      "max_examples_per_file":  6,
+                      "why":  "GetListFor and GetSingleProperty each issue at least one database round-trip. Calling them per loop iteration produces an N+1 query pattern that scales poorly and can cause significant latency under large provisioning sets.",
+                      "review_notes":  "Triggered by GetListFor, GetSingleProperty, or GetSingleFiltered calls found inside a loop body (loop depth \u003e 0).",
+                      "remediation":  "Move expensive data access, allocation, or persistence work out of the loop, or batch it so one iteration does not cause another round-trip.",
+                      "test_ideas":  [
+                                         "Enable SQL logging or benchmark data collection and verify the loop no longer causes one expensive operation per iteration."
+                                     ],
+                      "surface_scope":  [
+                                            "script",
+                                            "process"
+                                        ],
+                      "match_confidence":  "medium",
+                      "source_ids":  [
+                                         "oneim-base-objects",
+                                         "oneim-system-debugger-context"
+                                     ]
+                  },
+                  {
+                      "id":  "SEC185",
+                      "title":  "Password embedded in a connection string literal",
+                      "category":  "security",
+                      "severity":  "high",
+                      "confidence":  82,
+                      "state":  "active",
+                      "engine":  "declarative",
+                      "detector_family":  "secrets",
+                      "why":  "Embedding a password directly inside a connection string literal commits the credential to version control and to OneIM customisation export packages, exposing it to anyone with read access. ADO.NET connection strings are not encrypted at rest in OneIM scripts.",
+                      "match_kind":  "line-pattern",
+                      "pattern":  "(?i)\"[^\"]*[Pp]assword\\s*=[^\";\\/\\\\]{2,}",
+                      "triggering_scenario":  "A developer hardcodes the database password in a connection string: \u0027Dim strConnection = \"User ID=sa;Password=Secret123;Data Source=...\"\u0027. The script is committed and the credential is leaked in every export.",
+                      "remediation":  "Store the database password in the OneIM credential container or read it from an environment variable / secrets vault at runtime. Do not embed password values in connection string literals.",
+                      "test_ideas":  [
+                                         "\u0027\"User ID=sa;Password=abc;Server=x\"\u0027 should fire; \u0027\"Password=x\"\u0027 (too short value) should not fire; \u0027\"IntegratedSecurity=true\"\u0027 should not fire; variable reference \u0027Password=\" \u0026 pw \u0026 \"\u0027 should not fire (no literal value inside the quotes)."
+                                     ],
+                      "surface_scope":  [
+                                            "any"
+                                        ],
+                      "match_confidence":  "high",
+                      "source_ids":  [
+                                         "owasp-credential-storage",
+                                         "dotnet-connection-strings"
+                                     ]
+                  },
+                  {
+                      "id":  "SEC190",
+                      "title":  "LDAP filter built by string concatenation â€” injection risk",
+                      "category":  "security",
+                      "severity":  "high",
+                      "confidence":  82,
+                      "state":  "active",
+                      "engine":  "coded",
+                      "detector_family":  "injection",
+                      "max_examples_per_file":  6,
+                      "why":  "Constructing an LDAP filter by concatenating user-supplied or script-parameter values with \u0027\u0026\u0027 creates an LDAP injection vulnerability. An attacker who controls the parameter can append extra filter clauses to expand or bypass the query scope.",
+                      "review_notes":  "Triggered when a line constructs a DirectorySearcher or assigns .Filter and also contains \u0027\u0026\u0027 string concatenation, suggesting a dynamically built filter expression.",
+                      "remediation":  "Escape or parameterize the variable input before it is embedded into the query or filter text.",
+                      "test_ideas":  [
+                                         "Pass crafted filter input and confirm the query or directory filter is escaped or rejected safely."
+                                     ],
+                      "surface_scope":  [
+                                            "script",
+                                            "process"
+                                        ],
+                      "match_confidence":  "high",
+                      "source_ids":  [
+                                         "owasp-ldap-injection",
+                                         "ca2100"
+                                     ]
+                  },
+                  {
+                      "id":  "REL240",
+                      "title":  "GetFk result used without IsEmpty guard",
+                      "category":  "reliability",
+                      "severity":  "medium",
+                      "confidence":  80,
+                      "state":  "active",
+                      "engine":  "coded",
+                      "detector_family":  "null-safety",
+                      "max_examples_per_file":  8,
+                      "why":  "GetFk returns a foreign-key object that may be empty if the related row does not exist. Chaining .GetParent() or accessing properties directly without first checking IsEmpty will throw a NullReferenceException or return an empty base object, silently producing wrong values during provisioning.",
+                      "review_notes":  "Triggered when .GetFk(...).GetParent() or .GetFk(...).GetValue() appears on the same line without an intervening IsEmpty check.",
+                      "remediation":  "Add the required emptiness or bounds checks before dereferencing the value so the code path handles missing data safely.",
+                      "test_ideas":  [
+                                         "Run the code with empty, missing, or short collections and confirm the path no longer throws."
+                                     ],
+                      "surface_scope":  [
+                                            "any"
+                                        ],
+                      "match_confidence":  "high",
+                      "source_ids":  [
+                                         "oneim-foreign-key-access",
+                                         "oneim-base-objects"
+                                     ]
+                  },
+                  {
+                      "id":  "STR600",
+                      "title":  "Avoid .ToLower()/.ToUpper() for string comparison â€” use StringComparison.OrdinalIgnoreCase",
+                      "category":  "correctness",
+                      "severity":  "low",
+                      "confidence":  72,
+                      "state":  "active",
+                      "engine":  "coded",
+                      "detector_family":  "language-safety",
+                      "max_examples_per_file":  8,
+                      "why":  "Calling .ToLower() or .ToUpper() before a comparison allocates a temporary string and uses the current thread culture. In the Turkish locale \u0027I\u0027.ToLower() is \u0027Ä±\u0027 (dotless i), not \u0027i\u0027, breaking comparisons that work everywhere else. For identifier and field-name comparisons in OneIM scripts the safe idiom is String.Equals(a, b, StringComparison.OrdinalIgnoreCase).",
+                      "review_notes":  "Triggered when .ToLower() or .ToUpper() result is directly compared with = or \u003c\u003e on the same line, or when the call appears inside an If/ElseIf/While condition expression.",
+                      "remediation":  "Prefer compile-time-safe language features so null handling, conversions, parsing, and string semantics stay explicit.",
+                      "test_ideas":  [
+                                         "Exercise the invalid-input path and confirm the code now handles conversion, parsing, or null behavior explicitly."
+                                     ],
+                      "surface_scope":  [
+                                            "any"
+                                        ],
+                      "match_confidence":  "high",
+                      "source_ids":  [
+                                         "vb-string-culture",
+                                         "dotnet-string-comparison"
+                                     ]
+                  },
+                  {
+                      "id":  "OIM530",
+                      "title":  "Use f.UidComparison() for UID_ columns instead of f.Comparison(..., ValType.String)",
+                      "category":  "correctness",
+                      "severity":  "medium",
+                      "confidence":  82,
+                      "state":  "active",
+                      "engine":  "coded",
+                      "detector_family":  "language-safety",
+                      "max_examples_per_file":  8,
+                      "why":  "ISqlFormatter.UidComparison() is the dedicated method for OneIM UID (GUID) column comparisons. It handles OneIM\u0027s empty-UID sentinel value (\u0027\u0027) correctly and generates optimised SQL. Using the generic f.Comparison(..., ValType.String) on a UID column treats it as a plain varchar, which can miss NULL vs empty-GUID distinctions and bypasses any UID-specific SQL generation the formatter provides.",
+                      "review_notes":  "Triggered when f.Comparison() (or any ISqlFormatter .Comparison call) is passed a column name that starts with \u0027UID_\u0027. The OneIM reference samples use f.UidComparison() for these columns.",
+                      "remediation":  "Prefer compile-time-safe language features so null handling, conversions, parsing, and string semantics stay explicit.",
+                      "test_ideas":  [
+                                         "Exercise the invalid-input path and confirm the code now handles conversion, parsing, or null behavior explicitly."
+                                     ],
+                      "surface_scope":  [
+                                            "script",
+                                            "process"
+                                        ],
+                      "match_confidence":  "high",
+                      "source_ids":  [
+                                         "oneim-base-objects",
+                                         "oneim-create-edit-scripts"
+                                     ]
+                  },
+                  {
+                      "id":  "OIM535",
+                      "title":  "Direct = \"\" comparison on .GetValue(\"UID_...\").String â€” use String.IsNullOrEmpty",
+                      "category":  "correctness",
+                      "severity":  "low",
+                      "confidence":  78,
+                      "state":  "active",
+                      "engine":  "declarative",
+                      "detector_family":  "uid-handling",
+                      "why":  "Comparing .GetValue(\"UID_...\").String directly to \"\" with the = operator uses culture-sensitive equality and misses the case where the DbVal returns Nothing. The OneIM performance tuning reference guide uses String.IsNullOrEmpty() for this check; for FK relationships the .IsEmpty property on the IEntityForeignKey object is even more semantically precise.",
+                      "match_kind":  "line-pattern",
+                      "pattern":  "(?i)\\.GetValue\\s*\\(\\s*\"UID_[^\"]*\"\\s*\\)\\.String\\s*(?:=|\u003c\u003e)\\s*\"\"",
+                      "triggering_scenario":  "A script checks whether a UID column is populated by comparing the string value to \"\". If the runtime returns Nothing for a missing value rather than an empty string, the comparison silently evaluates to False and the subsequent logic runs against an absent object.",
+                      "remediation":  "Replace the = \"\" check with String.IsNullOrEmpty(obj.GetValue(\"UID_...\").String). When working with foreign key columns, retrieve the FK object with GetFk() and check .IsEmpty instead.",
+                      "test_ideas":  [
+                                         "\u0027obj.GetValue(\"UID_Dept\").String = \"\"\u0027 should fire; \u0027String.IsNullOrEmpty(obj.GetValue(\"UID_Dept\").String)\u0027 should not fire; \u0027obj.GetValue(\"Firstname\").String = \"\"\u0027 should not fire (non-UID column)."
+                                     ],
+                      "surface_scope":  [
+                                            "script",
+                                            "process"
+                                        ],
+                      "match_confidence":  "high",
+                      "source_ids":  [
+                                         "oneim-base-objects",
+                                         "oneim-collection-load-types"
+                                     ]
+                  },
+                  {
+                      "id":  "PER450",
+                      "title":  "Connection pooling disabled (Pooling=false) in ADO.NET connection string",
+                      "category":  "performance",
+                      "severity":  "medium",
+                      "confidence":  88,
+                      "state":  "active",
+                      "engine":  "declarative",
+                      "detector_family":  "connection-management",
+                      "why":  "Disabling ADO.NET connection pooling forces a full TCP handshake and authentication round-trip to the external database on every operation. OneIM sync scripts that call external databases repeatedly pay this overhead on each invocation, turning millisecond operations into multi-second ones at scale.",
+                      "match_kind":  "line-pattern",
+                      "pattern":  "(?i)\"[^\"]*Pooling\\s*=\\s*False",
+                      "triggering_scenario":  "A developer sets \u0027Pooling=false\u0027 in the connection string to avoid connection-reuse surprises during development. The string is shipped to production unchanged, causing every provisioning step that calls the external database to open and close a new connection rather than reusing a pooled one.",
+                      "remediation":  "Remove \u0027Pooling=false\u0027 from the connection string, or change it to \u0027Pooling=true\u0027. The ADO.NET default is pooling enabled. Only disable pooling when you have a specific, documented reason (e.g., a legacy driver that is not thread-safe).",
+                      "test_ideas":  [
+                                         "\u0027\"...;Pooling=false;...\"\u0027 should fire; \u0027\"...;Pooling=true;...\"\u0027 should not fire; \u0027\"IntegratedSecurity=true\"\u0027 should not fire."
+                                     ],
+                      "surface_scope":  [
+                                            "script",
+                                            "process"
+                                        ],
+                      "match_confidence":  "high",
+                      "source_ids":  [
+                                         "dotnet-connection-pooling",
+                                         "dotnet-connection-strings"
+                                     ]
+                  },
+                  {
+                      "id":  "PER451",
+                      "title":  "IEntity.Create(Session) called inside a loop â€” one SELECT per item",
+                      "category":  "performance",
+                      "severity":  "medium",
+                      "confidence":  78,
+                      "state":  "active",
+                      "engine":  "coded",
+                      "detector_family":  "loop-performance",
+                      "max_examples_per_file":  6,
+                      "why":  "Calling .Create(Session) on a collection element inflates a slim collection entry into a full IEntity object by issuing an additional SELECT for the missing columns. Calling it inside a loop produces one extra round-trip per row â€” an N+1 pattern that is explicitly flagged as a performance problem in the OneIM scripting guide. The fix is to pre-select the needed columns with Query.Select() and use EntityCollectionLoadType.Slim or BulkReadOnly so the collection is already fully loaded.",
+                      "review_notes":  "Triggered when .Create(Session) appears inside a loop (loop depth \u003e 0). Matches both .Create(Session) and .Create(Session, EntityLoadType.xxx) forms.",
+                      "remediation":  "Move expensive data access, allocation, or persistence work out of the loop, or batch it so one iteration does not cause another round-trip.",
+                      "test_ideas":  [
+                                         "Enable SQL logging or benchmark data collection and verify the loop no longer causes one expensive operation per iteration."
+                                     ],
+                      "surface_scope":  [
+                                            "script",
+                                            "process"
+                                        ],
+                      "match_confidence":  "medium",
+                      "source_ids":  [
+                                         "oneim-collection-load-types",
+                                         "oneim-base-objects"
+                                     ]
+                  },
+                  {
+                      "id":  "PER452",
+                      "title":  "Query.SelectAll() loads every column â€” prefer Select() with needed columns only",
+                      "category":  "performance",
+                      "severity":  "low",
+                      "confidence":  60,
+                      "state":  "active",
+                      "engine":  "declarative",
+                      "detector_family":  "query-performance",
+                      "why":  "SelectAll() retrieves every column in the table, including large text, binary, and rarely used fields. For wide tables (50+ columns) this multiplies network payload and memory usage. OneIM\u0027s performance tuning guide explicitly shows replacing SelectAll() with a targeted Select(col1, col2, ...) as the first optimisation step when iterating large collections.",
+                      "match_kind":  "line-pattern",
+                      "pattern":  "(?i)\\.SelectAll\\s*\\(\\s*\\)",
+                      "triggering_scenario":  "A script loads all Person objects with SelectAll() to read only FirstName and LastName. The query transfers all 60+ Person columns across the network for every row, inflating a simple export from seconds to minutes for large tenants.",
+                      "remediation":  "Replace .SelectAll() with .Select(\"Col1\", \"Col2\", ...) listing only the columns the loop actually reads. Combine with EntityCollectionLoadType.Slim to avoid unnecessary object inflation.",
+                      "test_ideas":  [
+                                         "\u0027.SelectAll()\u0027 should fire; \u0027.Select(\"FirstName\", \"LastName\")\u0027 should not fire; \u0027.SelectDisplays()\u0027 should not fire."
+                                     ],
+                      "surface_scope":  [
+                                            "script",
+                                            "process"
+                                        ],
+                      "match_confidence":  "high",
+                      "source_ids":  [
+                                         "oneim-collection-load-types",
+                                         "oneim-system-debugger-context"
+                                     ]
+                  },
+                  {
+                      "id":  "PER455",
+                      "title":  "BuildSessionFactory() called per method invocation â€” factory should be cached",
+                      "category":  "performance",
+                      "severity":  "medium",
+                      "confidence":  70,
+                      "state":  "active",
+                      "engine":  "coded",
+                      "detector_family":  "loop-performance",
+                      "max_examples_per_file":  4,
+                      "why":  "BuildSessionFactory() compiles connection metadata, validates the schema mapping, and allocates the connection pool infrastructure for an external database. This work is expensive (tens to hundreds of milliseconds) and the result is safe to reuse across calls. Placing it inside a helper method that is called once per provisioned account rebuilds the factory on every record, wasting significant time at scale.",
+                      "review_notes":  "Triggered on any line containing BuildSessionFactory(). The finding advises moving the factory to a Shared ReadOnly module-level field or a lazily-initialised cache so it is built once and reused.",
+                      "remediation":  "Move expensive data access, allocation, or persistence work out of the loop, or batch it so one iteration does not cause another round-trip.",
+                      "test_ideas":  [
+                                         "Enable SQL logging or benchmark data collection and verify the loop no longer causes one expensive operation per iteration."
+                                     ],
+                      "surface_scope":  [
+                                            "script",
+                                            "process"
+                                        ],
+                      "match_confidence":  "medium",
+                      "source_ids":  [
+                                         "dotnet-connection-pooling",
+                                         "oneim-system-debugger-context"
+                                     ]
+                  },
+                  {
+                      "id":  "CNC610",
+                      "title":  "Template write (PutValue/ExecuteTemplate) inside a dependency cycle",
+                      "category":  "concurrency",
+                      "severity":  "high",
+                      "confidence":  80,
+                      "enabled":  true,
+                      "state":  "active",
+                      "engine":  "coded",
+                      "detector_family":  "graph",
+                      "why":  "A template that writes values and participates in a circular dependency may trigger cascading re-evaluations, causing infinite loops, lock contention, or inconsistent field values during provisioning.",
+                      "review_notes":  "Flagged by the cascade graph analyser when a node marked is_writer belongs to a multi-node SCC (concurrency_risk becomes \u0027write-cycle\u0027).",
+                      "remediation":  "Break the dependency cycle or remove the write from the cycle so the template graph has a safe evaluation order.",
+                      "test_ideas":  [
+                                         "Rebuild the cascade report and verify the affected template no longer writes inside a cycle."
+                                     ],
+                      "surface_scope":  [
+                                            "any"
+                                        ],
+                      "match_confidence":  "medium",
+                      "source_ids":  [
+                                         "oneim-base-objects",
+                                         "oneim-system-debugger-context"
+                                     ]
+                  },
+                  {
+                      "id":  "WEB600",
+                      "title":  "Use HttpClient instead of obsolete HttpWebRequest / WebClient",
+                      "category":  "reliability",
+                      "severity":  "medium",
+                      "confidence":  90,
+                      "state":  "active",
+                      "engine":  "declarative",
+                      "detector_family":  "web-requests",
+                      "why":  "HttpWebRequest, WebRequest, and WebClient are marked obsolete in .NET 6+ (SYSLIB0014) and do not support modern features like HTTP/2, connection pooling via IHttpClientFactory, or async cancellation. In OneIM scripts that call external REST services the legacy types also handle TLS negotiation less robustly than HttpClient.",
+                      "match_kind":  "line-pattern",
+                      "pattern":  "(?i)\\bHttpWebRequest\\.Create\\s*\\(|\\bNew\\s+WebClient\\s*\\(\\s*\\)|\\bNew\\s+HttpWebRequest\\b",
+                      "triggering_scenario":  "A script calls an external REST endpoint using HttpWebRequest.Create() and manually manages request/response streams. When the target service upgrades to HTTP/2 or changes TLS requirements the call silently fails in ways that HttpClient would surface as clear exceptions.",
+                      "remediation":  "Replace HttpWebRequest / WebClient with System.Net.Http.HttpClient. Wrap it in a Using block or cache a shared instance. Use GetAsync / PostAsync with async/await where the OneIM script runtime permits it.",
+                      "test_ideas":  [
+                                         "\u0027HttpWebRequest.Create(url)\u0027 should fire; \u0027New WebClient()\u0027 should fire; \u0027New HttpClient()\u0027 should not fire."
+                                     ],
+                      "surface_scope":  [
+                                            "any"
+                                        ],
+                      "match_confidence":  "high",
+                      "source_ids":  [
+                                         "syslib0014",
+                                         "httpclient-guidelines"
+                                     ]
+                  },
+                  {
+                      "id":  "API600",
+                      "title":  "Do not enable ObservableEventStreamResponse.AwaitTasks without a reviewed deadlock-safe need",
+                      "category":  "concurrency",
+                      "severity":  "high",
+                      "confidence":  92,
+                      "state":  "active",
+                      "engine":  "coded",
+                      "detector_family":  "api-server-event-stream",
+                      "max_examples_per_file":  4,
+                      "why":  "The One Identity API Server reference explicitly states that ObservableEventStreamResponse.AwaitTasks can cause deadlocks while the system waits for outstanding write operations.",
+                      "review_notes":  "Triggered when code explicitly sets AwaitTasks = True. The API docs describe this as a deadlock risk, so only narrowly reviewed uses should survive this rule.",
+                      "remediation":  "Leave AwaitTasks disabled by default. If synchronous draining is truly required, document the reason, constrain the write path, and verify the shutdown flow under concurrency load.",
+                      "test_ideas":  [
+                                         "Run concurrent write activity against the event-stream path and confirm shutdown does not hang when AwaitTasks remains disabled.",
+                                         "If a reviewed exception is required, reproduce the shutdown path under load and document why the deadlock risk is acceptably controlled."
+                                     ],
+                      "surface_scope":  [
+                                            "any"
+                                        ],
+                      "match_confidence":  "high",
+                      "source_ids":  [
+                                         "oneim-apiserver-observable-event-stream-awaittasks",
+                                         "oneim-apiserver-observable-event-stream-response"
+                                     ]
+                  },
+                  {
+                      "id":  "API610",
+                      "title":  "Review API Server configurations that enable IncludeAllExceptionInfo",
+                      "category":  "security",
+                      "severity":  "low",
+                      "confidence":  55,
+                      "state":  "active",
+                      "engine":  "coded",
+                      "detector_family":  "api-server-config",
+                      "max_examples_per_file":  4,
+                      "why":  "The API Server configuration surface exposes an IncludeAllExceptionInfo switch. Enabling it can broaden the exception detail returned by the API and should be constrained to controlled troubleshooting scenarios.",
+                      "review_notes":  "Advisory only. Triggered on IncludeAllExceptionInfo = True because the property name itself suggests broader exception disclosure, but the runtime exposure still needs manual review.",
+                      "remediation":  "Prefer IncludeAllExceptionInfo = False for normal environments and enable full exception detail only for controlled diagnostics with a clear rollback path.",
+                      "test_ideas":  [
+                                         "Trigger a known API error and verify the client no longer receives unnecessary internal exception detail after disabling the setting.",
+                                         "Confirm server-side diagnostics still contain the required troubleshooting detail."
+                                     ],
+                      "surface_scope":  [
+                                            "any"
+                                        ],
+                      "match_confidence":  "low",
+                      "source_ids":  [
+                                         "oneim-apiserver-include-all-exception-info",
+                                         "oneim-apiserver-server-level-config"
+                                     ]
+                  },
+                  {
+                      "id":  "API620",
+                      "title":  "Review API Server configurations that disable endpoint security permission checks",
+                      "category":  "security",
+                      "severity":  "medium",
+                      "confidence":  58,
+                      "state":  "active",
+                      "engine":  "coded",
+                      "detector_family":  "api-server-config",
+                      "max_examples_per_file":  4,
+                      "why":  "The API Server configuration surface exposes an EnableEndpointSecurityPermissionCheck switch. Explicitly disabling that check deserves a manual review of the intended access boundary and deployment scope.",
+                      "review_notes":  "Advisory only because the property page is signature-oriented; the finding is driven by the explicit config choice and should be reviewed with environment context.",
+                      "remediation":  "Keep endpoint security permission checks enabled by default, and document any deliberate exception as a narrowly scoped operational decision.",
+                      "test_ideas":  [
+                                         "Exercise the endpoint with a principal lacking the expected permission and confirm access is rejected when the check is enabled.",
+                                         "Document the deployment scope and compensating controls if the check must remain disabled."
+                                     ],
+                      "surface_scope":  [
+                                            "any"
+                                        ],
+                      "match_confidence":  "low",
+                      "source_ids":  [
+                                         "oneim-apiserver-enable-endpoint-security-permission-check",
+                                         "oneim-apiserver-server-level-config"
+                                     ]
+                  },
+                  {
+                      "id":  "API630",
+                      "title":  "Review API Server wildcard CORS origin settings",
+                      "category":  "security",
+                      "severity":  "low",
+                      "confidence":  55,
+                      "state":  "active",
+                      "engine":  "coded",
+                      "detector_family":  "api-server-config",
+                      "max_examples_per_file":  4,
+                      "why":  "The API Server configuration surface exposes CorsOrigins as the explicit browser-origin allowlist. A wildcard entry broadens cross-origin access and should be reviewed against the intended client set.",
+                      "review_notes":  "Advisory only. Triggered when CorsOrigins contains \"*\" on the same line.",
+                      "remediation":  "Replace wildcard origins with the exact trusted origins that need browser access to the API surface.",
+                      "test_ideas":  [
+                                         "Send a browser-origin request from an untrusted origin and confirm it is rejected after narrowing the allowlist.",
+                                         "Verify the intended first-party origins still pass preflight and regular requests."
+                                     ],
+                      "surface_scope":  [
+                                            "any"
+                                        ],
+                      "match_confidence":  "low",
+                      "source_ids":  [
+                                         "oneim-apiserver-cors-origins",
+                                         "oneim-apiserver-server-level-config"
+                                     ]
+                  },
+                  {
+                      "id":  "API640",
+                      "title":  "Prefer IRequest.GetRequestIpAddress over manual forwarded-header parsing",
+                      "category":  "reliability",
+                      "severity":  "low",
+                      "confidence":  65,
+                      "state":  "active",
+                      "engine":  "coded",
+                      "detector_family":  "api-server-request-pipeline",
+                      "max_examples_per_file":  6,
+                      "why":  "The One Identity API Server exposes an IRequest.GetRequestIpAddress helper. Manually reading X-Forwarded-For or Forwarded headers can drift from the framework helper and proxy configuration behavior.",
+                      "review_notes":  "Triggered by obvious forwarded-header reads. This is a low-severity maintainability and consistency rule, not a proof of exploitable behavior by itself.",
+                      "remediation":  "Use IRequest.GetRequestIpAddress so client IP resolution stays aligned with the API Server request pipeline and configured proxy handling.",
+                      "test_ideas":  [
+                                         "Exercise both direct and reverse-proxy requests and confirm the resolved client IP still matches expectations after switching to GetRequestIpAddress.",
+                                         "Verify spoofed forwarded headers are handled consistently with the intended proxy configuration."
+                                     ],
+                      "surface_scope":  [
+                                            "any"
+                                        ],
+                      "match_confidence":  "medium",
+                      "source_ids":  [
+                                         "oneim-apiserver-get-request-ip-address"
+                                     ]
+                  },
+                  {
+                      "id":  "REL250",
+                      "title":  "IDisposable resource declared with Dim instead of Using â€” resource may leak",
+                      "category":  "reliability",
+                      "severity":  "medium",
+                      "confidence":  75,
+                      "state":  "active",
+                      "engine":  "declarative",
+                      "detector_family":  "resource-lifetime",
+                      "why":  "Declaring a disposable resource with Dim instead of Using means Dispose is only called if the code explicitly calls .Close() or .Dispose(). Any exception before that call leaks the resource. In the REST webservice sample, StreamReader and HttpWebResponse are closed manually, which means an exception between open and close silently leaks the connection or file handle.",
+                      "match_kind":  "line-pattern",
+                      "pattern":  "(?i)^\\s*Dim\\s+\\w+\\s+(?:As\\s+New\\s+|=\\s*New\\s+)(?:StreamReader|StreamWriter|FileStream|MemoryStream|SqlConnection|OracleConnection|HttpWebResponse|StreamWriter|BinaryReader|BinaryWriter)\\b",
+                      "triggering_scenario":  "A script opens a StreamReader, reads content, then calls .Close(). An exception thrown between open and close leaves the file handle open until GC finalises the object, potentially blocking other scripts from accessing the same file.",
+                      "remediation":  "Replace \u0027Dim reader As New StreamReader(path)\u0027 with \u0027Using reader As New StreamReader(path) ... End Using\u0027. The Using block guarantees Dispose is called even when an exception occurs.",
+                      "test_ideas":  [
+                                         "\u0027Dim reader As New StreamReader(path)\u0027 should fire; \u0027Using reader As New StreamReader(path)\u0027 should not fire; \u0027Dim sb As New StringBuilder()\u0027 should not fire (StringBuilder is not IDisposable)."
+                                     ],
+                      "surface_scope":  [
+                                            "any"
+                                        ],
+                      "match_confidence":  "high",
+                      "source_ids":  [
+                                         "ca2000"
+                                     ]
+                  },
+                  {
+                      "id":  "STR610",
+                      "title":  "String.Format() called with a variable as the format string â€” format injection risk",
+                      "category":  "security",
+                      "severity":  "medium",
+                      "confidence":  78,
+                      "state":  "active",
+                      "engine":  "declarative",
+                      "detector_family":  "format-string",
+                      "why":  "When the first argument to String.Format is a variable rather than a string literal, the format string can contain unexpected format specifiers if the variable comes from external input, a configuration store, or a user-supplied template. A malformed format string (e.g. too few arguments for the placeholders) throws a FormatException; a deliberately crafted one may expose internal data in log messages or error responses.",
+                      "match_kind":  "line-pattern",
+                      "pattern":  "(?i)\\bString\\.Format\\s*\\(\\s*[A-Za-z_]\\w*\\s*,",
+                      "triggering_scenario":  "A script reads a message template from a database config column and passes it directly to String.Format. An administrator who can edit that config entry can inject {99} placeholders to cause runtime exceptions or expose argument values in error logs.",
+                      "remediation":  "Use a string literal as the format argument: String.Format(\"Name: {0}\", name). If a user-supplied template is required, validate that it contains only safe placeholders before passing it to String.Format.",
+                      "test_ideas":  [
+                                         "\u0027String.Format(template, val1)\u0027 should fire; \u0027String.Format(\"{0}: {1}\", a, b)\u0027 should not fire; \u0027String.Format(GetMessage(), x)\u0027 should fire."
+                                     ],
+                      "surface_scope":  [
+                                            "any"
+                                        ],
+                      "match_confidence":  "high",
+                      "source_ids":  [
+                                         "owasp-credential-storage"
+                                     ]
+                  },
+                  {
+                      "id":  "OIM545",
+                      "title":  "GetSingleValue() throws when no row matches â€” prefer TryGetSingleValue()",
+                      "category":  "reliability",
+                      "severity":  "medium",
+                      "confidence":  72,
+                      "state":  "active",
+                      "engine":  "declarative",
+                      "detector_family":  "oneim-query",
+                      "why":  "Session.Source.GetSingleValue() throws a ViException when zero rows match the query. In provisioning scripts this aborts the entire sync job for the current object. TryGetSingleValue() returns Nothing when no row is found, allowing the script to handle the absent value gracefully rather than propagating an unhandled exception.",
+                      "match_kind":  "line-pattern",
+                      "pattern":  "(?i)\\b(?:Session\\.Source|Connection)\\b[^\\n]*\\.GetSingleValue\\s*\\(",
+                      "triggering_scenario":  "A provisioning script calls GetSingleValue to look up the home-server hostname for a user. When a new user has no home-server assignment the method throws, failing the provisioning job and writing a confusing exception to the sync log instead of a meaningful business message.",
+                      "remediation":  "Replace Session.Source.GetSingleValue(...) with Session.Source.TryGetSingleValue(...) and add a Nothing check on the result before using it.",
+                      "test_ideas":  [
+                                         "\u0027Session.Source.GetSingleValue(\"Person\", \"Firstname\", where)\u0027 should fire; \u0027Session.Source.TryGetSingleValue(\"Person\", \"Firstname\", where)\u0027 should not fire."
+                                     ],
+                      "surface_scope":  [
+                                            "script",
+                                            "process"
+                                        ],
+                      "match_confidence":  "high",
+                      "source_ids":  [
+                                         "oneim-base-objects",
+                                         "oneim-create-edit-scripts"
+                                     ]
+                  },
+                  {
+                      "id":  "OIM555",
+                      "title":  "IEntity.Save(Session) called inside a loop â€” use UnitOfWork.Put() for bulk writes",
+                      "category":  "performance",
+                      "severity":  "medium",
+                      "confidence":  75,
+                      "state":  "active",
+                      "engine":  "coded",
+                      "detector_family":  "loop-performance",
+                      "max_examples_per_file":  6,
+                      "why":  "Each .Save(Session) call commits a single object in its own database round-trip. Inside a loop that processes N objects this produces N individual INSERT/UPDATE/DELETE statements, each paying full round-trip latency. The OneIM UnitOfWork pattern (Session.StartUnitOfWork â†’ uow.Put â†’ uow.Commit) batches all changes into a single transaction, dramatically reducing database overhead for bulk operations.",
+                      "review_notes":  "Triggered when .Save(Session) appears at loop depth greater than 0.",
+                      "remediation":  "Move expensive data access, allocation, or persistence work out of the loop, or batch it so one iteration does not cause another round-trip.",
+                      "test_ideas":  [
+                                         "Enable SQL logging or benchmark data collection and verify the loop no longer causes one expensive operation per iteration."
+                                     ],
+                      "surface_scope":  [
+                                            "script",
+                                            "process"
+                                        ],
+                      "match_confidence":  "medium",
+                      "source_ids":  [
+                                         "oneim-base-objects",
+                                         "oneim-system-debugger-context"
+                                     ]
+                  },
+                  {
+                      "id":  "OIM560",
+                      "title":  "Multiple TryGetSingleValue calls with the same table and where clause â€” use TryGet instead",
+                      "category":  "performance",
+                      "severity":  "low",
+                      "confidence":  78,
+                      "state":  "active",
+                      "engine":  "coded",
+                      "detector_family":  "enumeration-performance",
+                      "max_examples_per_file":  6,
+                      "why":  "Each TryGetSingleValue call issues a separate SELECT that returns exactly one column. When the same table is queried two or more times with the same where clause, the extra round-trips are avoidable. Session.Source.TryGet(Of IEntity) loads the entity once and returns Nothing when no row matches â€” the same safe behaviour as TryGetSingleValue â€” while making all columns available in memory for the cost of a single SELECT.",
+                      "review_notes":  "Triggered when TryGetSingleValue or GetSingleValue appears two or more times in the same file with the same table name (first string literal) and the same where clause expression (third argument). Calls with different where clauses are not grouped. Each call after the first in a matching group is reported as a finding.",
+                      "remediation":  "Reduce repeated traversal or repeated single-row lookups by caching the result once and reusing it inside the hot path.",
+                      "test_ideas":  [
+                                         "Benchmark the hot path before and after caching or collapsing the repeated enumeration or single-row lookup."
+                                     ],
+                      "surface_scope":  [
+                                            "script",
+                                            "process"
+                                        ],
+                      "match_confidence":  "medium",
+                      "source_ids":  [
+                                         "oneim-base-objects",
+                                         "oneim-create-edit-scripts"
+                                     ]
+                  },
+                  {
+                      "id":  "OIM570",
+                      "title":  "MultiValueProperty modified (.Add/.Remove) without writing .Value back via PutValue â€” changes silently lost",
+                      "category":  "reliability",
+                      "severity":  "high",
+                      "confidence":  82,
+                      "state":  "active",
+                      "engine":  "coded",
+                      "detector_family":  "null-safety",
+                      "max_examples_per_file":  4,
+                      "why":  "MultiValueProperty is an in-memory wrapper around a single database column string. Calling .Add() or .Remove() updates the wrapper but the underlying column is only updated when you call entity.PutValue(\"Column\", mvp.Value). If .Value is never passed to PutValue the modifications are silently discarded when the entity goes out of scope.",
+                      "review_notes":  "Triggered when a file declares a MultiValueProperty variable and calls .Add() or .Remove() on it but no line in the file passes .Value to PutValue. Fires at the line of the first modification call.",
+                      "remediation":  "Add the required emptiness or bounds checks before dereferencing the value so the code path handles missing data safely.",
+                      "test_ideas":  [
+                                         "Run the code with empty, missing, or short collections and confirm the path no longer throws."
+                                     ],
+                      "surface_scope":  [
+                                            "any"
+                                        ],
+                      "match_confidence":  "high",
+                      "source_ids":  [
+                                         "oneim-base-objects",
+                                         "oneim-create-edit-scripts"
+                                     ]
+                  },
+                  {
+                      "id":  "OIM571",
+                      "title":  "MultiValueProperty accessed by index without a preceding .Count bounds check",
+                      "category":  "reliability",
+                      "severity":  "medium",
+                      "confidence":  78,
+                      "state":  "active",
+                      "engine":  "coded",
+                      "detector_family":  "null-safety",
+                      "max_examples_per_file":  6,
+                      "why":  "Accessing a MultiValueProperty by position (mvp(i)) without first checking mvp.Count throws an IndexOutOfRangeException when the stored value has fewer entries than expected. The OneIM reference sample explicitly guards every positional access with \u0027If iPos \u003c mvp.Count Then\u0027.",
+                      "review_notes":  "Triggered when a MultiValueProperty variable is accessed by array index on a line where no .Count check is visible in the preceding 10 lines.",
+                      "remediation":  "Add the required emptiness or bounds checks before dereferencing the value so the code path handles missing data safely.",
+                      "test_ideas":  [
+                                         "Run the code with empty, missing, or short collections and confirm the path no longer throws."
+                                     ],
+                      "surface_scope":  [
+                                            "any"
+                                        ],
+                      "match_confidence":  "medium",
+                      "source_ids":  [
+                                         "oneim-base-objects",
+                                         "oneim-create-edit-scripts"
+                                     ]
+                  },
+                  {
+                      "id":  "OIM580",
+                      "title":  "VI_AE_ITDataFrom* called without comment-based column dependency declarations",
+                      "category":  "correctness",
+                      "severity":  "medium",
+                      "confidence":  76,
+                      "state":  "active",
+                      "engine":  "coded",
+                      "detector_family":  "oneim-side-effects",
+                      "max_examples_per_file":  4,
+                      "why":  "VI_AE_ITDataFromOrg and VI_AE_ITDataFromPers read multiple columns from the IT data hierarchy internally. The OneIM template engine only schedules re-evaluation when it sees an explicit column reference ($Column$) in the template. When all references are hidden inside the ITData function call the template is never re-triggered on data changes. The workaround is to declare the hidden dependencies as comment-based dollar references (\u0027$Column$) so the engine registers them.",
+                      "review_notes":  "Triggered when VI_AE_ITDataFromOrg or VI_AE_ITDataFromPers appears in the file but no comment lines with the \u0027$...$\u0027 dollar-notation dependency pattern are present. Fires at the line of the ITData call.",
+                      "remediation":  "Make hidden OneIM side effects explicit with guards or dependency declarations so evaluation and recalculation happen when intended.",
+                      "test_ideas":  [
+                                         "Change the dependency inputs in a test environment and confirm the script recalculates only when intended."
+                                     ],
+                      "surface_scope":  [
+                                            "template"
+                                        ],
+                      "match_confidence":  "medium",
+                      "source_ids":  [
+                                         "oneim-base-objects",
+                                         "oneim-create-edit-scripts"
+                                     ]
+                  },
+                  {
+                      "id":  "VB006",
+                      "title":  "Avoid Parse() â€” use TryParse() to prevent FormatException",
+                      "category":  "correctness",
+                      "severity":  "medium",
+                      "confidence":  85,
+                      "state":  "active",
+                      "engine":  "declarative",
+                      "detector_family":  "language-safety",
+                      "why":  "Direct .Parse() calls throw on invalid or null input. OneIM scripts receive column values from the database which may be empty strings or non-numeric. Unhandled FormatException in a template or script aborts the provisioning process.",
+                      "match_kind":  "line-pattern",
+                      "pattern":  "\\b(Integer|Long|Int32|Int64|Short|Int16|Double|Single|Decimal)\\.Parse\\s*\\(",
+                      "triggering_scenario":  "Calling Integer.Parse(), Long.Parse(), Double.Parse(), etc. throws FormatException when the input is not a valid number and InvalidCastException for null. In OneIM templates the column value comes from user input or external data and may not be numeric.",
+                      "remediation":  "Replace .Parse() with the corresponding .TryParse() pattern: Dim result As Integer; If Integer.TryParse(rawValue, result) Then ... Else handle invalid input. This avoids unhandled exceptions.",
+                      "test_ideas":  [
+                                         "Verify Integer.Parse(value) triggers the rule.",
+                                         "Verify Long.Parse(value) triggers the rule.",
+                                         "Verify Integer.TryParse(value, result) does NOT trigger the rule.",
+                                         "Verify Double.TryParse does NOT trigger the rule."
+                                     ],
+                      "surface_scope":  [
+                                            "any"
+                                        ],
+                      "match_confidence":  "high",
+                      "source_ids":  [
+                                         "vb-error-handling"
+                                     ]
+                  },
+                  {
+                      "id":  "REL260",
+                      "title":  "CType/DirectCast used without a preceding TypeOf guard",
+                      "category":  "reliability",
+                      "severity":  "medium",
+                      "confidence":  70,
+                      "state":  "active",
+                      "engine":  "coded",
+                      "detector_family":  "safe-cast",
+                      "max_examples_per_file":  6,
+                      "why":  "CType and DirectCast throw InvalidCastException at runtime when the object is not of the target type. In OneIM objects may be Nothing or a different subtype depending on provisioning state.",
+                      "review_notes":  "Triggered when CType() or DirectCast() appears without a TypeOf ... Is ... check in the preceding context_lines lines.",
+                      "remediation":  "Add a TypeOf or TryCast guard so invalid runtime types are handled safely instead of throwing at the cast site.",
+                      "test_ideas":  [
+                                         "Pass an object of the wrong type and confirm the cast path is now guarded instead of throwing."
+                                     ],
+                      "surface_scope":  [
+                                            "any"
+                                        ],
+                      "match_confidence":  "high",
+                      "source_ids":  [
+                                         "vb-error-handling"
+                                     ]
+                  },
+                  {
+                      "id":  "SEC200",
+                      "title":  "Process.Start() call detected â€” potential OS command injection risk",
+                      "category":  "security",
+                      "severity":  "high",
+                      "confidence":  90,
+                      "state":  "active",
+                      "engine":  "declarative",
+                      "detector_family":  "process-execution",
+                      "why":  "Running OS commands from within OneIM provisioning scripts exposes the server to privilege escalation and command injection. Even fixed paths can be abused if arguments are derived from provisioning data.",
+                      "match_kind":  "line-pattern",
+                      "pattern":  "\\bProcess\\.Start\\s*\\(",
+                      "triggering_scenario":  "Process.Start() launches an OS-level process. If any part of the arguments is derived from user-controlled or database-sourced values without sanitization, an attacker can inject arbitrary OS commands.",
+                      "remediation":  "Avoid Process.Start() in OneIM scripts. If an external process must be launched, use a fixed executable path and argument list with no user-controlled segments. Validate and whitelist all input values before constructing arguments.",
+                      "test_ideas":  [
+                                         "Verify Process.Start(path) triggers the rule.",
+                                         "Verify a comment mentioning Process.Start does NOT trigger the rule.",
+                                         "Verify the compliant alternative (no Process.Start call) does not trigger."
+                                     ],
+                      "surface_scope":  [
+                                            "any"
+                                        ],
+                      "match_confidence":  "high",
+                      "source_ids":  [
+                                         "vb-security"
+                                     ]
+                  },
+                  {
+                      "id":  "OIM590",
+                      "title":  "Session.Source.GetList called with an empty WHERE filter",
+                      "category":  "performance",
+                      "severity":  "medium",
+                      "confidence":  88,
+                      "state":  "active",
+                      "engine":  "coded",
+                      "detector_family":  "oneim-query",
+                      "max_examples_per_file":  4,
+                      "why":  "Calling GetList with an empty string or String.Empty as the WHERE clause loads the entire table into memory. In production OneIM databases these tables can contain millions of rows, causing severe memory pressure and slow provisioning.",
+                      "review_notes":  "Triggered when Session.Source.GetList is called with an empty string literal or String.Empty as the first non-type argument.",
+                      "remediation":  "Use narrower, bulk-friendly OneIM query patterns so the code does not fetch the whole table or throw on expected missing rows.",
+                      "test_ideas":  [
+                                         "Enable SQL logging and confirm the query path no longer reads the whole table or throws on expected missing data."
+                                     ],
+                      "surface_scope":  [
+                                            "any"
+                                        ],
+                      "match_confidence":  "high",
+                      "source_ids":  [
+                                         "oneim-base-objects"
+                                     ]
+                  },
+                  {
+                      "id":  "OIM597",
+                      "title":  "TryGet / TryGetSingleValue called inside a loop â€” prefer GetCollection for bulk reads",
+                      "category":  "performance",
+                      "severity":  "medium",
+                      "confidence":  78,
+                      "state":  "active",
+                      "engine":  "coded",
+                      "detector_family":  "loop-performance",
+                      "max_examples_per_file":  6,
+                      "why":  "TryGet and TryGetSingleValue each issue a separate SELECT per call. Calling them inside a loop produces an N+1 query pattern: 100 loop iterations produce 100 individual round-trips to the database. Session.Source.GetCollection (or GetCollectionFiltered) loads all matching entities in a single query and allows in-memory lookup, collapsing N round-trips into one.",
+                      "review_notes":  "Triggered when TryGet, TryGetSingleValue, or TryGetSingleFiltered appear inside a loop body (loop depth \u003e 0). False positives may occur when the loop body only executes once in practice; review the loop range before acting.",
+                      "remediation":  "Move expensive data access, allocation, or persistence work out of the loop, or batch it so one iteration does not cause another round-trip.",
+                      "test_ideas":  [
+                                         "Enable SQL logging or benchmark data collection and verify the loop no longer causes one expensive operation per iteration."
+                                     ],
+                      "surface_scope":  [
+                                            "script",
+                                            "process"
+                                        ],
+                      "match_confidence":  "medium",
+                      "source_ids":  [
+                                         "oneim-base-objects",
+                                         "oneim-system-debugger-context"
+                                     ]
+                  },
+                  {
+                      "id":  "OIM596",
+                      "title":  "Hardcoded business value in comparison should use Connection.GetConfigParmValue",
+                      "category":  "correctness",
+                      "severity":  "low",
+                      "confidence":  65,
+                      "state":  "active",
+                      "engine":  "coded",
+                      "detector_family":  "oneim-config-param",
+                      "max_examples_per_file":  6,
+                      "why":  "OneIM Designer allows administrators to store environment-specific values (status codes, department names, thresholds) as named Configuration Parameters. Scripts that hardcode these values directly must be modified and redeployed when the business value changes. Using Connection.GetConfigParmValue(\"KeyName\") externalizes the value and allows administrators to change it without touching the script.",
+                      "review_notes":  "Triggered when entity.GetValue() or GetColumnValue() results are compared against a hardcoded non-trivial string literal and Connection.GetConfigParmValue is not called anywhere in the file. False positives are common for technical constants (GUIDs, empty string); review each finding manually.",
+                      "remediation":  "Move environment-specific business literals into OneIM configuration parameters and read them through the supported config API.",
+                      "test_ideas":  [
+                                         "Change the configuration parameter in a test environment and confirm the behavior updates without a code change."
+                                     ],
+                      "surface_scope":  [
+                                            "script",
+                                            "process"
+                                        ],
+                      "match_confidence":  "medium",
+                      "source_ids":  [
+                                         "oneim-create-edit-scripts",
+                                         "oneim-base-objects"
+                                     ]
+                  }
+              ]
+}

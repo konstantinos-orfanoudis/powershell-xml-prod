@@ -1,0 +1,4 @@
+interface:
+  display_name: "OneIM VB.NET Auditor"
+  short_description: "Audit OneIM VB.NET with approved sources"
+  default_prompt: "Use $oneim-vbnet-auditor to audit One Identity Manager VB.NET code with approved One Identity, Microsoft Learn, and OWASP evidence."

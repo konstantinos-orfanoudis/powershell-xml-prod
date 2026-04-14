@@ -16,6 +16,59 @@ export interface Issue {
 
 function mkId() { return `iss-${crypto.randomUUID?.() ?? Math.random().toString(36).slice(2)}`; }
 
+function normalizeDeclaredEncoding(value: string) {
+  const cleaned = String(value || "")
+    .trim()
+    .replace(/\s+with\s+bom$/i, "")
+    .replace(/^utf8$/i, "utf-8");
+
+  return cleaned;
+}
+
+function buildNormalizedXmlDeclaration(declaration: string) {
+  const version =
+    declaration.match(/version\s*=\s*["']?([A-Za-z0-9._-]+)["']?/i)?.[1] ?? "1.0";
+  const standalone =
+    declaration.match(/standalone\s*=\s*["']?(yes|no)["']?/i)?.[1]?.toLowerCase();
+  const rawEncoding =
+    declaration.match(/encoding\s*=\s*["']?([^"'?>]+)/i)?.[1] ??
+    declaration.match(/encoding\s*=\s*["']?([^?>\s]+)/i)?.[1] ??
+    "";
+  const encoding = normalizeDeclaredEncoding(rawEncoding);
+
+  return `<?xml version="${version}"${encoding ? ` encoding="${encoding}"` : ""}${
+    standalone ? ` standalone="${standalone}"` : ""
+  }?>`;
+}
+
+export function prepareXmlForValidation(xmlText: string) {
+  const originalXml = String(xmlText || "");
+  let xmlForParsing = originalXml.replace(/^\uFEFF/, "");
+  let declarationIssue: Issue | undefined;
+
+  const declarationMatch = xmlForParsing.match(/^\s*<\?xml[\s\S]*?\?>/i);
+  if (declarationMatch) {
+    const normalizedDeclaration = buildNormalizedXmlDeclaration(declarationMatch[0]);
+    if (normalizedDeclaration !== declarationMatch[0].trim()) {
+      xmlForParsing =
+        normalizedDeclaration + xmlForParsing.slice(declarationMatch[0].length);
+      declarationIssue = {
+        id: mkId(),
+        message:
+          'XML declaration was normalized for validation. Non-standard encoding values like "utf-8 with BOM" are tolerated here.',
+        code: "xml.declaration.normalized",
+        severity: "warning",
+        line: 1,
+        column: 1,
+        length: declarationMatch[0].length,
+        relatedPath: "<?xml ... ?>",
+      };
+    }
+  }
+
+  return { xmlForParsing, declarationIssue };
+}
+
 function buildLineIndex(text: string) {
   const starts: number[] = [0];
   for (let i = 0; i < text.length; i++) if (text[i] === "\n") starts.push(i + 1);
@@ -74,9 +127,13 @@ function tagList(doc: Document, tag: string) { return Array.from(doc.getElements
 export function validateConnector(xmlText: string, psText: string, entities: SchemaEntity[]): Issue[] {
   const issues: Issue[] = [];
   const starts = buildLineIndex(xmlText);
+  const preparedXml = prepareXmlForValidation(xmlText);
+  if (preparedXml.declarationIssue) {
+    issues.push(preparedXml.declarationIssue);
+  }
 
   // 1) XML well-formed
-  const dom = new DOMParser().parseFromString(xmlText, "application/xml");
+  const dom = new DOMParser().parseFromString(preparedXml.xmlForParsing, "application/xml");
   const parseErr = dom.getElementsByTagName("parsererror")[0];
   if (parseErr) {
     const raw = parseErr.textContent?.trim() ?? "XML is not well-formed";
@@ -141,6 +198,15 @@ export function validateConnector(xmlText: string, psText: string, entities: Sch
 
   const binds = tagList(dom, "Bind");
   for (const b of binds) {
+    const commandResultOf = attr(b, "commandResultOf") || attr(b, "CommandResultOf");
+    const path = attr(b, "path") || attr(b, "Path");
+
+    // Return-binding style <Bind> nodes use CommandResultOf/Path instead of from/to.
+    // Those are validated elsewhere and should not trip the generic bind rule.
+    if (nonEmpty(commandResultOf) || nonEmpty(path)) {
+      continue;
+    }
+
     const src = attr(b, "from") || attr(b, "From") || attr(b, "source") || attr(b, "Source");
     const dst = attr(b, "to") || attr(b, "To") || attr(b, "target") || attr(b, "Target");
     if (!nonEmpty(src) || !nonEmpty(dst)) {

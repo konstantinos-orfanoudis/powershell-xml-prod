@@ -1,0 +1,123 @@
+
+> powershell-parser@0.1.0 dev
+> next dev -p 3000
+
+   ▲ Next.js 15.5.2
+   - Local:        http://localhost:3000
+   - Network:      http://10.0.0.46:3000
+   - Environments: .env.local
+
+ ✓ Starting...
+ ✓ Ready in 5.5s
+ ○ Compiling /sscp ...
+ ✓ Compiled /sscp in 20.4s (592 modules)
+ ✓ Compiled in 2.9s (236 modules)
+ GET /sscp 200 in 24821ms
+ ✓ Compiled in 1914ms (236 modules)
+ ○ Compiling /api/sscp/drill ...
+ ✓ Compiled /api/sscp/drill in 4.9s (443 modules)
+ POST /api/sscp/drill 200 in 91115ms
+ ✓ Compiled in 16.3s (237 modules)
+ ✓ Compiled in 19.6s (237 modules)
+ ✓ Compiled in 12.6s (237 modules)
+ ✓ Compiled in 12.4s (237 modules)
+ ○ Compiling /api/sscp/drill ...
+ ✓ Compiled /api/sscp/drill in 3.8s (220 modules)
+ POST /api/sscp/drill 200 in 7052ms
+ ✓ Compiled in 17s (457 modules)
+ POST /api/sscp/drill 200 in 16653ms
+ ✓ Compiled in 16.5s (457 modules)
+ POST /api/sscp/drill 200 in 19518ms
+ ○ Compiling /sscp ...
+ ✓ Compiled /sscp in 6.5s (338 modules)
+ GET /sscp 200 in 10861ms
+ ○ Compiling /favicon.ico ...
+ ✓ Compiled /favicon.ico in 2.9s (355 modules)
+ GET /favicon.ico 200 in 4133ms
+ ○ Compiling /api/sscp/drill ...
+ ✓ Compiled /api/sscp/drill in 873ms (477 modules)
+ POST /api/sscp/drill 200 in 16926ms
+ ✓ Compiled in 9.8s (237 modules)
+ ○ Compiling /_error ...
+ ✓ Compiled /_error in 63.9s (914 modules)
+ GET /sscp 500 in 72299ms
+ GET /sscp 200 in 2898ms
+ GET /sscp 200 in 371ms
+ GET /sscp 200 in 381ms
+ GET /sscp 200 in 1999ms
+ ✓ Compiled in 8.5s (387 modules)
+ GET /sscp 200 in 396ms
+ ✓ Compiled in 7.7s (387 modules)
+ GET /sscp 200 in 365ms
+ ✓ Compiled in 7.6s (387 modules)
+ GET /sscp 200 in 535ms
+ ✓ Compiled in 7.8s (387 modules)
+ GET /sscp 200 in 290ms
+ ✓ Compiled in 7.6s (387 modules)
+ GET /sscp 200 in 380ms
+ ✓ Compiled in 8.2s (387 modules)
+ GET /sscp 200 in 288ms
+ ○ Compiling /api/sscp/drill ...
+ ✓ Compiled /api/sscp/drill in 6.1s (571 modules)
+ GET /sscp 200 in 1692ms
+ POST /api/sscp/drill 200 in 22783ms
+ POST /api/sscp/drill 200 in 16132ms
+ ○ Compiling / ...
+ ✓ Compiled / in 16.1s (870 modules)
+ GET / 200 in 20362ms
+ ○ Compiling /_not-found ...
+ ✓ Compiled /_not-found in 19.1s (820 modules)
+ GET /Powershell-Connectorstool 404 in 29341ms
+ ○ Compiling / ...
+ ✓ Compiled / in 1587ms (490 modules)
+ GET / 200 in 6386ms
+ ○ Compiling /Powershell-ConnectorsTool ...
+ ✓ Compiled /Powershell-ConnectorsTool in 9.5s (884 modules)
+ GET /Powershell-ConnectorsTool 200 in 12752ms
+ ○ Compiling /powershell-XML ...
+ ✓ Compiled /powershell-XML in 34s (910 modules)
+ GET /powershell-XML 200 in 41600ms
+ ✓ Compiled in 18.9s (924 modules)
+ ✓ Compiled in 9ms (511 modules)
+ GET /Powershell-ConnectorsTool 200 in 14674ms
+ GET /powershell-XML 200 in 14767ms
+ GET /Powershell-ConnectorsTool 200 in 1185ms
+ ○ Compiling /XML-Validator ...
+ ✓ Compiled /XML-Validator in 13.7s (917 modules)
+ GET /XML-Validator 200 in 19173ms
+ ○ Compiling /api/ai/xml-validator ...
+ ✓ Compiled /api/ai/xml-validator in 10.9s (1046 modules)
+ POST /api/ai/xml-validator 502 in 21672ms
+ ✓ Compiled in 19.6s (931 modules)
+ GET /XML-Validator 200 in 3301ms
+ ○ Compiling /api/ai/xml-validator ...
+ ✓ Compiled /api/ai/xml-validator in 9s (645 modules)
+ GET /XML-Validator 200 in 1832ms
+ POST /api/ai/xml-validator 200 in 23936ms
+ GET /XML-Validator 200 in 5906ms
+ ○ Compiling /favicon.ico ...
+ ✓ Compiled /favicon.ico in 7.9s (533 modules)
+ GET /favicon.ico 200 in 9393ms
+ ○ Compiling /api/ai/xml-validator ...
+ ✓ Compiled /api/ai/xml-validator in 1524ms (647 modules)
+ POST /api/ai/xml-validator 200 in 29263ms
+ POST /api/ai/xml-validator 200 in 27283ms
+ ✓ Compiled in 30.2s (1060 modules)
+ GET /XML-Validator 200 in 1135ms
+ POST /api/ai/xml-validator 200 in 22198ms
+ ✓ Compiled in 37.1s (1060 modules)
+ GET /XML-Validator 200 in 1502ms
+ POST /api/ai/xml-validator 200 in 26364ms
+ ✓ Compiled in 28s (931 modules)
+ GET /XML-Validator 200 in 2418ms
+ GET /XML-Validator 200 in 2367ms
+ ○ Compiling /favicon.ico ...
+ ✓ Compiled /favicon.ico in 5.4s (533 modules)
+ GET /favicon.ico 200 in 8121ms
+ ○ Compiling /api/ai/xml-validator ...
+ ✓ Compiled /api/ai/xml-validator in 1684ms (647 modules)
+ POST /api/ai/xml-validator 200 in 25238ms
+ GET /sscp 200 in 3960ms
+ ○ Compiling /api/sscp/drill ...
+ ✓ Compiled /api/sscp/drill in 10.9s (653 modules)
+ POST /api/sscp/drill 200 in 27300ms

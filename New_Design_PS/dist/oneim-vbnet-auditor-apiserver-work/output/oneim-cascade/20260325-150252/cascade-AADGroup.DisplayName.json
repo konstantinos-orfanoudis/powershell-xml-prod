@@ -1,0 +1,23 @@
+{
+  "root_template": "AADGroup.DisplayName",
+  "generated_at": "2026-03-25 15:02:52",
+  "node_count": 1,
+  "edge_count": 0.0,
+  "cycle_count": 0,
+  "bottleneck": null,
+  "nodes": [
+    {
+      "key": "AADGroup.DisplayName",
+      "node_type": "template",
+      "table_name": "AADGroup",
+      "column_name": "DisplayName",
+      "has_template": false,
+      "avg_ms": null,
+      "p95_ms": null,
+      "threshold_exceeded": false,
+      "in_cycle": false,
+      "cycle_paths": []
+    }
+  ],
+  "cycles": []
+}

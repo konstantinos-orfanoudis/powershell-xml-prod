@@ -1,0 +1,56 @@
+{
+  "report_metadata": {
+    "generated_at": "2026-03-25T12:05:28.3407335+00:00",
+    "backend": "BuiltinSampler",
+    "warmup_count": 1,
+    "measured_run_count": 3,
+    "access_mode": "Auto",
+    "project_config_path": "C:\\Users\\aiuser\\Documents\\DMWorkshop2\\Config\\Example\\projectConfig.xml",
+    "schema_snapshot_path": "C:\\Users\\aiuser\\Desktop\\System_Debugger_Libary\\.agents\\skills\\oneim-vbnet-auditor\\output\\oneim-schema\\AIplayground_OneIM931\\schema-snapshot.json",
+    "thresholds_file": null
+  },
+  "summary": {
+    "total_benchmarks": 1,
+    "total_errors": 0,
+    "threshold_failures": 0
+  },
+  "results": [
+    {
+      "name": "Person.FirstName",
+      "surface": "template",
+      "table_name": "Person",
+      "column_name": "FirstName",
+      "column_uid": "QER-8F03B89FA2F7451597EAAED8E9B9057B",
+      "has_template": false,
+      "template_preview": "",
+      "warmup_count": 1,
+      "measured_run_count": 3,
+      "backend": "BuiltinSampler",
+      "avg_ms": 44.751,
+      "stddev_ms": 54.528,
+      "min_ms": 4.244,
+      "max_ms": 121.832,
+      "p95_ms": 121.832,
+      "raw_samples": [
+        {
+          "elapsed_ms": 8.177,
+          "memory_delta_bytes": 501240,
+          "cpu_delta_ms": 31.25
+        },
+        {
+          "elapsed_ms": 121.832,
+          "memory_delta_bytes": 156192,
+          "cpu_delta_ms": 15.625
+        },
+        {
+          "elapsed_ms": 4.244,
+          "memory_delta_bytes": 155960,
+          "cpu_delta_ms": 0.0
+        }
+      ],
+      "threshold_exceeded": false,
+      "threshold_details": null,
+      "error": null
+    }
+  ]
+}

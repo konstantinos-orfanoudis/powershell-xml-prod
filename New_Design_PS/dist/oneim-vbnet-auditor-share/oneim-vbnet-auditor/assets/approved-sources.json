@@ -1,0 +1,601 @@
+{
+  "policy_version": "2026-03-23",
+  "default_oneim_version": "9.3.1",
+  "allowed_authorities": [
+    {
+      "name": "One Identity",
+      "domains": [
+        "support.oneidentity.com"
+      ],
+      "priority": 1,
+      "use_for": [
+        "oneim-behavior",
+        "oneim-version-context",
+        "oneim-script-guidance"
+      ]
+    },
+    {
+      "name": "Microsoft Learn",
+      "domains": [
+        "learn.microsoft.com"
+      ],
+      "priority": 2,
+      "use_for": [
+        "vbnet-semantics",
+        "dotnet-analyzers",
+        "reliability",
+        "performance",
+        "api-guidance"
+      ]
+    },
+    {
+      "name": "OWASP",
+      "domains": [
+        "cheatsheetseries.owasp.org",
+        "owasp.org"
+      ],
+      "priority": 3,
+      "use_for": [
+        "vulnerability-classes",
+        "defense-in-depth-guidance"
+      ]
+    }
+  ],
+  "blocked_source_types": [
+    "blogs",
+    "stack-overflow",
+    "forums",
+    "github-issues",
+    "ai-summaries",
+    "vendor-marketing"
+  ],
+  "confidence_rules": {
+    "high": [
+      "direct-code-evidence",
+      "approved-source-match",
+      "clear-sink-or-failure-mode",
+      "version-matched-oneim-context-when-needed"
+    ],
+    "medium": [
+      "direct-code-evidence",
+      "approved-generic-dotnet-or-owasp-guidance",
+      "incomplete-oneim-or-runtime-context"
+    ],
+    "low": [
+      "heuristic-smell-without-clear-sink",
+      "generalized-owasp-only-pattern",
+      "cross-version-oneim-comparison"
+    ],
+    "fallback": "needs-manual-review"
+  },
+  "sources": [
+    {
+      "id": "oneim-support-9.3.1",
+      "family": "oneim-version-context",
+      "title": "Identity Manager 9.3.1 product support anchor",
+      "authority": "One Identity",
+      "url": "https://support.oneidentity.com/identity-manager/9.3.1",
+      "applies_to": [
+        "version-awareness",
+        "support-lifecycle"
+      ]
+    },
+    {
+      "id": "oneim-test-scripts",
+      "family": "oneim-script-guidance",
+      "title": "Testing scripts in the Script Editor",
+      "authority": "One Identity",
+      "url": "https://support.oneidentity.com/technical-documents/identity-manager/9.3/configuration-guide/scripts-in-one-identity-manager/testing-scripts-in-the-script-editor",
+      "applies_to": [
+        "script-testing",
+        "sql-log",
+        "transaction-context"
+      ]
+    },
+    {
+      "id": "oneim-create-edit-scripts",
+      "family": "oneim-script-guidance",
+      "title": "Creating and editing scripts in the Script Editor",
+      "authority": "One Identity",
+      "url": "https://support.oneidentity.com/technical-documents/identity-manager/9.3/configuration-guide/scripts-in-one-identity-manager/creating-and-editing-scripts-in-the-script-editor",
+      "applies_to": [
+        "script-scope",
+        "designer-context",
+        "custom-script-authoring"
+      ]
+    },
+    {
+      "id": "oneim-overriding-scripts",
+      "family": "oneim-script-guidance",
+      "title": "Overriding scripts",
+      "authority": "One Identity",
+      "url": "https://support.oneidentity.com/technical-documents/identity-manager/9.3/configuration-guide/scripts-in-one-identity-manager/overriding-scripts",
+      "applies_to": [
+        "ootb-vs-custom",
+        "override-patterns"
+      ]
+    },
+    {
+      "id": "oneim-base-objects",
+      "family": "oneim-script-guidance",
+      "title": "Using base objects",
+      "authority": "One Identity",
+      "url": "https://support.oneidentity.com/technical-documents/identity-manager/9.3/configuration-guide/scripts-in-one-identity-manager/using-base-objects",
+      "applies_to": [
+        "base-putvalue",
+        "object-writes",
+        "oneim-script-semantics"
+      ]
+    },
+    {
+      "id": "oneim-system-debugger-context",
+      "family": "oneim-script-guidance",
+      "title": "System Debugger logging and testing context",
+      "authority": "One Identity",
+      "url": "https://support.oneidentity.com/technical-documents/identity-manager/9.3/configuration-guide/23",
+      "applies_to": [
+        "sql-log",
+        "object-log",
+        "performance-timing",
+        "debugging-context"
+      ]
+    },
+    {
+      "id": "vb-option-strict",
+      "family": "vbnet-semantics",
+      "title": "Option Strict Statement",
+      "authority": "Microsoft Learn",
+      "url": "https://learn.microsoft.com/en-us/dotnet/visual-basic/language-reference/statements/option-strict-statement",
+      "applies_to": [
+        "implicit-conversions",
+        "late-binding",
+        "correctness"
+      ]
+    },
+    {
+      "id": "vb-option-explicit",
+      "family": "vbnet-semantics",
+      "title": "Option Explicit Statement",
+      "authority": "Microsoft Learn",
+      "url": "https://learn.microsoft.com/en-ca/dotnet/visual-basic/language-reference/statements/option-explicit-statement",
+      "applies_to": [
+        "undeclared-variables",
+        "correctness"
+      ]
+    },
+    {
+      "id": "vb-string-culture",
+      "family": "vbnet-semantics",
+      "title": "How Culture Affects Strings in Visual Basic",
+      "authority": "Microsoft Learn",
+      "url": "https://learn.microsoft.com/en-us/dotnet/visual-basic/programming-guide/language-features/strings/how-culture-affects-strings",
+      "applies_to": [
+        "string-comparison",
+        "identifier-comparison",
+        "security-sensitive-comparison"
+      ]
+    },
+    {
+      "id": "ca1031",
+      "family": "reliability",
+      "title": "CA1031 Do not catch general exception types",
+      "authority": "Microsoft Learn",
+      "url": "https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/ca1031",
+      "applies_to": [
+        "exception-swallowing",
+        "broad-catch"
+      ]
+    },
+    {
+      "id": "ca2000",
+      "family": "reliability",
+      "title": "CA2000 Dispose objects before losing scope",
+      "authority": "Microsoft Learn",
+      "url": "https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/ca2000",
+      "applies_to": [
+        "resource-disposal",
+        "using-blocks"
+      ]
+    },
+    {
+      "id": "ca2100",
+      "family": "security",
+      "title": "CA2100 Review SQL queries for security vulnerabilities",
+      "authority": "Microsoft Learn",
+      "url": "https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/ca2100",
+      "applies_to": [
+        "sql-injection",
+        "dynamic-query-text",
+        "db-command-text"
+      ]
+    },
+    {
+      "id": "owasp-sql-injection",
+      "family": "security",
+      "title": "OWASP SQL Injection Prevention Cheat Sheet",
+      "authority": "OWASP",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/SQL_Injection_Prevention_Cheat_Sheet.html",
+      "applies_to": [
+        "sql-injection",
+        "parameterization",
+        "query-construction"
+      ]
+    },
+    {
+      "id": "ca3003",
+      "family": "security",
+      "title": "CA3003 Review code for file path injection vulnerabilities",
+      "authority": "Microsoft Learn",
+      "url": "https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/ca3003",
+      "applies_to": [
+        "file-path-injection",
+        "user-controlled-paths"
+      ]
+    },
+    {
+      "id": "owasp-path-traversal",
+      "family": "security",
+      "title": "OWASP Path Traversal",
+      "authority": "OWASP",
+      "url": "https://owasp.org/www-community/attacks/Path_Traversal",
+      "applies_to": [
+        "path-traversal",
+        "file-read-risk",
+        "file-write-risk"
+      ]
+    },
+    {
+      "id": "owasp-file-upload",
+      "family": "security",
+      "title": "OWASP File Upload Cheat Sheet",
+      "authority": "OWASP",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/File_Upload_Cheat_Sheet.html",
+      "applies_to": [
+        "file-upload",
+        "file-intake",
+        "extension-validation",
+        "storage-location"
+      ]
+    },
+    {
+      "id": "httpclient-guidelines",
+      "family": "api-guidance",
+      "title": "HttpClient guidelines for .NET",
+      "authority": "Microsoft Learn",
+      "url": "https://learn.microsoft.com/en-us/dotnet/fundamentals/networking/http/httpclient-guidelines",
+      "applies_to": [
+        "web-requests",
+        "connection-lifetime",
+        "dns-lifetime",
+        "request-patterns"
+      ]
+    },
+    {
+      "id": "syslib0014",
+      "family": "api-guidance",
+      "title": "SYSLIB0014 WebRequest, HttpWebRequest, ServicePoint, and WebClient are obsolete",
+      "authority": "Microsoft Learn",
+      "url": "https://learn.microsoft.com/en-us/dotnet/fundamentals/syslib-diagnostics/syslib0014",
+      "applies_to": [
+        "obsolete-web-apis",
+        "webrequest",
+        "webclient"
+      ]
+    },
+    {
+      "id": "owasp-ssrf",
+      "family": "security",
+      "title": "OWASP Server-Side Request Forgery Prevention Cheat Sheet",
+      "authority": "OWASP",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/Server_Side_Request_Forgery_Prevention_Cheat_Sheet.html",
+      "applies_to": [
+        "ssrf",
+        "user-controlled-urls",
+        "outbound-request-validation"
+      ]
+    },
+    {
+      "id": "ca5359",
+      "family": "security",
+      "title": "CA5359 Do not disable certificate validation",
+      "authority": "Microsoft Learn",
+      "url": "https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/ca5359",
+      "applies_to": [
+        "certificate-validation",
+        "tls-security"
+      ]
+    },
+    {
+      "id": "ca5364",
+      "family": "security",
+      "title": "CA5364 Do not use deprecated security protocols",
+      "authority": "Microsoft Learn",
+      "url": "https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/ca5364",
+      "applies_to": [
+        "tls-version",
+        "security-protocols"
+      ]
+    },
+    {
+      "id": "ca5350",
+      "family": "security",
+      "title": "CA5350 Do not use weak cryptographic algorithms",
+      "authority": "Microsoft Learn",
+      "url": "https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/ca5350",
+      "applies_to": [
+        "weak-crypto",
+        "weak-hashes"
+      ]
+    },
+    {
+      "id": "ca3075",
+      "family": "security",
+      "title": "CA3075 Insecure DTD processing in XML",
+      "authority": "Microsoft Learn",
+      "url": "https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/ca3075",
+      "applies_to": [
+        "xml",
+        "dtd-processing",
+        "xxe"
+      ]
+    },
+    {
+      "id": "owasp-xxe",
+      "family": "security",
+      "title": "OWASP XML External Entity Prevention Cheat Sheet",
+      "authority": "OWASP",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/XML_External_Entity_Prevention_Cheat_Sheet.html",
+      "applies_to": [
+        "xxe",
+        "xml-parser-hardening"
+      ]
+    },
+    {
+      "id": "ca2300",
+      "family": "security",
+      "title": "CA2300 Do not use insecure deserializer BinaryFormatter",
+      "authority": "Microsoft Learn",
+      "url": "https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/ca2300",
+      "applies_to": [
+        "binaryformatter",
+        "insecure-deserialization"
+      ]
+    },
+    {
+      "id": "ca2310",
+      "family": "security",
+      "title": "CA2310 Do not use insecure deserializer NetDataContractSerializer",
+      "authority": "Microsoft Learn",
+      "url": "https://learn.microsoft.com/lb-lu/dotnet/fundamentals/code-analysis/quality-rules/ca2310",
+      "applies_to": [
+        "netdatacontractserializer",
+        "insecure-deserialization"
+      ]
+    },
+    {
+      "id": "owasp-command-injection",
+      "family": "security",
+      "title": "OWASP OS Command Injection Defense Cheat Sheet",
+      "authority": "OWASP",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/OS_Command_Injection_Defense_Cheat_Sheet.html",
+      "applies_to": [
+        "process-start",
+        "shell-invocation",
+        "argument-injection"
+      ]
+    },
+    {
+      "id": "ca1827",
+      "family": "performance",
+      "title": "CA1827 Do not use Count or LongCount when Any can be used",
+      "authority": "Microsoft Learn",
+      "url": "https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/ca1827",
+      "applies_to": [
+        "count-vs-any",
+        "linq-performance"
+      ]
+    },
+    {
+      "id": "ca1851",
+      "family": "performance",
+      "title": "CA1851 Possible multiple enumerations of IEnumerable",
+      "authority": "Microsoft Learn",
+      "url": "https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/ca1851",
+      "applies_to": [
+        "multiple-enumeration",
+        "linq-performance"
+      ]
+    },
+    {
+      "id": "stringbuilder-guidance",
+      "family": "performance",
+      "title": "System.Text.StringBuilder class",
+      "authority": "Microsoft Learn",
+      "url": "https://learn.microsoft.com/en-us/dotnet/fundamentals/runtime-libraries/system-text-stringbuilder",
+      "applies_to": [
+        "string-concatenation-in-loops",
+        "mutable-string-performance"
+      ]
+    },
+    {
+      "id": "ca2200",
+      "family": "reliability",
+      "title": "CA2200 Rethrow to preserve stack details",
+      "authority": "Microsoft Learn",
+      "url": "https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/ca2200",
+      "applies_to": [
+        "exception-rethrowing",
+        "stack-trace-preservation",
+        "catch-block-correctness"
+      ]
+    },
+    {
+      "id": "owasp-credential-storage",
+      "family": "security",
+      "title": "OWASP Authentication Cheat Sheet: Credential Storage",
+      "authority": "OWASP",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html",
+      "applies_to": [
+        "hardcoded-credentials",
+        "secret-storage",
+        "credential-hygiene",
+        "api-key-management"
+      ]
+    },
+    {
+      "id": "dotnet-threading",
+      "family": "reliability",
+      "title": "Managed threading best practices",
+      "authority": "Microsoft Learn",
+      "url": "https://learn.microsoft.com/en-us/dotnet/standard/threading/managed-threading-best-practices",
+      "applies_to": [
+        "shared-state",
+        "thread-safety",
+        "static-mutable-fields",
+        "race-conditions"
+      ]
+    },
+    {
+      "id": "owasp-ldap-injection",
+      "family": "security",
+      "title": "OWASP LDAP Injection Prevention Cheat Sheet",
+      "authority": "OWASP",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/LDAP_Injection_Prevention_Cheat_Sheet.html",
+      "applies_to": [
+        "ldap-injection",
+        "directory-query-construction",
+        "filter-parameterization"
+      ]
+    },
+    {
+      "id": "dotnet-connection-strings",
+      "family": "security",
+      "title": "Protecting Connection Information",
+      "authority": "Microsoft Learn",
+      "url": "https://learn.microsoft.com/en-us/dotnet/framework/data/adonet/protecting-connection-information",
+      "applies_to": [
+        "connection-string-security",
+        "hardcoded-credentials",
+        "database-password-storage"
+      ]
+    },
+    {
+      "id": "dotnet-connection-pooling",
+      "family": "performance",
+      "title": "SQL Server Connection Pooling (ADO.NET)",
+      "authority": "Microsoft Learn",
+      "url": "https://learn.microsoft.com/en-us/dotnet/framework/data/adonet/sql-server-connection-pooling",
+      "applies_to": [
+        "connection-pooling",
+        "connection-string-pooling",
+        "adonet-performance"
+      ]
+    },
+    {
+      "id": "dotnet-string-comparison",
+      "family": "vbnet-semantics",
+      "title": "String comparisons in .NET: best practices",
+      "authority": "Microsoft Learn",
+      "url": "https://learn.microsoft.com/en-us/dotnet/standard/base-types/best-practices-strings",
+      "applies_to": [
+        "string-equality",
+        "ordinal-comparison",
+        "culture-sensitive-comparison",
+        "tolower-toupper-antipattern"
+      ]
+    },
+    {
+      "id": "oneim-collection-load-types",
+      "family": "oneim-script-guidance",
+      "title": "Loading entity collections in OneIM scripts",
+      "authority": "One Identity",
+      "url": "https://support.oneidentity.com/technical-documents/identity-manager/9.3/configuration-guide/scripts-in-one-identity-manager/using-base-objects",
+      "applies_to": [
+        "entity-collection-load-type",
+        "bulk-readonly",
+        "slim-collection",
+        "entity-create-in-loop",
+        "selectall-performance"
+      ]
+    },
+    {
+      "id": "vb-error-handling",
+      "family": "vbnet-semantics",
+      "title": "Robust error handling and safe parsing patterns in VB.NET",
+      "authority": "Microsoft Learn",
+      "url": "https://learn.microsoft.com/en-us/dotnet/visual-basic/programming-guide/language-features/error-types",
+      "applies_to": [
+        "TryParse",
+        "safe-cast",
+        "exception-handling",
+        "FormatException"
+      ]
+    },
+    {
+      "id": "vb-security",
+      "family": "dotnet-analyzers",
+      "title": "Security guidance for .NET and VB.NET applications",
+      "authority": "Microsoft Learn",
+      "url": "https://learn.microsoft.com/en-us/dotnet/standard/security/security-and-user-input",
+      "applies_to": [
+        "command-injection",
+        "process-start",
+        "input-validation",
+        "owasp-command-injection"
+      ]
+    },
+    {
+      "id": "oneim-foreign-key-access",
+      "family": "oneim-script-guidance",
+      "title": "Working with foreign key objects in OneIM scripts",
+      "authority": "One Identity",
+      "url": "https://support.oneidentity.com/technical-documents/identity-manager/9.3/configuration-guide/scripts-in-one-identity-manager/using-base-objects",
+      "applies_to": [
+        "foreign-key-access",
+        "IsEmpty-guard",
+        "null-reference",
+        "GetParent-safety"
+      ]
+    }
+  ],
+  "rule_mapping": {
+    "sql-and-db-access": [
+      "ca2100",
+      "owasp-sql-injection"
+    ],
+    "web-requests": [
+      "httpclient-guidelines",
+      "syslib0014",
+      "ca5359",
+      "ca5364",
+      "owasp-ssrf"
+    ],
+    "file-reading-and-writing": [
+      "ca3003",
+      "owasp-path-traversal",
+      "owasp-file-upload"
+    ],
+    "xml-and-deserialization": [
+      "ca3075",
+      "owasp-xxe",
+      "ca2300",
+      "ca2310"
+    ],
+    "process-execution": [
+      "owasp-command-injection"
+    ],
+    "reliability-with-security-impact": [
+      "vb-option-strict",
+      "vb-option-explicit",
+      "vb-string-culture",
+      "ca1031",
+      "ca2000"
+    ],
+    "performance": [
+      "ca1827",
+      "ca1851",
+      "stringbuilder-guidance",
+      "oneim-system-debugger-context"
+    ]
+  }
+}

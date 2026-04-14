@@ -1,36 +1,99 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# SSCP + CISSP Coach Workspace
 
-## Getting Started
+This workspace contains the full tutor project plus the browser extension companion.
 
-First, run the development server:
+## What is included
 
-```bash
+- `app/sscp` - the main SSCP study coach UI
+- `app/api/sscp` - planning, teaching, drills, reviews, mock exams, notes import, resources, narration, and extension capture routes
+- `lib/sscp` - study models, catalog data, notes parsing, and tutor logic
+- `browser-extension/sscp-companion` - Chrome/Edge extension for page capture, selection capture, and quick read-aloud
+
+## Source trust policy
+
+The tutor uses three source layers in this order:
+
+1. `official` - canonical ISC2 outline grounding for SSCP and CISSP
+2. `trusted_live` - current cybersecurity articles, videos, and examples from trusted sources
+3. `user_notes` - imported note material from the local `SSCP.zip` archive as supplemental reinforcement only
+
+If these conflict, the higher-trust source wins.
+
+## Run the tutor on Windows
+
+From the project root:
+
+```powershell
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Then open:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+`http://localhost:3000/sscp`
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+If you want a one-command launcher on Windows, run:
 
-## Learn More
+```powershell
+.\Start-SSCP-CISSP-Coach.ps1
+```
 
-To learn more about Next.js, take a look at the following resources:
+That script installs dependencies if needed, launches the dev server, and opens the tutor page.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Browser extension companion
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Extension folder:
 
-## Deploy on Vercel
+`browser-extension/sscp-companion`
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Quick Windows setup:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```powershell
+.\Open-SSCP-Extension-Setup.ps1
+```
+
+That script opens the tutor, opens the Edge extensions page, and opens the unpacked extension folder in Explorer.
+
+To load it into Chrome or Edge:
+
+1. Open `chrome://extensions` or `edge://extensions`
+2. Turn on `Developer mode`
+3. Click `Load unpacked`
+4. Choose `browser-extension/sscp-companion`
+
+The extension expects the tutor app to be running locally and defaults to:
+
+`http://localhost:3000`
+
+## Desktop notes import
+
+The tutor can import and chunk supplemental PDF notes from:
+
+`C:\Users\aiuser\Desktop\SSCP.zip`
+
+Those note chunks are labeled as `User notes reference`, not `official source`.
+
+## Main tutor features
+
+- Adaptive 7-day study planning
+- Learn, Drill, Resources, and Library workspaces
+- Mixed-format questions
+- Side-by-side `SSCP review` and `CISSP review`
+- Read-aloud controls
+- Mindmaps and diagrams for summaries and memorization
+- Curated and live cybersecurity resources
+- Browser extension capture flow
+
+## Build check
+
+To verify the workspace compiles:
+
+```powershell
+npm run build
+```
+
+## Notes
+
+- The app is designed as a local-first workspace.
+- The browser extension is a companion, not a replacement for the main tutor UI.
+- Current cybersecurity resources should always be treated as time-sensitive and shown with source/date context.

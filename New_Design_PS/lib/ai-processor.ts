@@ -2,8 +2,11 @@
 // Shared logic for PowerShell generation — imported by receive/route.ts and submit/route.ts.
 // Kept outside route files so Next.js doesn't reject non-handler exports.
 
+import fs from "fs/promises";
+import path from "path";
 import OpenAI from "openai";
 import { putResult } from "./resultbus";
+import { buildValidatorPolicyContext } from "./xml-validator/policy";
 
 const OPENAI_API_KEY  = process.env.OPENAI_API_KEY!;
 const OPENAI_MODEL    = process.env.OPENAI_MODEL || "gpt-4.1";
@@ -14,6 +17,14 @@ const VECTOR_STORE_ID = process.env.NEXT_PUBLIC_VECTOR_STORE_ID!;
 
 const POWERSHELL_SYSTEM_PROMPT = `You are a Senior PowerShell & API Integration Engineer.
 Your job is to generate or refactor PowerShell functions that interact with external systems (SQL/REST/SOAP/SCIM) using the grounding context provided from the file search tool.
+
+Validation Alignment
+
+You will also receive the current XML-Validator rules markdown used by this app.
+
+Treat those rules as generation constraints.
+
+Do not generate PowerShell that is likely to violate those validation rules when the surrounding XML is built or checked later.
 
 Grounding
 
@@ -194,6 +205,18 @@ function looksLikePwshScript(s: string): boolean {
   );
 }
 
+function promptSection(label: string, value: string, limit = 22000): string {
+  const text = String(value || "").trim();
+  if (!text) return `${label}:\n<empty>`;
+  if (text.length <= limit) return `${label}:\n${text}`;
+  return `${label}:\n${text.slice(0, limit)}\n\n[truncated ${text.length - limit} chars]`;
+}
+
+async function readXmlValidatorRulesPrompt(): Promise<string> {
+  const rulesPath = path.join(process.cwd(), "doc", "xml-validator-rules.md");
+  return fs.readFile(rulesPath, "utf8");
+}
+
 // ── Background processing ─────────────────────────────────────────────────────
 
 export async function processSubmission(
@@ -207,16 +230,37 @@ export async function processSubmission(
       apiKey: OPENAI_API_KEY,
       ...(OPENAI_BASE_URL ? { baseURL: OPENAI_BASE_URL } : {}),
     });
+    const [validatorRules, policyContext] = await Promise.all([
+      readXmlValidatorRulesPrompt().catch(() => ""),
+      buildValidatorPolicyContext("", fileText).catch(() => null),
+    ]);
 
     // Replace TODO line with message if provided
     const prompt = message
       ? fileText.replace(/(#\s*TODO:).*/, `$1 ${message}`)
       : fileText;
+    const instructions = [
+      POWERSHELL_SYSTEM_PROMPT,
+      ...(validatorRules
+        ? [
+            "Validator Rules",
+            "Use the following XML-Validator rules as constraints while generating or refactoring PowerShell so the resulting code aligns with the app's validator expectations.",
+            promptSection("XML-Validator rules", validatorRules, 26000),
+          ]
+        : []),
+      ...(policyContext?.promptAddendum
+        ? [
+            "Security Policy Guidance",
+            "Use the following security policy addendum as internal generation constraints. Apply SSCP-grounded principles — least privilege, secure defaults, transport protection, secret handling, logging, and incident readiness — to the generated PowerShell. Do not cite SSCP domains or auditor source names in the output; use them only as internal guidance.",
+            promptSection("Security policy addendum", policyContext.promptAddendum, 12000),
+          ]
+        : []),
+    ].join("\n\n");
 
     // ── OpenAI Responses API — single call, no polling ───────────────────────
     const response = await (openai.responses as any).create({
       model: OPENAI_MODEL,
-      instructions: POWERSHELL_SYSTEM_PROMPT,
+      instructions,
       input: prompt,
       tools: VECTOR_STORE_ID
         ? [{ type: "file_search", vector_store_ids: [VECTOR_STORE_ID] }]

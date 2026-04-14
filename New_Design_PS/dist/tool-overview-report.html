@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OneIM VB.NET Auditor — Tool Overview</title>
+<style>
+  /* ── Reset & base ── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { font-size: 15px; scroll-behavior: smooth; }
+  body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    background: #f0f2f5;
+    color: #1e2535;
+    line-height: 1.65;
+  }
+
+  /* ── Layout ── */
+  .page { max-width: 1100px; margin: 0 auto; padding: 0 1.5rem 4rem; }
+
+  /* ── Hero ── */
+  .hero {
+    background: linear-gradient(135deg, #0f2d56 0%, #1a4f8a 60%, #1e6fb5 100%);
+    color: #fff;
+    padding: 3.5rem 2.5rem 3rem;
+    border-radius: 0 0 18px 18px;
+    margin-bottom: 2.5rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: "";
+    position: absolute; inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  }
+  .hero-tag {
+    display: inline-block;
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.25);
+    border-radius: 20px;
+    font-size: .75rem;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    padding: .25rem .85rem;
+    margin-bottom: 1rem;
+  }
+  .hero h1 { font-size: 2rem; font-weight: 700; line-height: 1.2; margin-bottom: .6rem; }
+  .hero p  { font-size: 1.05rem; opacity: .88; max-width: 680px; }
+  .hero-meta {
+    margin-top: 1.6rem;
+    display: flex; flex-wrap: wrap; gap: .8rem;
+  }
+  .hero-stat {
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 8px;
+    padding: .5rem 1rem;
+    font-size: .85rem;
+    font-weight: 600;
+  }
+  .hero-stat span { display: block; font-size: 1.4rem; font-weight: 700; line-height: 1.1; }
+
+  /* ── Section headings ── */
+  h2 {
+    font-size: 1.25rem;
+    color: #0f2d56;
+    border-left: 4px solid #1a7fd4;
+    padding-left: .75rem;
+    margin: 2.5rem 0 1rem;
+  }
+  h3 { font-size: 1rem; color: #1a4f8a; margin: 1.2rem 0 .4rem; font-weight: 600; }
+
+  /* ── Cards ── */
+  .card {
+    background: #fff;
+    border: 1px solid #dde3ec;
+    border-radius: 10px;
+    padding: 1.2rem 1.4rem;
+    margin-bottom: 1rem;
+  }
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1rem;
+  }
+  .card-icon {
+    font-size: 1.6rem;
+    margin-bottom: .5rem;
+    display: block;
+  }
+  .card h3 { margin-top: 0; }
+  .card p  { font-size: .88rem; color: #445; margin-top: .3rem; }
+
+  /* ── Category badges ── */
+  .badge {
+    display: inline-block;
+    padding: .15rem .55rem;
+    border-radius: 4px;
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    vertical-align: middle;
+  }
+  .b-correctness  { background: #e8f0fb; color: #1a4f8a; }
+  .b-security     { background: #fde8e8; color: #b91c1c; }
+  .b-performance  { background: #fff3e0; color: #b45309; }
+  .b-reliability  { background: #f0fdf4; color: #166534; }
+  .b-concurrency  { background: #f3e8ff; color: #6b21a8; }
+  .b-high   { background: #fde8e8; color: #b91c1c; }
+  .b-medium { background: #fff3cd; color: #92400e; }
+  .b-low    { background: #e8f0fb; color: #1e40af; }
+
+  /* ── Stat row ── */
+  .stat-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+  .stat-box {
+    background: #fff;
+    border: 1px solid #dde3ec;
+    border-radius: 10px;
+    padding: 1rem;
+    text-align: center;
+  }
+  .stat-box .num { font-size: 2rem; font-weight: 700; color: #0f2d56; line-height: 1; }
+  .stat-box .lbl { font-size: .78rem; color: #667; margin-top: .3rem; }
+
+  /* ── Rule table ── */
+  table { width: 100%; border-collapse: collapse; font-size: .83rem; background: #fff; border-radius: 10px; overflow: hidden; margin-top: .5rem; }
+  th { background: #0f2d56; color: #fff; text-align: left; padding: .55rem .8rem; font-size: .78rem; letter-spacing: .04em; text-transform: uppercase; }
+  td { padding: .42rem .8rem; border-bottom: 1px solid #edf0f5; vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #f7f9fc; }
+
+  /* ── Graph algo table ── */
+  .algo-table td:first-child { font-weight: 600; color: #1a4f8a; width: 220px; }
+  .algo-table td:nth-child(2) { color: #555; font-size: .82rem; }
+
+  /* ── Timeline / workflow ── */
+  .flow {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0;
+    align-items: stretch;
+    margin: 1rem 0;
+  }
+  .flow-step {
+    flex: 1;
+    min-width: 150px;
+    background: #fff;
+    border: 1px solid #dde3ec;
+    border-right: none;
+    padding: 1rem 1rem .9rem;
+    position: relative;
+  }
+  .flow-step:last-child { border-right: 1px solid #dde3ec; border-radius: 0 8px 8px 0; }
+  .flow-step:first-child { border-radius: 8px 0 0 8px; }
+  .flow-step::after {
+    content: "›";
+    position: absolute;
+    right: -10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.3rem;
+    color: #1a7fd4;
+    z-index: 1;
+    background: #f0f2f5;
+    line-height: 1;
+    padding: 0 1px;
+  }
+  .flow-step:last-child::after { display: none; }
+  .flow-step .fs-num {
+    display: inline-block;
+    background: #0f2d56;
+    color: #fff;
+    border-radius: 50%;
+    width: 22px; height: 22px;
+    font-size: .72rem;
+    font-weight: 700;
+    text-align: center;
+    line-height: 22px;
+    margin-bottom: .4rem;
+  }
+  .flow-step .fs-title { font-size: .82rem; font-weight: 700; color: #0f2d56; }
+  .flow-step .fs-desc  { font-size: .76rem; color: #667; margin-top: .2rem; }
+
+  /* ── Ideas section ── */
+  .idea-list { list-style: none; display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; }
+  .idea-list li {
+    background: #fff;
+    border: 1px solid #dde3ec;
+    border-left: 4px solid #1a7fd4;
+    border-radius: 0 8px 8px 0;
+    padding: .9rem 1.1rem;
+    font-size: .88rem;
+  }
+  .idea-list li strong { display: block; color: #0f2d56; margin-bottom: .25rem; }
+
+  /* ── Risk table ── */
+  .risk-table td:nth-child(3) { color: #b91c1c; font-size: .82rem; }
+
+  /* ── Footer ── */
+  .footer {
+    margin-top: 3rem;
+    padding-top: 1.2rem;
+    border-top: 1px solid #dde3ec;
+    font-size: .78rem;
+    color: #889;
+    text-align: center;
+  }
+
+  /* ── Scrollable table wrapper ── */
+  .tbl-wrap { overflow-x: auto; border-radius: 10px; border: 1px solid #dde3ec; margin-top: .5rem; }
+  .tbl-wrap table { border-radius: 0; border: none; }
+
+  /* ── Print ── */
+  @media print {
+    body { background: #fff; }
+    .hero { border-radius: 0; }
+    .flow-step::after { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════ HERO -->
+<div class="hero">
+  <div class="page">
+    <span class="hero-tag">Internal Tool — OneIM Practice</span>
+    <h1>OneIM VB.NET Auditor</h1>
+    <p>Automated static analysis, live benchmarking, and cascade dependency mapping for One Identity Manager VB.NET scripts and templates — catching production risks before they reach the synchronisation engine.</p>
+    <div class="hero-meta">
+      <div class="hero-stat"><span>59</span> audit rules</div>
+      <div class="hero-stat"><span>5</span> risk categories</div>
+      <div class="hero-stat"><span>410</span> automated tests</div>
+      <div class="hero-stat"><span>8</span> graph algorithms</div>
+      <div class="hero-stat"><span>118</span> example files</div>
+    </div>
+  </div>
+</div>
+
+<div class="page">
+
+<!-- ═══════════════════════════════════════════════════ PROBLEM -->
+<h2>The Problem It Solves</h2>
+<div class="card">
+  <p>One Identity Manager stores business logic as VB.NET scripts and templates <strong>inside the database</strong>. These are edited through Designer's GUI, have no version control by default, and receive no automated code review before going live. A single bad template can:</p>
+  <br>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:.6rem;margin-top:.4rem;">
+    <div style="background:#fde8e8;border-radius:7px;padding:.7rem .9rem;font-size:.85rem;"><strong style="color:#b91c1c;">Corrupt data</strong> for thousands of identities via a silent exception or wrong null check</div>
+    <div style="background:#fde8e8;border-radius:7px;padding:.7rem .9rem;font-size:.85rem;"><strong style="color:#b91c1c;">Deadlock a sync thread</strong> indefinitely via circular template dependencies</div>
+    <div style="background:#fde8e8;border-radius:7px;padding:.7rem .9rem;font-size:.85rem;"><strong style="color:#b91c1c;">Expose credentials</strong> hardcoded in connection strings that end up in audit logs</div>
+    <div style="background:#fde8e8;border-radius:7px;padding:.7rem .9rem;font-size:.85rem;"><strong style="color:#b91c1c;">Make sync 100× slower</strong> via N+1 database queries inside loops</div>
+    <div style="background:#fde8e8;border-radius:7px;padding:.7rem .9rem;font-size:.85rem;"><strong style="color:#b91c1c;">Break on deployment</strong> when a hardcoded business value doesn't match the target environment</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ WORKFLOW -->
+<h2>How It Fits Into a Delivery Workflow</h2>
+<div class="flow">
+  <div class="flow-step">
+    <span class="fs-num">1</span>
+    <div class="fs-title">Export from Designer</div>
+    <div class="fs-desc">System Debugger exports .vb files from the live system</div>
+  </div>
+  <div class="flow-step">
+    <span class="fs-num">2</span>
+    <div class="fs-title">Static Audit</div>
+    <div class="fs-desc">59 rules scanned — seconds per file, no live connection needed</div>
+  </div>
+  <div class="flow-step">
+    <span class="fs-num">3</span>
+    <div class="fs-title">Live Benchmark</div>
+    <div class="fs-desc">11 timed executions per template on a real system with regression detection</div>
+  </div>
+  <div class="flow-step">
+    <span class="fs-num">4</span>
+    <div class="fs-title">Cascade Analysis</div>
+    <div class="fs-desc">Graph algorithms map dependency risks — critical path, deadlock candidates, single points of failure</div>
+  </div>
+  <div class="flow-step">
+    <span class="fs-num">5</span>
+    <div class="fs-title">HTML + JSON Report</div>
+    <div class="fs-desc">Self-contained report for the team; JSON for CI pipeline gates</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ COMPONENTS -->
+<h2>Tool Components</h2>
+<div class="card-grid">
+
+  <div class="card">
+    <span class="card-icon">&#x1F50D;</span>
+    <h3>Static Code Audit</h3>
+    <p><code>invoke_oneim_audit.ps1</code><br>Point at a folder of .vb files. Runs all 59 rules via regex and context-aware pattern matching. Produces a colour-coded HTML report with severity filters, per-file navigation, per-category risk scores, and a finding breakdown histogram. Also outputs JSON for CI pipelines.<br><br><strong>Typical time for 20 templates: ~10 seconds</strong></p>
+  </div>
+
+  <div class="card">
+    <span class="card-icon">&#x23F1;</span>
+    <h3>Live Benchmark</h3>
+    <p><code>invoke_oneim_benchmark.ps1</code><br>Connects to a real OneIM system. Runs each template 10 times (1 warmup) and captures avg, p95, p99, standard deviation, GC pressure, and thread deltas. Detects regressions against a stored baseline — if a template that used to take 30ms now takes 60ms it is flagged automatically.<br><br><strong>Typical time for 20 templates: 1–5 minutes</strong></p>
+  </div>
+
+  <div class="card">
+    <span class="card-icon">&#x1F578;</span>
+    <h3>Cascade Dependency Graph</h3>
+    <p><code>export_template_cascade_report.ps1</code><br>Maps the full upstream/downstream dependency web for a template. Runs 8 graph algorithms (see below) and renders findings in a visual HTML report with plain-English explanations. Companion JSON for further tooling.<br><br><strong>Typical time: seconds (pure in-memory graph analysis)</strong></p>
+  </div>
+
+  <div class="card">
+    <span class="card-icon">&#x1F4DA;</span>
+    <h3>Reference Library Management</h3>
+    <p><code>extract_custom_reference_files.ps1</code> and related scripts<br>Distinguishes custom code from out-of-the-box OneIM scripts. Custom candidates go through a formal review → promote / reject workflow with audit metadata. The auditor never flags vendor-shipped code as a violation.</p>
+  </div>
+
+  <div class="card">
+    <span class="card-icon">&#x1F5C3;</span>
+    <h3>Schema Snapshot &amp; Diff</h3>
+    <p><code>export_oneim_schema_snapshot.ps1</code> / <code>compare_schema_snapshots.ps1</code><br>Point-in-time snapshot of tables, columns, and FK relationships. Comparing two snapshots detects schema drift — a column removed in PROD that still exists in DEV would silently break any template referencing it.</p>
+  </div>
+
+  <div class="card">
+    <span class="card-icon">&#x2699;</span>
+    <h3>Rule Tooling</h3>
+    <p><code>new_audit_rule.ps1</code> / <code>validate_audit_rules.ps1</code> / <code>export_audit_rules.ps1</code><br>Scaffold new rules from a template, validate the entire catalog for consistency (duplicate IDs, broken regexes, missing sources), export all rules to Markdown / CSV / JSON for documentation or review.</p>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════════ RULES -->
+<h2>The 59 Audit Rules</h2>
+
+<div class="stat-row">
+  <div class="stat-box"><div class="num" style="color:#1a4f8a;">17</div><div class="lbl">Correctness</div></div>
+  <div class="stat-box"><div class="num" style="color:#b91c1c;">14</div><div class="lbl">Security</div></div>
+  <div class="stat-box"><div class="num" style="color:#b45309;">13</div><div class="lbl">Performance</div></div>
+  <div class="stat-box"><div class="num" style="color:#166534;">8</div><div class="lbl">Reliability</div></div>
+  <div class="stat-box"><div class="num" style="color:#6b21a8;">7</div><div class="lbl">Concurrency</div></div>
+  <div class="stat-box"><div class="num" style="color:#b91c1c;">13</div><div class="lbl">High severity</div></div>
+  <div class="stat-box"><div class="num" style="color:#92400e;">33</div><div class="lbl">Medium severity</div></div>
+  <div class="stat-box"><div class="num" style="color:#1e40af;">13</div><div class="lbl">Low severity</div></div>
+</div>
+
+<div class="tbl-wrap">
+<table>
+  <thead>
+    <tr><th>Category</th><th>Rule</th><th>Severity</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><span class="badge b-correctness">Correctness</span></td><td>Option Explicit should be enabled</td><td><span class="badge b-medium">medium</span></td></tr>
+    <tr><td><span class="badge b-correctness">Correctness</span></td><td>Option Strict should be enabled</td><td><span class="badge b-medium">medium</span></td></tr>
+    <tr><td><span class="badge b-correctness">Correctness</span></td><td>Avoid obvious late binding and Object-heavy code</td><td><span class="badge b-medium">medium</span></td></tr>
+    <tr><td><span class="badge b-correctness">Correctness</span></td><td>Dispose disposable objects before losing scope</td><td><span class="badge b-medium">medium</span></td></tr>
+    <tr><td><span class="badge b-correctness">Correctness</span></td><td>Use explicit StringComparison for identifier-sensitive comparisons</td><td><span class="badge b-medium">medium</span></td></tr>
+    <tr><td><span class="badge b-correctness">Correctness</span></td><td>Review GetTriggerValue-driven writes for Nothing or empty handling</td><td><span class="badge b-medium">medium</span></td></tr>
+    <tr><td><span class="badge b-correctness">Correctness</span></td><td>Use Is Nothing / IsNot Nothing instead of = Nothing / &lt;&gt; Nothing</td><td><span class="badge b-medium">medium</span></td></tr>
+    <tr><td><span class="badge b-correctness">Correctness</span></td><td>Do not rethrow with Throw ex — bare Throw preserves the stack trace</td><td><span class="badge b-medium">medium</span></td></tr>
+    <tr><td><span class="badge b-correctness">Correctness</span></td><td>Avoid .ToLower()/.ToUpper() for string comparison — use OrdinalIgnoreCase</td><td><span class="badge b-low">low</span></td></tr>
+    <tr><td><span class="badge b-correctness">Correctness</span></td><td>Use f.UidComparison() for UID_ columns instead of f.Comparison()</td><td><span class="badge b-medium">medium</span></td></tr>
+    <tr><td><span class="badge b-correctness">Correctness</span></td><td>Direct = "" comparison on .GetValue("UID_...").String — use IsNullOrEmpty</td><td><span class="badge b-low">low</span></td></tr>
+    <tr><td><span class="badge b-correctness">Correctness</span></td><td>Review PutValue or ExecuteTemplate for sync-time side effects</td><td><span class="badge b-low">low</span></td></tr>
+    <tr><td><span class="badge b-correctness">Correctness</span></td><td>Custom VI-KEY entries should use CCC-prefixed script names</td><td><span class="badge b-low">low</span></td></tr>
+    <tr><td><span class="badge b-correctness">Correctness</span></td><td>Custom VI-KEY entries should implement CCC-prefixed Function/Sub names</td><td><span class="badge b-low">low</span></td></tr>
+    <tr><td><span class="badge b-correctness">Correctness</span></td><td>VI_AE_ITDataFrom* called without comment-based column dependency declarations</td><td><span class="badge b-medium">medium</span></td></tr>
+    <tr><td><span class="badge b-correctness">Correctness</span></td><td>Avoid Parse() — use TryParse() to prevent FormatException</td><td><span class="badge b-medium">medium</span></td></tr>
+    <tr><td><span class="badge b-correctness">Correctness</span></td><td>Hardcoded business value should use Connection.GetConfigParmValue</td><td><span class="badge b-low">low</span></td></tr>
+    <tr><td><span class="badge b-security">Security</span></td><td>Avoid string-built SQL or filter expressions</td><td><span class="badge b-high">high</span></td></tr>
+    <tr><td><span class="badge b-security">Security</span></td><td>Avoid launching external processes from OneIM script logic</td><td><span class="badge b-high">high</span></td></tr>
+    <tr><td><span class="badge b-security">Security</span></td><td>Do not use insecure deserializers</td><td><span class="badge b-high">high</span></td></tr>
+    <tr><td><span class="badge b-security">Security</span></td><td>Review deprecated TLS or disabled certificate validation</td><td><span class="badge b-high">high</span></td></tr>
+    <tr><td><span class="badge b-security">Security</span></td><td>Hardcoded credential or secret literal</td><td><span class="badge b-high">high</span></td></tr>
+    <tr><td><span class="badge b-security">Security</span></td><td>Password embedded in a connection string literal</td><td><span class="badge b-high">high</span></td></tr>
+    <tr><td><span class="badge b-security">Security</span></td><td>LDAP filter built by string concatenation — injection risk</td><td><span class="badge b-high">high</span></td></tr>
+    <tr><td><span class="badge b-security">Security</span></td><td>Process.Start() call detected — potential OS command injection</td><td><span class="badge b-high">high</span></td></tr>
+    <tr><td><span class="badge b-security">Security</span></td><td>Broad exception handling should not hide failures</td><td><span class="badge b-medium">medium</span></td></tr>
+    <tr><td><span class="badge b-security">Security</span></td><td>Avoid obsolete web request APIs</td><td><span class="badge b-medium">medium</span></td></tr>
+    <tr><td><span class="badge b-security">Security</span></td><td>Review outbound web requests with variable-driven URLs</td><td><span class="badge b-medium">medium</span></td></tr>
+    <tr><td><span class="badge b-security">Security</span></td><td>Review file I/O paths that appear variable-driven</td><td><span class="badge b-medium">medium</span></td></tr>
+    <tr><td><span class="badge b-security">Security</span></td><td>Review XML parsing for insecure DTD or external entity behavior</td><td><span class="badge b-medium">medium</span></td></tr>
+    <tr><td><span class="badge b-security">Security</span></td><td>String.Format() with a variable format string — format injection risk</td><td><span class="badge b-medium">medium</span></td></tr>
+    <tr><td><span class="badge b-performance">Performance</span></td><td>Expensive OneIM lookup (GetListFor / GetSingleProperty) inside a loop</td><td><span class="badge b-medium">medium</span></td></tr>
+    <tr><td><span class="badge b-performance">Performance</span></td><td>IEntity.Create(Session) inside a loop — one SELECT per item</td><td><span class="badge b-medium">medium</span></td></tr>
+    <tr><td><span class="badge b-performance">Performance</span></td><td>Connection pooling disabled (Pooling=false) in ADO.NET connection string</td><td><span class="badge b-medium">medium</span></td></tr>
+    <tr><td><span class="badge b-performance">Performance</span></td><td>BuildSessionFactory() called per method invocation — should be cached</td><td><span class="badge b-medium">medium</span></td></tr>
+    <tr><td><span class="badge b-performance">Performance</span></td><td>IEntity.Save(Session) inside a loop — use UnitOfWork.Put() for bulk writes</td><td><span class="badge b-medium">medium</span></td></tr>
+    <tr><td><span class="badge b-performance">Performance</span></td><td>Session.Source.GetList called with an empty WHERE filter</td><td><span class="badge b-medium">medium</span></td></tr>
+    <tr><td><span class="badge b-performance">Performance</span></td><td>Prefer Any over Count for emptiness checks</td><td><span class="badge b-low">low</span></td></tr>
+    <tr><td><span class="badge b-performance">Performance</span></td><td>Avoid repeated string concatenation in loops</td><td><span class="badge b-low">low</span></td></tr>
+    <tr><td><span class="badge b-performance">Performance</span></td><td>Review possible multiple enumeration of IEnumerable</td><td><span class="badge b-low">low</span></td></tr>
+    <tr><td><span class="badge b-performance">Performance</span></td><td>Review repeated object or database access inside loops</td><td><span class="badge b-low">low</span></td></tr>
+    <tr><td><span class="badge b-performance">Performance</span></td><td>Object allocation inside a loop body</td><td><span class="badge b-low">low</span></td></tr>
+    <tr><td><span class="badge b-performance">Performance</span></td><td>Query.SelectAll() loads every column — prefer Select() with needed columns</td><td><span class="badge b-low">low</span></td></tr>
+    <tr><td><span class="badge b-performance">Performance</span></td><td>Multiple TryGetSingleValue calls with same table/where clause — use TryGet</td><td><span class="badge b-low">low</span></td></tr>
+    <tr><td><span class="badge b-reliability">Reliability</span></td><td>MultiValueProperty modified (.Add/.Remove) without PutValue writeback — changes silently lost</td><td><span class="badge b-high">high</span></td></tr>
+    <tr><td><span class="badge b-reliability">Reliability</span></td><td>Empty Catch block silently swallows exceptions</td><td><span class="badge b-medium">medium</span></td></tr>
+    <tr><td><span class="badge b-reliability">Reliability</span></td><td>GetFk result used without IsEmpty guard</td><td><span class="badge b-medium">medium</span></td></tr>
+    <tr><td><span class="badge b-reliability">Reliability</span></td><td>Use HttpClient instead of obsolete HttpWebRequest / WebClient</td><td><span class="badge b-medium">medium</span></td></tr>
+    <tr><td><span class="badge b-reliability">Reliability</span></td><td>IDisposable declared with Dim instead of Using — resource may leak</td><td><span class="badge b-medium">medium</span></td></tr>
+    <tr><td><span class="badge b-reliability">Reliability</span></td><td>GetSingleValue() throws on no match — prefer TryGetSingleValue()</td><td><span class="badge b-medium">medium</span></td></tr>
+    <tr><td><span class="badge b-reliability">Reliability</span></td><td>MultiValueProperty accessed by index without .Count bounds check</td><td><span class="badge b-medium">medium</span></td></tr>
+    <tr><td><span class="badge b-reliability">Reliability</span></td><td>CType/DirectCast without a preceding TypeOf guard</td><td><span class="badge b-medium">medium</span></td></tr>
+    <tr><td><span class="badge b-concurrency">Concurrency</span></td><td>NOLOCK hint may yield dirty reads under concurrent writes</td><td><span class="badge b-high">high</span></td></tr>
+    <tr><td><span class="badge b-concurrency">Concurrency</span></td><td>BeginTransaction without visible Commit or Rollback in scope</td><td><span class="badge b-high">high</span></td></tr>
+    <tr><td><span class="badge b-concurrency">Concurrency</span></td><td>Nested transaction — BeginTransaction called twice before Commit</td><td><span class="badge b-high">high</span></td></tr>
+    <tr><td><span class="badge b-concurrency">Concurrency</span></td><td>Template write (PutValue/ExecuteTemplate) inside a dependency cycle</td><td><span class="badge b-high">high</span></td></tr>
+    <tr><td><span class="badge b-concurrency">Concurrency</span></td><td>Thread.Sleep blocks a OneIM sync thread</td><td><span class="badge b-medium">medium</span></td></tr>
+    <tr><td><span class="badge b-concurrency">Concurrency</span></td><td>Unbounded loop (While True / Do While True)</td><td><span class="badge b-medium">medium</span></td></tr>
+    <tr><td><span class="badge b-concurrency">Concurrency</span></td><td>Shared (static) mutable field — race conditions across sync threads</td><td><span class="badge b-medium">medium</span></td></tr>
+  </tbody>
+</table>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ GRAPH -->
+<h2>Cascade Graph Analysis — 8 Algorithms</h2>
+<p style="font-size:.9rem;color:#556;margin-bottom:.8rem;">The cascade report goes beyond listing nodes. It runs a suite of graph algorithms — each answering a specific question about structural risk in the template dependency web.</p>
+
+<div class="tbl-wrap">
+<table class="algo-table">
+  <thead><tr><th>Algorithm</th><th>Question it answers for the team</th></tr></thead>
+  <tbody>
+    <tr><td>BFS Traversal</td><td>What are all templates upstream and downstream of this one? How far does the cascade reach?</td></tr>
+    <tr><td>Cycle Detection</td><td>Is there a circular dependency that can never safely evaluate? Where exactly is the loop?</td></tr>
+    <tr><td>Topological Sort (Kahn's)</td><td>In what order should templates be evaluated so that no template reads a value that hasn't been written yet?</td></tr>
+    <tr><td>SCC — Kosaraju's algorithm</td><td>Which groups of templates can all reach each other, creating a write-read-write race condition under concurrent sync?</td></tr>
+    <tr><td>Critical Path (DP)</td><td>Which chain of templates sets the absolute minimum on total cascade time? Where should optimisation effort go first?</td></tr>
+    <tr><td>Articulation Points — Tarjan's algorithm</td><td>Which single templates, if they fail or are deleted, would disconnect the rest of the cascade? These are structural single points of failure.</td></tr>
+    <tr><td>Feedback Arc Set (greedy)</td><td>Which specific dependency relationships should be removed in Designer to break all cycles with the fewest changes?</td></tr>
+    <tr><td>Dominator Tree — Cooper/Harvey/Kennedy</td><td>Which templates are mandatory gateways that every evaluation path must pass through? A bug there affects everything downstream.</td></tr>
+    <tr><td>Betweenness Centrality — Brandes' algorithm</td><td>Which templates act as traffic hubs where the most recalculation work converges? These are latency hot-spots under concurrent load.</td></tr>
+  </tbody>
+</table>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ RISKS -->
+<h2>What It Catches — Practical Examples</h2>
+<div class="tbl-wrap">
+<table class="risk-table">
+  <thead><tr><th>Risk</th><th>What the auditor sees</th><th>Consequence if missed in production</th></tr></thead>
+  <tbody>
+    <tr><td>N+1 Database Query</td><td><code>GetListFor()</code> or <code>Create(Session)</code> inside a loop</td><td>Sync that should take 2 seconds takes 20 minutes</td></tr>
+    <tr><td>Write-cycle deadlock</td><td>Two templates that write each other's fields (SCC detection)</td><td>Sync thread hangs indefinitely; only fix is a server restart</td></tr>
+    <tr><td>Silent data loss</td><td><code>MultiValueProperty.Add()</code> without <code>PutValue</code> writeback</td><td>Changes appear to succeed but are discarded; no error raised</td></tr>
+    <tr><td>Swallowed exception</td><td>Empty <code>Catch</code> block</td><td>Data corruption happens silently; no log entry, no alert</td></tr>
+    <tr><td>Hardcoded secret</td><td>Password or credential in a connection string literal</td><td>Credential exposed in Designer export, audit log, version history</td></tr>
+    <tr><td>Environment mismatch</td><td><code>If col.GetValue = "HR"</code> instead of <code>GetConfigParmValue</code></td><td>Template breaks when deployed to a different tenant or region</td></tr>
+    <tr><td>Unguarded FK access</td><td><code>.GetFk().GetParent()</code> without <code>.IsEmpty</code> check</td><td>NullReferenceException at sync time; sync thread crashes</td></tr>
+    <tr><td>Schema drift</td><td>Column in DEV snapshot missing from PROD snapshot</td><td>Template that works in testing fails silently in production</td></tr>
+    <tr><td>Performance regression</td><td>Benchmark avg rises from 30ms to 65ms vs baseline</td><td>Gradual sync slowdown goes unnoticed until it becomes an incident</td></tr>
+    <tr><td>SQL injection</td><td>String concatenation inside a filter or query expression</td><td>Attacker can read or modify any data in the OneIM database</td></tr>
+  </tbody>
+</table>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ QUALITY -->
+<h2>Tool Quality — Self-Testing</h2>
+<div class="card" style="border-left: 4px solid #166534;">
+  <p>The auditor is tested against itself with <strong>410 automated Pester tests</strong> across four test lanes. Every one of the 59 rules has a <code>violation.vb</code> and a <code>compliant.vb</code> example file — 118 files total — that serve as living documentation and regression guards.</p>
+  <br>
+  <div class="stat-row" style="margin-bottom:0;">
+    <div class="stat-box"><div class="num" style="color:#166534;">184</div><div class="lbl">PS 5.1 integration tests<br>(end-to-end audit runs)</div></div>
+    <div class="stat-box"><div class="num" style="color:#166534;">19</div><div class="lbl">PS 7 schema index tests</div></div>
+    <div class="stat-box"><div class="num" style="color:#166534;">52</div><div class="lbl">PS 7 benchmark stat tests<br>(p-values, regression)</div></div>
+    <div class="stat-box"><div class="num" style="color:#166534;">155</div><div class="lbl">PS 7 graph algorithm tests<br>(all 8 algorithms)</div></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ USAGE -->
+<h2>How to Run It — Quick Reference</h2>
+<div class="card">
+  <h3>Audit a folder of templates (minimum command)</h3>
+  <pre style="background:#1e2535;color:#c9d1d9;padding:1rem;border-radius:6px;font-size:.82rem;overflow-x:auto;">powershell -NoProfile -File scripts\invoke_oneim_audit.ps1 `
+    -TargetPath "C:\OneIM\ExportedTemplates" `
+    -ReferenceRepoPath "C:\OneIM\ReferenceRepo"</pre>
+
+  <h3 style="margin-top:1rem;">Audit + benchmark combined report</h3>
+  <pre style="background:#1e2535;color:#c9d1d9;padding:1rem;border-radius:6px;font-size:.82rem;overflow-x:auto;">powershell -NoProfile -File scripts\invoke_oneim_audit.ps1 `
+    -TargetPath "C:\OneIM\ExportedTemplates" `
+    -ReferenceRepoPath "C:\OneIM\ReferenceRepo" `
+    -BenchmarkReportPath "output\benchmark-report.json"</pre>
+
+  <h3 style="margin-top:1rem;">Cascade dependency graph for one template</h3>
+  <pre style="background:#1e2535;color:#c9d1d9;padding:1rem;border-radius:6px;font-size:.82rem;overflow-x:auto;">powershell -NoProfile -File scripts\export_template_cascade_report.ps1 `
+    -TemplateName "Person.CentralAccount" `
+    -SchemaSnapshotPath "output\schema-snapshot.json"</pre>
+
+  <h3 style="margin-top:1rem;">Run the full test suite</h3>
+  <pre style="background:#1e2535;color:#c9d1d9;padding:1rem;border-radius:6px;font-size:.82rem;overflow-x:auto;">powershell -NoProfile -File scripts\run_auditor_tests.ps1
+# Expected: 410 tests, 0 failures, ~80 seconds total</pre>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ IDEAS -->
+<h2>Ideas for Discussion &amp; Potential Extensions</h2>
+<ul class="idea-list">
+  <li>
+    <strong>CI/CD Pipeline Gate</strong>
+    The JSON output and exit codes are already pipeline-ready. A gate step could block a deployment automatically if any new high-severity finding appears compared to the last clean baseline — zero extra tooling needed.
+  </li>
+  <li>
+    <strong>Automatic Optimisation Candidates</strong>
+    Combine benchmark data + critical path + betweenness centrality: any template that is simultaneously slow, on the critical path, and a high-traffic hub is the highest-ROI target for caching or query optimisation. The tool could surface this list automatically.
+  </li>
+  <li>
+    <strong>Cross-Template Config Param Propagation</strong>
+    OIM596 already detects hardcoded business values in single files. Extended to the cascade graph, it could identify entire chains where the same hardcoded value flows through multiple templates — flagging all of them at once and suggesting a single shared Configuration Parameter.
+  </li>
+  <li>
+    <strong>Designer Live Connection</strong>
+    Currently requires a System Debugger export. A read-only Designer API connection would let the tool audit live templates without an export step — enabling continuous background scanning.
+  </li>
+  <li>
+    <strong>Scheduled Health Pulse</strong>
+    Schema diff + benchmark regression detection already exist as separate tools. A scheduled weekly run combining both could produce a "health pulse" report — a signal the team sees before problems become incidents.
+  </li>
+  <li>
+    <strong>Rule Severity Tuning per Project</strong>
+    The external <code>audit-config.json</code> already supports overriding detection thresholds. It could be extended to let teams promote or demote rule severities per project context — e.g. a performance-critical project where low-severity performance rules become medium.
+  </li>
+</ul>
+
+<!-- ═══════════════════════════════════════════════════ FOOTER -->
+<div class="footer">
+  <p>OneIM VB.NET Auditor &mdash; Internal Tool &mdash; Generated 2026-03-31</p>
+  <p style="margin-top:.3rem;">59 rules &bull; 410 tests &bull; 8 graph algorithms &bull; 0 external dependencies</p>
+</div>
+
+</div><!-- /page -->
+</body>
+</html>

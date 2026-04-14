@@ -1,0 +1,11 @@
+{
+  "version": "2026-03-23",
+  "notes": "Dormant example only. Suppressions are intentionally disabled during the current rule-tuning phase of the auditor.",
+  "suppressions": [
+    {
+      "rule_id": "REL210",
+      "path_glob": "TypedWrappers\\TypedWrappers.vb",
+      "justification": "Generated wrapper code is reviewed separately and should not dominate the main audit report."
+    }
+  ]
+}

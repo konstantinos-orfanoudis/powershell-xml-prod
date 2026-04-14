@@ -25,6 +25,9 @@ type Fn = {
 export type SchemaAttr = { name: string; type?: string };
 export type SchemaEntity = { name: string; attributes?: SchemaAttr[] };
 export type Schema = { entities?: SchemaEntity[] };
+type BuildUploadXmlOptions = {
+  includeModulePathSupport?: boolean;
+};
 
 const SENSITIVE_RE = /password|token|secret|bearer/i;
 const lc = (s: string) => String(s || "").trim().toLowerCase();
@@ -228,12 +231,17 @@ export function classifyParamsForUpload(importedFns: Fn[], schema: Schema): Fn[]
   return next;
 }
 
-function buildConnectionParametersXml(params: Array<{ name: string; secure: boolean }>) {
+function buildConnectionParametersXml(
+  params: Array<{ name: string; secure: boolean }>,
+  options?: BuildUploadXmlOptions
+) {
   const lines = params.map(p => {
     const sens = p.secure ? ' IsSensibleData="true"' : "";
     return `    <ConnectionParameter Description="${esc(p.name)}" Name="${esc(p.name)}"${sens}/>`;
   });
-  lines.unshift(`    <ConnectionParameter Description="Path to the supporting PowerShell Module eg. C:\\temp\\SalesforceFunctions.psm1 (optional)" Name="PathToPSModule"/>`);
+  if (options?.includeModulePathSupport !== false) {
+    lines.unshift(`    <ConnectionParameter Description="Path to the supporting PowerShell Module eg. C:\\temp\\SalesforceFunctions.psm1 (optional)" Name="PathToPSModule"/>`);
+  }
   return `  <ConnectionParameters>\n${lines.join("\n")}\n  </ConnectionParameters>\n`;
 }
 
@@ -246,7 +254,10 @@ function buildGetAuthorizationCData(params: Array<{ name: string }>) {
   return ["<![CDATA[ [CmdletBinding()]", "        param(", ...plist, "        )", ...assigns, "        ]]>"].join("\n");
 }
 
-function buildCustomCommands(params: Array<{ name: string }>) {
+function buildCustomCommands(
+  params: Array<{ name: string }>,
+  options?: BuildUploadXmlOptions
+) {
   const importSf =
 `      <CustomCommand Name="Import-SFModule">
         <![CDATA[ param(
@@ -262,13 +273,12 @@ function buildCustomCommands(params: Array<{ name: string }>) {
         ${buildGetAuthorizationCData(params)}
       </CustomCommand>`;
 
-  return [
-    "    <CustomCommands>",
-    importSf,
-    getAuth,
-    "    </CustomCommands>",
-    "",
-  ].join("\n");
+  const lines = ["    <CustomCommands>"];
+  if (options?.includeModulePathSupport !== false) {
+    lines.push(importSf);
+  }
+  lines.push(getAuth, "    </CustomCommands>", "");
+  return lines.join("\n");
 }
 
 function buildPredefinedCommands(fns: Fn[]) {
@@ -278,18 +288,34 @@ function buildPredefinedCommands(fns: Fn[]) {
   return `    <PredefinedCommands>\n${lines.join("\n")}\n    </PredefinedCommands>\n`;
 }
 
-function buildConnectSequence(params: Array<{ name: string; secure: boolean }>) {
+function buildConnectSequence(
+  params: Array<{ name: string; secure: boolean }>,
+  options?: BuildUploadXmlOptions
+) {
   const getAuthSet = params.map(p => setParamLine(p, "            ")).join("\n");
+  const items: string[] = [];
+  let order = 1;
+
+  if (options?.includeModulePathSupport !== false) {
+    items.push(
+      `          <Item Order="${order}" Command="Import-SFModule">`,
+      '            <SetParameter Value="PathToPSModule" Source="ConnectionParameter" Param="_PathToPSModule"/>',
+      "          </Item>"
+    );
+    order += 1;
+  }
+
+  items.push(
+    `          <Item Order="${order}" Command="Get-Authorization">`,
+    getAuthSet ? getAuthSet : "",
+    "          </Item>"
+  );
+
   return [
     "    <EnvironmentInitialization>",
     "      <Connect>",
     "        <CommandSequence>",
-    '          <Item Order="1" Command="Import-SFModule">',
-    '            <SetParameter Value="PathToPSModule" Source="ConnectionParameter" Param="_PathToPSModule"/>',
-    "          </Item>",
-    '          <Item Order="2" Command="Get-Authorization">',
-    getAuthSet ? getAuthSet : "",
-    "          </Item>",
+    ...items,
     "        </CommandSequence>",
     "      </Connect>",
     "      <Disconnect/>",
@@ -483,20 +509,31 @@ function buildClassXml(entity: SchemaEntity, fns: Fn[], schema: Schema) {
 
 // ---------- public API
 
-export function buildXmlFromUploadPw(importedFns: Fn[], schema: Schema) {
+export function buildXmlFromUploadPw(
+  importedFns: Fn[],
+  schema: Schema,
+  options?: BuildUploadXmlOptions
+) {
   const connParams = collectConnectionParametersFromGlobals(importedFns, schema);
+  const includeModulePathSupport = options?.includeModulePathSupport !== false;
 
   const header =
 `<?xml version="1.0" encoding="utf-8"?>
 <PowershellConnectorDefinition Description="Example SQL Connector" Version="1.0" Id="CustomConnector">
   <PluginAssemblies/>`;
 
-  const connXml = buildConnectionParametersXml(connParams);
+  const connXml = buildConnectionParametersXml(connParams, {
+    includeModulePathSupport,
+  });
 
   const initOpen = "  <Initialization>\n";
-  const customCmds = buildCustomCommands(connParams);
+  const customCmds = buildCustomCommands(connParams, {
+    includeModulePathSupport,
+  });
   const predefined = buildPredefinedCommands(importedFns);
-  const connectSeq = buildConnectSequence(connParams);
+  const connectSeq = buildConnectSequence(connParams, {
+    includeModulePathSupport,
+  });
   const initClose = "  </Initialization>\n";
 
   const classXmls = (schema.entities || [])

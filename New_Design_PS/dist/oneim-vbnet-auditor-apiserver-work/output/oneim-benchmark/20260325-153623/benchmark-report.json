@@ -1,0 +1,91 @@
+{
+  "report_metadata": {
+    "generated_at": "2026-03-25T15:36:23.5907833+00:00",
+    "backend": "BuiltinSampler",
+    "warmup_count": 1,
+    "measured_run_count": 10,
+    "access_mode": "Auto",
+    "project_config_path": "C:\\Users\\aiuser\\Documents\\DMWorkshop2\\Config\\Example\\projectConfig.xml",
+    "schema_snapshot_path": "C:\\Users\\aiuser\\Desktop\\System_Debugger_Libary\\.agents\\skills\\oneim-vbnet-auditor\\output\\oneim-schema\\AIplayground_OneIM931\\schema-snapshot.json",
+    "thresholds_file": null
+  },
+  "summary": {
+    "total_benchmarks": 1,
+    "total_errors": 0,
+    "threshold_failures": 0
+  },
+  "results": [
+    {
+      "name": "Person.CentralAccount",
+      "surface": "template",
+      "table_name": "Person",
+      "column_name": "CentralAccount",
+      "column_uid": "QER-3082C6C2D6D748ED85A635C5063188F8",
+      "has_template": true,
+      "template_preview": "Dim importSource As String = $ImportSource$\r\n'only if the operator has not set the value manually\r\nIf Not Entity.Columns...",
+      "warmup_count": 1,
+      "measured_run_count": 10,
+      "backend": "BuiltinSampler",
+      "avg_ms": 65.077,
+      "stddev_ms": 49.556,
+      "min_ms": 3.311,
+      "max_ms": 106.688,
+      "p95_ms": 106.688,
+      "raw_samples": [
+        {
+          "elapsed_ms": 6.813,
+          "memory_delta_bytes": 533408,
+          "cpu_delta_ms": 0.0
+        },
+        {
+          "elapsed_ms": 105.278,
+          "memory_delta_bytes": 156088,
+          "cpu_delta_ms": 15.625
+        },
+        {
+          "elapsed_ms": 105.811,
+          "memory_delta_bytes": 164384,
+          "cpu_delta_ms": 78.125
+        },
+        {
+          "elapsed_ms": 106.688,
+          "memory_delta_bytes": 164328,
+          "cpu_delta_ms": 109.375
+        },
+        {
+          "elapsed_ms": 3.62,
+          "memory_delta_bytes": 164416,
+          "cpu_delta_ms": 0.0
+        },
+        {
+          "elapsed_ms": 3.841,
+          "memory_delta_bytes": 156184,
+          "cpu_delta_ms": 0.0
+        },
+        {
+          "elapsed_ms": 104.736,
+          "memory_delta_bytes": 156192,
+          "cpu_delta_ms": 109.375
+        },
+        {
+          "elapsed_ms": 3.311,
+          "memory_delta_bytes": 164288,
+          "cpu_delta_ms": 0.0
+        },
+        {
+          "elapsed_ms": 105.428,
+          "memory_delta_bytes": 164408,
+          "cpu_delta_ms": 0.0
+        },
+        {
+          "elapsed_ms": 105.248,
+          "memory_delta_bytes": 155856,
+          "cpu_delta_ms": 109.375
+        }
+      ],
+      "threshold_exceeded": false,
+      "threshold_details": null,
+      "error": null
+    }
+  ]
+}

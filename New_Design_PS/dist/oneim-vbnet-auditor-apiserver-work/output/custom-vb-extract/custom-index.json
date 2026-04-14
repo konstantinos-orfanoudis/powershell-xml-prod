@@ -1,0 +1,9 @@
+﻿{
+    "category":  "references",
+    "output":  "C:\\Users\\aiuser\\Desktop\\System_Debugger_Libary\\.agents\\skills\\oneim-vbnet-auditor\\output\\custom-vb-extract\\references\\Table__Apply__CCC_CustomRule.vb",
+    "source":  "Table\\Table.vb",
+    "start_line":  2,
+    "end_line":  5,
+    "kind":  "custom-reference-block",
+    "symbol":  "Apply"
+}

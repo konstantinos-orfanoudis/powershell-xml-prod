@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SSCP Companion</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <section class="hero">
+        <p class="eyebrow">SSCP Mastery Coach</p>
+        <h1>Browser Companion</h1>
+        <p class="copy">
+          Capture the current page or your selected text into the local tutor.
+        </p>
+      </section>
+
+      <section class="panel">
+        <label class="label" for="app-url">Tutor URL</label>
+        <input id="app-url" type="url" value="http://localhost:3000" />
+        <button id="save-url" class="ghost">Save URL</button>
+      </section>
+
+      <section class="panel grid">
+        <button id="open-tutor" class="primary">Open Tutor</button>
+        <button id="capture-page" class="secondary">Capture Page</button>
+        <button id="capture-selection" class="secondary">Capture Selection</button>
+        <button id="quiz-page" class="secondary">Quiz This Page</button>
+        <button id="read-selection" class="ghost">Read Selection</button>
+      </section>
+
+      <section class="panel">
+        <div class="label">Status</div>
+        <p id="status" class="status">Ready.</p>
+      </section>
+    </main>
+    <script src="popup.js"></script>
+  </body>
+  </html>

@@ -1,0 +1,95 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: linear-gradient(180deg, #f6efe6 0%, #efe4d4 100%);
+  color: #1f1a15;
+  font: 14px/1.5 "Segoe UI", Arial, sans-serif;
+}
+
+.shell {
+  width: 360px;
+  padding: 16px;
+}
+
+.hero {
+  background: #1f1a15;
+  color: #faf5ee;
+  border-radius: 24px;
+  padding: 18px;
+  box-shadow: 0 12px 30px rgba(37, 27, 18, 0.2);
+}
+
+.eyebrow,
+.label {
+  margin: 0;
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #9f9487;
+}
+
+.hero h1 {
+  margin: 8px 0 0;
+  font-size: 26px;
+  line-height: 1.15;
+}
+
+.copy {
+  margin: 10px 0 0;
+  color: #d7c9b8;
+}
+
+.panel {
+  margin-top: 14px;
+  border: 1px solid rgba(31, 26, 21, 0.1);
+  background: rgba(255, 255, 255, 0.78);
+  border-radius: 22px;
+  padding: 14px;
+}
+
+.grid {
+  display: grid;
+  gap: 10px;
+}
+
+input {
+  width: 100%;
+  margin-top: 8px;
+  padding: 11px 12px;
+  border: 1px solid rgba(31, 26, 21, 0.12);
+  border-radius: 16px;
+  background: #fff;
+}
+
+button {
+  width: 100%;
+  padding: 11px 12px;
+  border-radius: 16px;
+  border: 1px solid rgba(31, 26, 21, 0.12);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.primary {
+  background: #1f1a15;
+  border-color: #1f1a15;
+  color: #fff;
+}
+
+.secondary {
+  background: #f6efe6;
+  color: #1f1a15;
+}
+
+.ghost {
+  background: #fff;
+  color: #1f1a15;
+}
+
+.status {
+  margin: 10px 0 0;
+  color: #5f574f;
+}

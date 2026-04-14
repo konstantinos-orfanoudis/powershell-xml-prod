@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OneIM VB.NET Auditor — Application Summary</title>
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --surface2: #22263a;
+    --border: #2e3352;
+    --accent: #5b8dee;
+    --accent2: #7c6af5;
+    --green: #3ecf8e;
+    --orange: #f5a623;
+    --red: #e05252;
+    --amber: #f0c040;
+    --text: #e2e6f0;
+    --muted: #8892b0;
+    --code-bg: #13161f;
+    --pill-sec: #3a1a2e;
+    --pill-sec-t: #e05252;
+    --pill-perf: #1a2a3a;
+    --pill-perf-t: #5b8dee;
+    --pill-corr: #1a2e1a;
+    --pill-corr-t: #3ecf8e;
+    --pill-rel: #2a1a3a;
+    --pill-rel-t: #a78bfa;
+    --pill-cnc: #2a2a1a;
+    --pill-cnc-t: #f0c040;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; font-size: 15px; line-height: 1.65; }
+
+  header {
+    background: linear-gradient(135deg, #1a1d27 0%, #14172a 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 48px 48px 36px;
+  }
+  header .badge {
+    display: inline-block;
+    background: var(--accent2);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 4px;
+    margin-bottom: 14px;
+  }
+  header h1 { font-size: 2.4rem; font-weight: 800; line-height: 1.2; color: #fff; }
+  header h1 span { color: var(--accent); }
+  header .tagline { color: var(--muted); font-size: 1rem; margin-top: 10px; max-width: 700px; }
+  header .meta { margin-top: 18px; display: flex; gap: 24px; flex-wrap: wrap; }
+  header .meta-item { font-size: 0.82rem; color: var(--muted); }
+  header .meta-item strong { color: var(--text); }
+
+  main { max-width: 1100px; margin: 0 auto; padding: 40px 32px 80px; }
+
+  h2 { font-size: 1.35rem; font-weight: 700; color: #fff; margin: 48px 0 16px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
+  h2 .icon { margin-right: 8px; }
+  h3 { font-size: 1rem; font-weight: 700; color: var(--accent); margin: 24px 0 8px; }
+
+  p { color: var(--text); margin-bottom: 10px; }
+  ul, ol { padding-left: 22px; margin-bottom: 12px; }
+  li { margin-bottom: 5px; color: var(--text); }
+
+  /* Cards grid */
+  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; margin: 16px 0 24px; }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px 18px 14px;
+    position: relative;
+    overflow: hidden;
+  }
+  .card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; border-radius: 10px 10px 0 0; }
+  .card.green::before { background: var(--green); }
+  .card.blue::before { background: var(--accent); }
+  .card.purple::before { background: var(--accent2); }
+  .card.orange::before { background: var(--orange); }
+  .card.red::before { background: var(--red); }
+  .card.amber::before { background: var(--amber); }
+  .card-icon { font-size: 1.5rem; margin-bottom: 8px; }
+  .card-title { font-size: 0.82rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--muted); margin-bottom: 4px; }
+  .card-value { font-size: 2rem; font-weight: 800; color: #fff; line-height: 1; }
+  .card-sub { font-size: 0.78rem; color: var(--muted); margin-top: 6px; }
+
+  /* Rule table */
+  .rule-table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 0.84rem; }
+  .rule-table th { background: var(--surface2); color: var(--muted); font-weight: 600; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.8px; padding: 9px 12px; text-align: left; border-bottom: 1px solid var(--border); }
+  .rule-table td { padding: 8px 12px; border-bottom: 1px solid #1d2035; vertical-align: top; }
+  .rule-table tr:hover td { background: #1d2035; }
+
+  /* Severity pills */
+  .sev { display: inline-block; font-size: 0.7rem; font-weight: 700; padding: 2px 7px; border-radius: 99px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .sev-high { background: #3a1a1a; color: var(--red); }
+  .sev-medium { background: #2a1f0a; color: var(--orange); }
+  .sev-low { background: #1a1f2a; color: #7ab8f5; }
+
+  /* Category pills */
+  .cat { display: inline-block; font-size: 0.68rem; font-weight: 700; padding: 2px 7px; border-radius: 99px; }
+  .cat-security { background: var(--pill-sec); color: var(--pill-sec-t); }
+  .cat-performance { background: var(--pill-perf); color: var(--pill-perf-t); }
+  .cat-correctness { background: var(--pill-corr); color: var(--pill-corr-t); }
+  .cat-reliability { background: var(--pill-rel); color: var(--pill-rel-t); }
+  .cat-concurrency { background: var(--pill-cnc); color: var(--pill-cnc-t); }
+
+  /* Engine badge */
+  .eng { display: inline-block; font-size: 0.68rem; font-weight: 600; padding: 2px 7px; border-radius: 4px; }
+  .eng-coded { background: #1a2035; color: var(--accent); }
+  .eng-decl { background: #1f1a35; color: var(--accent2); }
+
+  /* Rule ID */
+  .rid { font-family: 'Cascadia Code', 'Fira Code', monospace; font-size: 0.8rem; color: #c9d1f5; }
+
+  /* Code block */
+  pre { background: var(--code-bg); border: 1px solid var(--border); border-radius: 8px; padding: 14px 18px; overflow-x: auto; font-size: 0.82rem; line-height: 1.55; margin: 8px 0 16px; }
+  code { font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace; font-size: 0.85em; background: #1d2035; padding: 1px 5px; border-radius: 3px; color: #c9d1f5; }
+  pre code { background: none; padding: 0; font-size: inherit; }
+
+  /* Feature list with icons */
+  .feat-list { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px; margin: 10px 0 20px; }
+  .feat-list li { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; display: flex; gap: 10px; align-items: flex-start; }
+  .feat-list li .fi { flex-shrink: 0; font-size: 1.1rem; margin-top: 1px; }
+  .feat-list li .ft { font-size: 0.84rem; }
+  .feat-list li .ft strong { color: #fff; display: block; margin-bottom: 2px; }
+  .feat-list li .ft span { color: var(--muted); }
+
+  /* Section boxes */
+  .infobox { background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--accent); border-radius: 8px; padding: 16px 20px; margin: 14px 0; }
+  .infobox.warn { border-left-color: var(--orange); }
+  .infobox.green { border-left-color: var(--green); }
+  .infobox p { margin: 0; font-size: 0.88rem; color: var(--muted); }
+  .infobox strong { color: var(--text); }
+
+  /* Lane blocks */
+  .lanes { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; margin: 16px 0; }
+  .lane { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 20px 20px 16px; }
+  .lane-tag { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+  .lane-tag.ps5 { color: var(--green); }
+  .lane-tag.ps7 { color: var(--accent); }
+  .lane h4 { font-size: 0.95rem; font-weight: 700; color: #fff; margin-bottom: 8px; }
+  .lane p { font-size: 0.82rem; color: var(--muted); margin: 0; }
+
+  /* Workflow steps */
+  .steps { counter-reset: step; list-style: none; padding: 0; }
+  .steps li { counter-increment: step; display: flex; gap: 14px; margin-bottom: 12px; align-items: flex-start; }
+  .steps li::before {
+    content: counter(step);
+    flex-shrink: 0;
+    width: 26px; height: 26px;
+    background: var(--accent2);
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 800;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin-top: 1px;
+  }
+  .steps li .sc { font-size: 0.88rem; }
+  .steps li .sc strong { color: #fff; display: block; margin-bottom: 2px; }
+  .steps li .sc span { color: var(--muted); font-size: 0.83rem; }
+
+  /* Script ref */
+  .script-ref { display: flex; align-items: center; gap: 8px; background: var(--code-bg); border: 1px solid var(--border); border-radius: 6px; padding: 6px 12px; margin: 5px 0; font-family: monospace; font-size: 0.8rem; }
+  .script-ref .sr-name { color: var(--accent); }
+  .script-ref .sr-desc { color: var(--muted); font-size: 0.75rem; margin-left: auto; font-family: sans-serif; }
+
+  footer { text-align: center; padding: 32px; border-top: 1px solid var(--border); color: var(--muted); font-size: 0.8rem; }
+
+  /* Nav */
+  .toc { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 18px 22px; margin: 24px 0 36px; display: flex; flex-wrap: wrap; gap: 12px; }
+  .toc a { color: var(--accent); font-size: 0.84rem; text-decoration: none; }
+  .toc a:hover { text-decoration: underline; }
+  .toc-sep { color: var(--border); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="badge">Application Summary</div>
+  <h1>OneIM VB.NET <span>Auditor</span></h1>
+  <p class="tagline">A PowerShell-based static analysis and live telemetry skill for One Identity Manager VB.NET code — covering security, correctness, performance, reliability, and concurrency.</p>
+  <div class="meta">
+    <div class="meta-item">Target platform: <strong>One Identity Manager 9.3.1</strong></div>
+    <div class="meta-item">Rules: <strong>50 active</strong></div>
+    <div class="meta-item">Test coverage: <strong>319 passing</strong></div>
+    <div class="meta-item">Example files: <strong>100 .vb files (50 rules × 2)</strong></div>
+    <div class="meta-item">Engine: <strong>PowerShell 5.1 + 7</strong></div>
+    <div class="meta-item">Generated: <strong>2026-03-27</strong></div>
+  </div>
+</header>
+
+<main>
+
+  <!-- TOC -->
+  <nav class="toc">
+    <a href="#overview">Overview</a><span class="toc-sep">·</span>
+    <a href="#stats">At a Glance</a><span class="toc-sep">·</span>
+    <a href="#static-audit">Static Audit</a><span class="toc-sep">·</span>
+    <a href="#rules">Rule Catalog</a><span class="toc-sep">·</span>
+    <a href="#authoring">Rule Authoring</a><span class="toc-sep">·</span>
+    <a href="#schema">Schema Snapshot</a><span class="toc-sep">·</span>
+    <a href="#benchmark">Benchmarking</a><span class="toc-sep">·</span>
+    <a href="#cascade">Cascade Report</a><span class="toc-sep">·</span>
+    <a href="#reference">Reference Library</a><span class="toc-sep">·</span>
+    <a href="#reporting">Reporting</a><span class="toc-sep">·</span>
+    <a href="#testing">Test Suite</a><span class="toc-sep">·</span>
+    <a href="#scripts">Script Index</a>
+  </nav>
+
+  <!-- OVERVIEW -->
+  <h2 id="overview"><span class="icon">🔍</span>Overview</h2>
+  <p>The <strong>OneIM VB.NET Auditor</strong> is a structured skill that performs automated code review of One Identity Manager VB.NET scripts, templates, methods, formatting rules, and process-related code. It combines a static analysis engine (pattern matching + coded detectors) with live database telemetry (schema snapshots, benchmarks, cascade dependency graphs) to surface quality problems with traceable evidence.</p>
+  <p>It is intentionally scoped to OneIM-specific VB.NET patterns — not generic VB.NET desktop or web applications — and enforces an approved evidence hierarchy (One Identity docs → Microsoft Learn → OWASP) so every finding can be justified to an auditor or a CTO.</p>
+
+  <div class="infobox">
+    <p><strong>Audit priority order is fixed:</strong> (1) Correctness → (2) Security → (3) Performance. All findings are classified under one of five categories: <em>security</em>, <em>correctness</em>, <em>reliability</em>, <em>performance</em>, or <em>concurrency</em>.</p>
+  </div>
+
+  <!-- STATS -->
+  <h2 id="stats"><span class="icon">📊</span>At a Glance</h2>
+  <div class="cards">
+    <div class="card red">
+      <div class="card-icon">🛡️</div>
+      <div class="card-title">Security Rules</div>
+      <div class="card-value">12</div>
+      <div class="card-sub">SEC100 – SEC190</div>
+    </div>
+    <div class="card green">
+      <div class="card-icon">✅</div>
+      <div class="card-title">Correctness Rules</div>
+      <div class="card-value">9</div>
+      <div class="card-sub">VB001–VB005, OIM510, OIM511, REL210, REL220</div>
+    </div>
+    <div class="card purple">
+      <div class="card-icon">🔗</div>
+      <div class="card-title">Reliability Rules</div>
+      <div class="card-value">7</div>
+      <div class="card-sub">REL200–REL250, OIM545</div>
+    </div>
+    <div class="card blue">
+      <div class="card-icon">⚡</div>
+      <div class="card-title">Performance Rules</div>
+      <div class="card-value">13</div>
+      <div class="card-sub">PER400–PER455, OIM500, OIM520, OIM555</div>
+    </div>
+    <div class="card amber">
+      <div class="card-icon">⚙️</div>
+      <div class="card-title">Concurrency Rules</div>
+      <div class="card-value">7</div>
+      <div class="card-sub">CNC600–CNC610</div>
+    </div>
+    <div class="card orange">
+      <div class="card-icon">🧪</div>
+      <div class="card-title">Passing Tests</div>
+      <div class="card-value">319</div>
+      <div class="card-sub">4 Pester lanes, 0 failures</div>
+    </div>
+  </div>
+
+  <!-- STATIC AUDIT -->
+  <h2 id="static-audit"><span class="icon">📁</span>Core Functionality — Static Audit</h2>
+  <p>The primary function: scan one or more VB.NET files or folders and produce a structured report of findings. This works entirely offline with no live OneIM connection required.</p>
+
+  <pre><code>powershell -File scripts/invoke_oneim_audit.ps1 `
+  -TargetPath   "C:\MyProject\Scripts" `
+  -ReferenceRepoPath "C:\ReferenceLib\oneim-9.3.1" `
+  [-BenchmarkReportPath output\benchmark-report.json] `
+  [-SchemaSnapshotPath  output\schema-snapshot.json] `
+  [-ThresholdsFile      thresholds.json] `
+  [-CascadeReportPath   output\cascade-Person.FirstName.json] `
+  [-SuppressionsFile    suppressions.json]</code></pre>
+
+  <ul class="feat-list">
+    <li><div class="fi">📂</div><div class="ft"><strong>Recursive file scanning</strong><span>Walks all .vb files in the target folder; each file is processed through all active detection units</span></div></li>
+    <li><div class="fi">🎯</div><div class="ft"><strong>50 active rules</strong><span>Two engines: coded (PowerShell dispatch table) and declarative (line-pattern, header-required, line-absence)</span></div></li>
+    <li><div class="fi">🔕</div><div class="ft"><strong>Suppressions</strong><span>Rule + path glob + justification; suppressed findings never appear in the report</span></div></li>
+    <li><div class="fi">📏</div><div class="ft"><strong>max_examples_per_file cap</strong><span>Prevents a single noisy rule from flooding the report for one file; cap is per-rule in the catalog</span></div></li>
+    <li><div class="fi">🔁</div><div class="ft"><strong>Finding deduplication</strong><span>Coded + declarative double-reports on the same rule/file/line are merged before output</span></div></li>
+    <li><div class="fi">🌐</div><div class="ft"><strong>Benchmark ingestion</strong><span>When a benchmark report and thresholds file are supplied, threshold overruns become additional PERF findings</span></div></li>
+    <li><div class="fi">🔗</div><div class="ft"><strong>Cascade ingestion</strong><span>Write-cycle nodes from a cascade JSON become CNC610 findings in the audit report</span></div></li>
+    <li><div class="fi">📝</div><div class="ft"><strong>Path scoping</strong><span>Rules can be restricted via include_paths/exclude_paths globs to specific folders</span></div></li>
+  </ul>
+
+  <!-- RULES -->
+  <h2 id="rules"><span class="icon">📋</span>Rule Catalog — All 50 Rules</h2>
+  <p>Rules live in <code>assets/audit-rules.json</code> and are the single source of truth. Two detector engines are used: <span class="eng eng-coded">coded</span> (PowerShell function dispatched per file line) and <span class="eng eng-decl">declarative</span> (regex/pattern interpreted at runtime — no code change needed to add).</p>
+
+  <table class="rule-table">
+    <thead>
+      <tr><th>ID</th><th>Title</th><th>Category</th><th>Severity</th><th>Engine</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="rid">VB001</td><td>Option Explicit should be enabled</td><td><span class="cat cat-correctness">correctness</span></td><td><span class="sev sev-medium">medium</span></td><td><span class="eng eng-coded">coded</span></td></tr>
+      <tr><td class="rid">VB002</td><td>Option Strict should be enabled</td><td><span class="cat cat-correctness">correctness</span></td><td><span class="sev sev-medium">medium</span></td><td><span class="eng eng-coded">coded</span></td></tr>
+      <tr><td class="rid">VB003</td><td>Avoid obvious late binding and Object-heavy code</td><td><span class="cat cat-correctness">correctness</span></td><td><span class="sev sev-medium">medium</span></td><td><span class="eng eng-coded">coded</span></td></tr>
+      <tr><td class="rid">VB004</td><td>Use Is Nothing / IsNot Nothing instead of = Nothing / &lt;&gt; Nothing</td><td><span class="cat cat-correctness">correctness</span></td><td><span class="sev sev-medium">medium</span></td><td><span class="eng eng-coded">coded</span></td></tr>
+      <tr><td class="rid">VB005</td><td>Do not rethrow with Throw ex — bare Throw preserves the stack trace</td><td><span class="cat cat-correctness">correctness</span></td><td><span class="sev sev-medium">medium</span></td><td><span class="eng eng-decl">declarative</span></td></tr>
+      <tr><td class="rid">SEC100</td><td>Avoid string-built SQL or filter expressions</td><td><span class="cat cat-security">security</span></td><td><span class="sev sev-high">high</span></td><td><span class="eng eng-coded">coded</span></td></tr>
+      <tr><td class="rid">SEC110</td><td>Avoid launching external processes from OneIM script logic</td><td><span class="cat cat-security">security</span></td><td><span class="sev sev-high">high</span></td><td><span class="eng eng-coded">coded</span></td></tr>
+      <tr><td class="rid">SEC120</td><td>Broad exception handling should not hide failures</td><td><span class="cat cat-security">security</span></td><td><span class="sev sev-medium">medium</span></td><td><span class="eng eng-coded">coded</span></td></tr>
+      <tr><td class="rid">SEC130</td><td>Avoid obsolete web request APIs</td><td><span class="cat cat-security">security</span></td><td><span class="sev sev-medium">medium</span></td><td><span class="eng eng-coded">coded</span></td></tr>
+      <tr><td class="rid">SEC131</td><td>Review outbound web requests with variable-driven URLs (SSRF)</td><td><span class="cat cat-security">security</span></td><td><span class="sev sev-medium">medium</span></td><td><span class="eng eng-coded">coded</span></td></tr>
+      <tr><td class="rid">SEC140</td><td>Review file I/O paths that appear to be variable-driven</td><td><span class="cat cat-security">security</span></td><td><span class="sev sev-medium">medium</span></td><td><span class="eng eng-coded">coded</span></td></tr>
+      <tr><td class="rid">SEC150</td><td>Review XML parsing for insecure DTD or external entity behavior (XXE)</td><td><span class="cat cat-security">security</span></td><td><span class="sev sev-medium">medium</span></td><td><span class="eng eng-coded">coded</span></td></tr>
+      <tr><td class="rid">SEC160</td><td>Do not use insecure deserializers (BinaryFormatter, NetDataContractSerializer)</td><td><span class="cat cat-security">security</span></td><td><span class="sev sev-high">high</span></td><td><span class="eng eng-coded">coded</span></td></tr>
+      <tr><td class="rid">SEC170</td><td>Review deprecated TLS or disabled certificate validation</td><td><span class="cat cat-security">security</span></td><td><span class="sev sev-high">high</span></td><td><span class="eng eng-coded">coded</span></td></tr>
+      <tr><td class="rid">SEC180</td><td>Hardcoded credential or secret literal</td><td><span class="cat cat-security">security</span></td><td><span class="sev sev-high">high</span></td><td><span class="eng eng-decl">declarative</span></td></tr>
+      <tr><td class="rid">SEC185</td><td>Password embedded in a connection string literal</td><td><span class="cat cat-security">security</span></td><td><span class="sev sev-high">high</span></td><td><span class="eng eng-decl">declarative</span></td></tr>
+      <tr><td class="rid">SEC190</td><td>LDAP filter built by string concatenation — injection risk</td><td><span class="cat cat-security">security</span></td><td><span class="sev sev-high">high</span></td><td><span class="eng eng-coded">coded</span></td></tr>
+      <tr><td class="rid">REL200</td><td>Dispose disposable objects before losing scope</td><td><span class="cat cat-reliability">reliability</span></td><td><span class="sev sev-medium">medium</span></td><td><span class="eng eng-coded">coded</span></td></tr>
+      <tr><td class="rid">REL210</td><td>Use explicit StringComparison for identifier-sensitive comparisons</td><td><span class="cat cat-reliability">reliability</span></td><td><span class="sev sev-medium">medium</span></td><td><span class="eng eng-coded">coded</span></td></tr>
+      <tr><td class="rid">REL220</td><td>Review GetTriggerValue-driven writes for Nothing or empty handling</td><td><span class="cat cat-reliability">reliability</span></td><td><span class="sev sev-medium">medium</span></td><td><span class="eng eng-coded">coded</span></td></tr>
+      <tr><td class="rid">REL230</td><td>Empty Catch block silently swallows exceptions</td><td><span class="cat cat-reliability">reliability</span></td><td><span class="sev sev-medium">medium</span></td><td><span class="eng eng-coded">coded</span></td></tr>
+      <tr><td class="rid">REL240</td><td>GetFk result used without IsEmpty guard</td><td><span class="cat cat-reliability">reliability</span></td><td><span class="sev sev-medium">medium</span></td><td><span class="eng eng-coded">coded</span></td></tr>
+      <tr><td class="rid">REL250</td><td>IDisposable resource declared with Dim instead of Using — resource may leak</td><td><span class="cat cat-reliability">reliability</span></td><td><span class="sev sev-medium">medium</span></td><td><span class="eng eng-decl">declarative</span></td></tr>
+      <tr><td class="rid">OIM500</td><td>Review PutValue / ExecuteTemplate usage for sync-time side effects</td><td><span class="cat cat-correctness">correctness</span></td><td><span class="sev sev-low">low</span></td><td><span class="eng eng-coded">coded</span></td></tr>
+      <tr><td class="rid">OIM510</td><td>Custom VI-KEY entries should use CCC-prefixed script names</td><td><span class="cat cat-correctness">correctness</span></td><td><span class="sev sev-low">low</span></td><td><span class="eng eng-coded">coded</span></td></tr>
+      <tr><td class="rid">OIM511</td><td>Custom VI-KEY entries should implement CCC-prefixed Function or Sub names</td><td><span class="cat cat-correctness">correctness</span></td><td><span class="sev sev-low">low</span></td><td><span class="eng eng-coded">coded</span></td></tr>
+      <tr><td class="rid">OIM520</td><td>Expensive OneIM lookup (GetListFor / GetSingleProperty) inside a loop</td><td><span class="cat cat-performance">performance</span></td><td><span class="sev sev-medium">medium</span></td><td><span class="eng eng-coded">coded</span></td></tr>
+      <tr><td class="rid">OIM530</td><td>Use f.UidComparison() for UID_ columns instead of f.Comparison(…, ValType.String)</td><td><span class="cat cat-correctness">correctness</span></td><td><span class="sev sev-medium">medium</span></td><td><span class="eng eng-coded">coded</span></td></tr>
+      <tr><td class="rid">OIM535</td><td>Direct = "" comparison on .GetValue("UID_…").String — use String.IsNullOrEmpty</td><td><span class="cat cat-correctness">correctness</span></td><td><span class="sev sev-low">low</span></td><td><span class="eng eng-decl">declarative</span></td></tr>
+      <tr><td class="rid">OIM545</td><td>GetSingleValue() throws when no row matches — prefer TryGetSingleValue()</td><td><span class="cat cat-reliability">reliability</span></td><td><span class="sev sev-medium">medium</span></td><td><span class="eng eng-decl">declarative</span></td></tr>
+      <tr><td class="rid">OIM555</td><td>IEntity.Save(Session) called inside a loop — use UnitOfWork.Put() for bulk writes</td><td><span class="cat cat-performance">performance</span></td><td><span class="sev sev-medium">medium</span></td><td><span class="eng eng-coded">coded</span></td></tr>
+      <tr><td class="rid">PER400</td><td>Prefer Any over Count for emptiness checks</td><td><span class="cat cat-performance">performance</span></td><td><span class="sev sev-low">low</span></td><td><span class="eng eng-coded">coded</span></td></tr>
+      <tr><td class="rid">PER410</td><td>Avoid repeated string concatenation in loops</td><td><span class="cat cat-performance">performance</span></td><td><span class="sev sev-low">low</span></td><td><span class="eng eng-coded">coded</span></td></tr>
+      <tr><td class="rid">PER420</td><td>Review possible multiple enumeration of IEnumerable</td><td><span class="cat cat-performance">performance</span></td><td><span class="sev sev-low">low</span></td><td><span class="eng eng-coded">coded</span></td></tr>
+      <tr><td class="rid">PER430</td><td>Review repeated object or database access inside loops</td><td><span class="cat cat-performance">performance</span></td><td><span class="sev sev-low">low</span></td><td><span class="eng eng-coded">coded</span></td></tr>
+      <tr><td class="rid">PER440</td><td>Object allocation inside a loop body (GC pressure)</td><td><span class="cat cat-performance">performance</span></td><td><span class="sev sev-low">low</span></td><td><span class="eng eng-coded">coded</span></td></tr>
+      <tr><td class="rid">PER450</td><td>Connection pooling disabled (Pooling=false) in ADO.NET connection string</td><td><span class="cat cat-performance">performance</span></td><td><span class="sev sev-medium">medium</span></td><td><span class="eng eng-decl">declarative</span></td></tr>
+      <tr><td class="rid">PER451</td><td>IEntity.Create(Session) called inside a loop — one SELECT per item</td><td><span class="cat cat-performance">performance</span></td><td><span class="sev sev-medium">medium</span></td><td><span class="eng eng-coded">coded</span></td></tr>
+      <tr><td class="rid">PER452</td><td>Query.SelectAll() loads every column — prefer Select() with needed columns only</td><td><span class="cat cat-performance">performance</span></td><td><span class="sev sev-low">low</span></td><td><span class="eng eng-decl">declarative</span></td></tr>
+      <tr><td class="rid">PER455</td><td>BuildSessionFactory() called per method invocation — factory should be cached</td><td><span class="cat cat-performance">performance</span></td><td><span class="sev sev-medium">medium</span></td><td><span class="eng eng-coded">coded</span></td></tr>
+      <tr><td class="rid">STR600</td><td>Avoid .ToLower()/.ToUpper() for string comparison — use StringComparison.OrdinalIgnoreCase</td><td><span class="cat cat-correctness">correctness</span></td><td><span class="sev sev-low">low</span></td><td><span class="eng eng-coded">coded</span></td></tr>
+      <tr><td class="rid">STR610</td><td>String.Format() called with a variable as the format string — format injection risk</td><td><span class="cat cat-security">security</span></td><td><span class="sev sev-medium">medium</span></td><td><span class="eng eng-decl">declarative</span></td></tr>
+      <tr><td class="rid">WEB600</td><td>Use HttpClient instead of obsolete HttpWebRequest / WebClient (SYSLIB0014)</td><td><span class="cat cat-reliability">reliability</span></td><td><span class="sev sev-medium">medium</span></td><td><span class="eng eng-decl">declarative</span></td></tr>
+      <tr><td class="rid">CNC600</td><td>NOLOCK hint may yield dirty reads under concurrent writes</td><td><span class="cat cat-concurrency">concurrency</span></td><td><span class="sev sev-high">high</span></td><td><span class="eng eng-decl">declarative</span></td></tr>
+      <tr><td class="rid">CNC601</td><td>BeginTransaction without visible Commit or Rollback in scope</td><td><span class="cat cat-concurrency">concurrency</span></td><td><span class="sev sev-high">high</span></td><td><span class="eng eng-coded">coded</span></td></tr>
+      <tr><td class="rid">CNC602</td><td>Possible nested transaction — BeginTransaction called more than once before Commit</td><td><span class="cat cat-concurrency">concurrency</span></td><td><span class="sev sev-high">high</span></td><td><span class="eng eng-coded">coded</span></td></tr>
+      <tr><td class="rid">CNC603</td><td>Thread.Sleep blocks a OneIM sync thread</td><td><span class="cat cat-concurrency">concurrency</span></td><td><span class="sev sev-medium">medium</span></td><td><span class="eng eng-decl">declarative</span></td></tr>
+      <tr><td class="rid">CNC604</td><td>Unbounded loop (While True / Do While True)</td><td><span class="cat cat-concurrency">concurrency</span></td><td><span class="sev sev-medium">medium</span></td><td><span class="eng eng-decl">declarative</span></td></tr>
+      <tr><td class="rid">CNC605</td><td>Shared (static) mutable field risks race conditions across concurrent sync threads</td><td><span class="cat cat-concurrency">concurrency</span></td><td><span class="sev sev-medium">medium</span></td><td><span class="eng eng-decl">declarative</span></td></tr>
+      <tr><td class="rid">CNC610</td><td>Template write (PutValue/ExecuteTemplate) inside a dependency cycle</td><td><span class="cat cat-concurrency">concurrency</span></td><td><span class="sev sev-high">high</span></td><td><span class="eng eng-coded">coded</span></td></tr>
+    </tbody>
+  </table>
+
+  <!-- RULE AUTHORING -->
+  <h2 id="authoring"><span class="icon">✏️</span>Rule Authoring Workflow</h2>
+  <p>New <strong>declarative</strong> rules can be added without touching detector PowerShell code. Three declarative match kinds are supported:</p>
+
+  <table class="rule-table">
+    <thead><tr><th>Match Kind</th><th>Fires When</th><th>Finding Location</th></tr></thead>
+    <tbody>
+      <tr><td><code>line-pattern</code></td><td>Regex matches any line in the file</td><td>Each matching line</td></tr>
+      <tr><td><code>header-required</code></td><td>Regex is absent from the first 40 lines</td><td>Line 1</td></tr>
+      <tr><td><code>line-absence</code></td><td>No line in the entire file matches the regex</td><td>Line 1</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Add a new rule in 4 steps</h3>
+  <ol class="steps">
+    <li><div class="sc"><strong>Scaffold with new_audit_rule.ps1</strong><span>Appends a draft declarative rule to audit-rules.json; validates the regex before writing; rejects duplicate IDs</span></div></li>
+    <li><div class="sc"><strong>Validate with validate_audit_rules.ps1</strong><span>Checks unique IDs, valid enums, regex compilation, required fields per engine type, and optional source-ID resolution</span></div></li>
+    <li><div class="sc"><strong>Promote from draft → active</strong><span>Change the "state" field in audit-rules.json; the rule immediately becomes part of the active audit run</span></div></li>
+    <li><div class="sc"><strong>Run the test suite</strong><span>scripts/run_auditor_tests.ps1 must still pass 319 tests with 0 failures</span></div></li>
+  </ol>
+
+  <div class="infobox green">
+    <p><strong>Path scoping:</strong> add <code>include_paths</code> or <code>exclude_paths</code> glob arrays to any rule to restrict it to specific relative paths (e.g., <code>["Scripts\\*"]</code>). Uses PowerShell WildcardPattern — case-insensitive.</p>
+  </div>
+
+  <!-- SCHEMA SNAPSHOT -->
+  <h2 id="schema"><span class="icon">🗄️</span>Live Schema Snapshot (Lane 2)</h2>
+  <p>Connects to the live OneIM database and exports table/column/FK-relation metadata for FK-aware analysis and cascade resolution. Works in three access modes.</p>
+
+  <pre><code>scripts/export_oneim_schema_snapshot.ps1
+  [-TestAssistRoot &lt;path&gt;]  [-ProjectConfigPath &lt;path&gt;]
+  [-AccessMode Auto|Session|Direct]
+  [-OutputDir &lt;path&gt;]  [-Force]</code></pre>
+
+  <ul class="feat-list">
+    <li><div class="fi">📦</div><div class="ft"><strong>Output: schema-snapshot.json</strong><span>Tables, columns, FK relations, plus pre-built indexes: column_to_fk_target and parent_to_children for O(1) lookups</span></div></li>
+    <li><div class="fi">🔄</div><div class="ft"><strong>Smart caching</strong><span>Existing snapshot is reused on subsequent runs; -Force regenerates even if a recent snapshot exists</span></div></li>
+    <li><div class="fi">🔀</div><div class="ft"><strong>Three access modes</strong><span>Auto (tries Direct first, falls back to Session), Session (TestAssist QConsole), Direct (ADO.NET SqlConnection)</span></div></li>
+    <li><div class="fi">📊</div><div class="ft"><strong>Schema diff</strong><span>compare_schema_snapshots.ps1 diffs two snapshots and writes a schema-diff.json; exit 1 when -FailOnDiff is set</span></div></li>
+  </ul>
+
+  <!-- BENCHMARKING -->
+  <h2 id="benchmark"><span class="icon">⏱️</span>Benchmarking (Lane 3)</h2>
+  <p>Measures the runtime performance of OneIM templates, script methods, and/or processes. A built-in sampler captures elapsed time, memory delta, CPU delta, GC collection counts per generation, and thread delta — no external tooling required. Optionally uses BenchmarkDotNet if available.</p>
+
+  <pre><code>scripts/invoke_oneim_benchmark.ps1
+  -TemplateNames Person.FirstName, Person.LastName
+  [-ScriptMethodNames &lt;name&gt;]  [-ProcessNames &lt;name&gt;]
+  [-WarmupCount 1]  [-MeasuredRunCount 10]
+  [-ThresholdsFile thresholds.json]
+  [-SchemaSnapshotPath &lt;path&gt;]
+  [-BaselineBenchmarkPath &lt;path&gt;]  [-RegressionThreshold 20]
+  [-CollectSqlMetrics]</code></pre>
+
+  <h3>Metrics computed per target</h3>
+  <table class="rule-table">
+    <thead><tr><th>Metric</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td><code>avg_ms / stddev_ms / min_ms / max_ms</code></td><td>Core elapsed-time statistics</td></tr>
+      <tr><td><code>p50_ms / p75_ms / p95_ms / p99_ms</code></td><td>Percentile latency (P95 is the primary threshold metric)</td></tr>
+      <tr><td><code>cv_pct / stability</code></td><td>Coefficient of variation; labelled stable / variable / unstable</td></tr>
+      <tr><td><code>warmup_effect_ratio</code></td><td>Ratio of first-sample cost to mean — detects JIT warm-up cost</td></tr>
+      <tr><td><code>total_gc_gen0/1/2</code></td><td>Cumulative GC collection counts across measured runs</td></tr>
+      <tr><td><code>max_thread_delta</code></td><td>Peak thread-count increase during measurement</td></tr>
+      <tr><td><code>regression_pct / regressed</code></td><td>Percentage change vs. a baseline; flagged when above -RegressionThreshold</td></tr>
+    </tbody>
+  </table>
+
+  <!-- CASCADE -->
+  <h2 id="cascade"><span class="icon">🕸️</span>Cascade Report (Template Dependency Graph)</h2>
+  <p>Builds a directed dependency graph for a single root template, tracing how field computations flow through FK relations, script method calls, and successor templates. Detects cycles using Kosaraju's two-pass SCC algorithm.</p>
+
+  <pre><code>scripts/export_template_cascade_report.ps1
+  -TemplateName Person.FirstName
+  [-SchemaSnapshotPath &lt;path&gt;]  [-TemplateCatalogPath &lt;path&gt;]
+  [-BenchmarkReportPath &lt;path&gt;]  [-ThresholdsFile &lt;path&gt;]</code></pre>
+
+  <ul class="feat-list">
+    <li><div class="fi">📈</div><div class="ft"><strong>Predecessor + successor trees</strong><span>Collapsible HTML sections showing all upstream and downstream template dependencies</span></div></li>
+    <li><div class="fi">🔴</div><div class="ft"><strong>Bottleneck highlighting</strong><span>Node with the highest avg_elapsed_ms highlighted in red when benchmark data is present</span></div></li>
+    <li><div class="fi">🟡</div><div class="ft"><strong>Cycle detection</strong><span>Cycle nodes and edges shown in amber; explicit cycle path arrays in the JSON companion</span></div></li>
+    <li><div class="fi">🟠</div><div class="ft"><strong>Threshold overruns</strong><span>Nodes exceeding configured max_avg_ms or max_p95_ms shown in red when -ThresholdsFile is supplied</span></div></li>
+    <li><div class="fi">⚠️</div><div class="ft"><strong>Write-cycle risk (CNC610)</strong><span>SCCs where any member is a writer are classified as concurrency_risk = write-cycle and fed back into the audit as CNC610 findings</span></div></li>
+    <li><div class="fi">🗺️</div><div class="ft"><strong>Topological order + depth histogram</strong><span>JSON output includes topological_order and depth_histogram for build-order analysis</span></div></li>
+  </ul>
+
+  <!-- REFERENCE LIBRARY -->
+  <h2 id="reference"><span class="icon">📚</span>Reference Library Management</h2>
+  <p>The auditor requires a curated reference library (not a raw System Debugger export) to validate findings against. A set of scripts manages the full lifecycle from raw export to promoted custom reference.</p>
+
+  <ul class="feat-list">
+    <li><div class="fi">📥</div><div class="ft"><strong>register_reference_export.ps1</strong><span>Registers a raw export as mixed-export; seeds candidate-custom from extracted custom snippets</span></div></li>
+    <li><div class="fi">✂️</div><div class="ft"><strong>extract_custom_reference_files.ps1</strong><span>Extracts custom-marked VB snippets from a raw System Debugger export</span></div></li>
+    <li><div class="fi">🧹</div><div class="ft"><strong>materialize_sanitized_ootb_export.ps1</strong><span>Creates a heuristic OOTB baseline by removing CCC custom ranges from a mixed export</span></div></li>
+    <li><div class="fi">📋</div><div class="ft"><strong>export_candidate_review_plan.ps1</strong><span>Generates a snippet-by-snippet JSON + Markdown review plan for a candidate entry</span></div></li>
+    <li><div class="fi">✅</div><div class="ft"><strong>promote_custom_reference.ps1</strong><span>Promotes a reviewed candidate into promoted-custom when confidence meets the threshold</span></div></li>
+    <li><div class="fi">❌</div><div class="ft"><strong>reject_custom_reference.ps1</strong><span>Moves a candidate into rejected with a recorded rationale and manifest trail</span></div></li>
+  </ul>
+
+  <!-- REPORTING -->
+  <h2 id="reporting"><span class="icon">📄</span>Reporting</h2>
+  <p>The audit produces a self-contained HTML report with interactive features. No external assets or CDN dependencies.</p>
+
+  <ul class="feat-list">
+    <li><div class="fi">📊</div><div class="ft"><strong>Executive summary</strong><span>Total findings, severity histogram, and category breakdown table</span></div></li>
+    <li><div class="fi">📁</div><div class="ft"><strong>File-grouped findings</strong><span>Each finding group is headed by its relative path; collapsible with one click</span></div></li>
+    <li><div class="fi">🔘</div><div class="ft"><strong>Severity filter checkboxes</strong><span>High / Medium / Low — hiding a severity also hides groups that become empty</span></div></li>
+    <li><div class="fi">🖨️</div><div class="ft"><strong>Print CSS</strong><span>Filter controls hidden; findings formatted for clean paper output</span></div></li>
+    <li><div class="fi">🔗</div><div class="ft"><strong>File index navigation</strong><span>Jump-to links for each file group when the report covers more than one file</span></div></li>
+    <li><div class="fi">📤</div><div class="ft"><strong>Rule set export</strong><span>export_audit_rules.ps1 writes audit-rules.md, .json, and .csv as a Bundle; supports -RuleState [All|Active|Draft|Disabled] filter</span></div></li>
+  </ul>
+
+  <h3>Finding detail fields</h3>
+  <p>Every finding includes: rule ID, title, category, severity, confidence, file path, line number, triggering scenario, remediation, test ideas, and source IDs (mapped to approved-sources.json).</p>
+
+  <!-- TEST SUITE -->
+  <h2 id="testing"><span class="icon">🧪</span>Test Suite</h2>
+  <p>Pester 4.10.1 regression suite run by <code>scripts/run_auditor_tests.ps1</code> in four independent lanes:</p>
+
+  <div class="lanes">
+    <div class="lane">
+      <div class="lane-tag ps5">● PowerShell 5.1</div>
+      <h4>Lane 1 — Core Auditor</h4>
+      <p>138 tests covering reference validation, all 50 detection rules (positive + negative), post-processing, suppression, deduplication, HTML report features, rule export, schema diff, rule validation, rule scaffolding, and end-to-end audit runner.</p>
+    </div>
+    <div class="lane">
+      <div class="lane-tag ps7">● PowerShell 7</div>
+      <h4>Lane 2 — Schema Snapshot</h4>
+      <p>19 tests covering the schema snapshot module: table/column/FK parsing, index building, environment fingerprinting, and cache reuse logic.</p>
+    </div>
+    <div class="lane">
+      <div class="lane-tag ps7">● PowerShell 7</div>
+      <h4>Lane 3 — Benchmark</h4>
+      <p>52 tests covering Get-SampleStats (percentiles, stability labels, warmup ratio, GC totals, thread delta), Get-ThresholdResult, Get-RegressionResult, and Get-OneImAuditDmvDelta.</p>
+    </div>
+    <div class="lane">
+      <div class="lane-tag ps7">● PowerShell 7</div>
+      <h4>Lane 4 — Graph / Cascade</h4>
+      <p>110 tests covering the graph module: node/edge management, DFS, Kosaraju SCC, topological sort (Kahn's), depth histogram, is_writer flag, write-cycle concurrency risk classification, and idempotency.</p>
+    </div>
+  </div>
+
+  <!-- SCRIPTS INDEX -->
+  <h2 id="scripts"><span class="icon">🗂️</span>Script &amp; Module Index</h2>
+
+  <h3>Entry-point scripts</h3>
+  <div class="script-ref"><span class="sr-name">invoke_oneim_audit.ps1</span><span class="sr-desc">Main audit runner</span></div>
+  <div class="script-ref"><span class="sr-name">export_oneim_schema_snapshot.ps1</span><span class="sr-desc">Database schema capture</span></div>
+  <div class="script-ref"><span class="sr-name">invoke_oneim_benchmark.ps1</span><span class="sr-desc">Template / method / process benchmarking</span></div>
+  <div class="script-ref"><span class="sr-name">export_template_cascade_report.ps1</span><span class="sr-desc">Cascade dependency graph + HTML</span></div>
+  <div class="script-ref"><span class="sr-name">compare_schema_snapshots.ps1</span><span class="sr-desc">Two-snapshot diff</span></div>
+  <div class="script-ref"><span class="sr-name">export_audit_rules.ps1</span><span class="sr-desc">Export rule catalog as Markdown / JSON / CSV / Bundle</span></div>
+  <div class="script-ref"><span class="sr-name">validate_audit_rules.ps1</span><span class="sr-desc">Structural validation of audit-rules.json</span></div>
+  <div class="script-ref"><span class="sr-name">new_audit_rule.ps1</span><span class="sr-desc">Scaffold a new declarative rule</span></div>
+  <div class="script-ref"><span class="sr-name">run_auditor_tests.ps1</span><span class="sr-desc">Pester regression suite (4 lanes)</span></div>
+
+  <h3>Reference library scripts</h3>
+  <div class="script-ref"><span class="sr-name">register_reference_export.ps1</span><span class="sr-desc">Bootstrap a raw export into the managed library</span></div>
+  <div class="script-ref"><span class="sr-name">extract_custom_reference_files.ps1</span><span class="sr-desc">Extract CCC custom snippets</span></div>
+  <div class="script-ref"><span class="sr-name">materialize_sanitized_ootb_export.ps1</span><span class="sr-desc">Create OOTB baseline</span></div>
+  <div class="script-ref"><span class="sr-name">export_candidate_review_plan.ps1</span><span class="sr-desc">Snippet review planning</span></div>
+  <div class="script-ref"><span class="sr-name">review_custom_reference.ps1</span><span class="sr-desc">Update confidence scoring</span></div>
+  <div class="script-ref"><span class="sr-name">split_candidate_reference.ps1</span><span class="sr-desc">Split review-plan bands</span></div>
+  <div class="script-ref"><span class="sr-name">promote_custom_reference.ps1</span><span class="sr-desc">Promote to promoted-custom</span></div>
+  <div class="script-ref"><span class="sr-name">reject_custom_reference.ps1</span><span class="sr-desc">Move to rejected with rationale</span></div>
+
+  <h3>PowerShell modules</h3>
+  <div class="script-ref"><span class="sr-name">OneimAudit.Common.psm1</span><span class="sr-desc">Shared path, directory, and confidence helpers</span></div>
+  <div class="script-ref"><span class="sr-name">OneimAudit.RuleCatalog.psm1</span><span class="sr-desc">Rule loading, state filtering, export, finding creation</span></div>
+  <div class="script-ref"><span class="sr-name">OneimAudit.Reference.psm1</span><span class="sr-desc">Reference path validation and bootstrap logic</span></div>
+  <div class="script-ref"><span class="sr-name">OneimAudit.Detectors.psm1</span><span class="sr-desc">All 50 detection units (coded + declarative dispatch)</span></div>
+  <div class="script-ref"><span class="sr-name">OneimAudit.PostProcessing.psm1</span><span class="sr-desc">Suppression, deduplication, example-cap enforcement</span></div>
+  <div class="script-ref"><span class="sr-name">OneimAudit.Reporting.psm1</span><span class="sr-desc">HTML report rendering with filters, file groups, print CSS</span></div>
+  <div class="script-ref"><span class="sr-name">OneimAudit.LiveSession.psm1</span><span class="sr-desc">TestAssist session bootstrap, SQL query helper (Session / Direct / Auto)</span></div>
+  <div class="script-ref"><span class="sr-name">OneimAudit.Graph.psm1</span><span class="sr-desc">11 graph functions: nodes, edges, DFS, Kosaraju SCC, topological sort, depth histogram</span></div>
+  <div class="script-ref"><span class="sr-name">OneimAudit.ConcurrencyDetectors.psm1</span><span class="sr-desc">Concurrency-specific detection (CNC601, CNC602, CNC610 context)</span></div>
+
+  <h3>Assets</h3>
+  <div class="script-ref"><span class="sr-name">assets/audit-rules.json</span><span class="sr-desc">50 active rules — single source of truth for all rule metadata</span></div>
+  <div class="script-ref"><span class="sr-name">assets/approved-sources.json</span><span class="sr-desc">Machine-readable source catalog; all rule source_ids must resolve here</span></div>
+  <div class="script-ref"><span class="sr-name">assets/suppressions.example.json</span><span class="sr-desc">Suppression format template (rule_id + path_glob + justification)</span></div>
+  <div class="script-ref"><span class="sr-name">examples/&lt;RULE_ID&gt;/violation.vb</span><span class="sr-desc">100 example files — violation + compliant pair for every rule</span></div>
+
+</main>
+
+<footer>
+  OneIM VB.NET Auditor — oneim-vbnet-auditor skill &nbsp;·&nbsp; Version 9.3.1 target &nbsp;·&nbsp; 50 rules &nbsp;·&nbsp; 319 tests &nbsp;·&nbsp; Report generated 2026-03-27
+</footer>
+
+</body>
+</html>

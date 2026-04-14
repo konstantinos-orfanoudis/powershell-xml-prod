@@ -1,0 +1,60 @@
+{
+  "_comment": "OneIM VB.NET Auditor configuration. Values here override built-in defaults. All keys are optional; missing keys fall back to the built-in default shown in each comment.",
+
+  "detection": {
+    "_comment": "Controls detection heuristics in OneimAudit.Detectors.psm1",
+
+    "header_scan_lines": 40,
+    "_comment_header_scan_lines": "Number of lines from the top of a file scanned for Option Strict/Explicit and other header-required rules. Default: 40.",
+
+    "mvp_guard_lookback_lines": 10,
+    "_comment_mvp_guard_lookback_lines": "How many lines above an MVP index access are checked for a .Count guard (OIM571). Default: 10.",
+
+    "nearby_throw_lookahead_lines": 6,
+    "_comment_nearby_throw_lookahead_lines": "Forward look-ahead window (lines) when checking whether a rethrow follows a caught exception. Default: 6.",
+
+    "nearby_dispose_lookahead_lines": 8,
+    "_comment_nearby_dispose_lookahead_lines": "Forward look-ahead window (lines) when checking whether a Using or Dispose follows resource creation. Default: 8.",
+
+    "context_lines": 6,
+    "_comment_context_lines": "Default number of preceding lines examined for contextual checks. Default: 6.",
+
+    "global_max_examples_per_file": 8,
+    "_comment_global_max_examples_per_file": "Fallback cap on duplicate-heavy rule examples per file when no per-rule max_examples_per_file is set. Default: 8."
+  },
+
+  "confidence": {
+    "_comment": "Thresholds used by Get-OneImAuditConfidenceLabel in OneimAudit.Common.psm1",
+
+    "high_threshold": 80,
+    "_comment_high_threshold": "Minimum score (0-100) for a finding to be labelled High confidence. Default: 80.",
+
+    "medium_threshold": 60,
+    "_comment_medium_threshold": "Minimum score (0-100) for a finding to be labelled Medium confidence. Default: 60."
+  },
+
+  "scoring": {
+    "_comment": "Controls the per-category risk scoring section in the HTML report",
+
+    "severity_weights": {
+      "high": 3,
+      "medium": 2,
+      "low": 1,
+      "_comment": "Multipliers applied to finding counts when computing the weighted risk score. Adjust to increase/decrease the penalty for high-severity findings."
+    },
+
+    "category_thresholds": {
+      "_comment": "Score thresholds (weighted findings per file) that define the colour band for each category card. Scores below green_max are green; between green_max and yellow_max are yellow; between yellow_max and orange_max are orange; above orange_max are red.",
+      "green_max": 2.0,
+      "yellow_max": 5.0,
+      "orange_max": 10.0
+    },
+
+    "overall_thresholds": {
+      "_comment": "Same colour bands but for the aggregate (sum of all categories) overall risk score.",
+      "green_max": 5.0,
+      "yellow_max": 15.0,
+      "orange_max": 30.0
+    }
+  }
+}

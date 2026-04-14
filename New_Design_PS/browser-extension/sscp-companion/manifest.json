@@ -1,0 +1,22 @@
+{
+  "manifest_version": 3,
+  "name": "SSCP Mastery Coach Companion",
+  "description": "Capture pages and selections into the local SSCP tutor and read them aloud.",
+  "version": "0.1.0",
+  "permissions": ["activeTab", "storage", "tts"],
+  "host_permissions": [
+    "<all_urls>",
+    "http://localhost:3000/*",
+    "http://127.0.0.1:3000/*"
+  ],
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}

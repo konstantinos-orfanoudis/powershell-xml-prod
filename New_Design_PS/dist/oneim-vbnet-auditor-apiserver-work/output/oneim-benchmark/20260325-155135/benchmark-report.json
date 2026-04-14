@@ -1,0 +1,331 @@
+{
+  "report_metadata": {
+    "generated_at": "2026-03-25T15:51:35.8399328+00:00",
+    "backend": "BuiltinSampler",
+    "warmup_count": 1,
+    "measured_run_count": 10,
+    "access_mode": "Auto",
+    "project_config_path": "C:\\Users\\aiuser\\Documents\\DMWorkshop2\\Config\\Example\\projectConfig.xml",
+    "schema_snapshot_path": "C:\\Users\\aiuser\\Desktop\\System_Debugger_Libary\\.agents\\skills\\oneim-vbnet-auditor\\output\\oneim-schema\\AIplayground_OneIM931\\schema-snapshot.json",
+    "thresholds_file": null
+  },
+  "summary": {
+    "total_benchmarks": 4,
+    "total_errors": 0,
+    "threshold_failures": 0
+  },
+  "results": [
+    {
+      "name": "Person.CentralAccount",
+      "surface": "template",
+      "table_name": "Person",
+      "column_name": "CentralAccount",
+      "column_uid": "QER-3082C6C2D6D748ED85A635C5063188F8",
+      "has_template": true,
+      "template_preview": "Dim importSource As String = $ImportSource$\r\n'only if the operator has not set the value manually\r\nIf Not Entity.Columns...",
+      "warmup_count": 1,
+      "measured_run_count": 10,
+      "backend": "BuiltinSampler",
+      "avg_ms": 75.384,
+      "stddev_ms": 45.874,
+      "min_ms": 4.608,
+      "max_ms": 106.263,
+      "p95_ms": 106.263,
+      "avg_mem_bytes": 193771,
+      "min_mem_bytes": 155480,
+      "max_mem_bytes": 500608,
+      "avg_cpu_ms": 25.0,
+      "min_cpu_ms": 0.0,
+      "max_cpu_ms": 109.375,
+      "raw_samples": [
+        {
+          "elapsed_ms": 5.965,
+          "memory_delta_bytes": 500608,
+          "cpu_delta_ms": 15.625
+        },
+        {
+          "elapsed_ms": 106.12,
+          "memory_delta_bytes": 156088,
+          "cpu_delta_ms": 31.25
+        },
+        {
+          "elapsed_ms": 105.073,
+          "memory_delta_bytes": 164392,
+          "cpu_delta_ms": 78.125
+        },
+        {
+          "elapsed_ms": 106.263,
+          "memory_delta_bytes": 164320,
+          "cpu_delta_ms": 0.0
+        },
+        {
+          "elapsed_ms": 105.355,
+          "memory_delta_bytes": 164384,
+          "cpu_delta_ms": 15.625
+        },
+        {
+          "elapsed_ms": 5.371,
+          "memory_delta_bytes": 156136,
+          "cpu_delta_ms": 0.0
+        },
+        {
+          "elapsed_ms": 104.908,
+          "memory_delta_bytes": 156136,
+          "cpu_delta_ms": 109.375
+        },
+        {
+          "elapsed_ms": 105.032,
+          "memory_delta_bytes": 164104,
+          "cpu_delta_ms": 0.0
+        },
+        {
+          "elapsed_ms": 105.148,
+          "memory_delta_bytes": 156064,
+          "cpu_delta_ms": 0.0
+        },
+        {
+          "elapsed_ms": 4.608,
+          "memory_delta_bytes": 155480,
+          "cpu_delta_ms": 0.0
+        }
+      ],
+      "threshold_exceeded": false,
+      "threshold_details": null,
+      "error": null
+    },
+    {
+      "name": "Person.LastName",
+      "surface": "template",
+      "table_name": "Person",
+      "column_name": "LastName",
+      "column_uid": "QER-5BF175C7551C45FDA0A0A4F18C47B00A",
+      "has_template": false,
+      "template_preview": "",
+      "warmup_count": 1,
+      "measured_run_count": 10,
+      "backend": "BuiltinSampler",
+      "avg_ms": 66.167,
+      "stddev_ms": 50.791,
+      "min_ms": 2.967,
+      "max_ms": 115.418,
+      "p95_ms": 115.418,
+      "avg_mem_bytes": 193523,
+      "min_mem_bytes": 147992,
+      "max_mem_bytes": 482832,
+      "avg_cpu_ms": 23.438,
+      "min_cpu_ms": 0.0,
+      "max_cpu_ms": 109.375,
+      "raw_samples": [
+        {
+          "elapsed_ms": 115.418,
+          "memory_delta_bytes": 156184,
+          "cpu_delta_ms": 109.375
+        },
+        {
+          "elapsed_ms": 109.61,
+          "memory_delta_bytes": 156144,
+          "cpu_delta_ms": 0.0
+        },
+        {
+          "elapsed_ms": 104.929,
+          "memory_delta_bytes": 156048,
+          "cpu_delta_ms": 0.0
+        },
+        {
+          "elapsed_ms": 105.609,
+          "memory_delta_bytes": 164256,
+          "cpu_delta_ms": 109.375
+        },
+        {
+          "elapsed_ms": 6.5,
+          "memory_delta_bytes": 482832,
+          "cpu_delta_ms": 0.0
+        },
+        {
+          "elapsed_ms": 2.967,
+          "memory_delta_bytes": 164240,
+          "cpu_delta_ms": 0.0
+        },
+        {
+          "elapsed_ms": 105.067,
+          "memory_delta_bytes": 164344,
+          "cpu_delta_ms": 0.0
+        },
+        {
+          "elapsed_ms": 104.715,
+          "memory_delta_bytes": 164344,
+          "cpu_delta_ms": 15.625
+        },
+        {
+          "elapsed_ms": 2.979,
+          "memory_delta_bytes": 147992,
+          "cpu_delta_ms": 0.0
+        },
+        {
+          "elapsed_ms": 3.88,
+          "memory_delta_bytes": 178848,
+          "cpu_delta_ms": 0.0
+        }
+      ],
+      "threshold_exceeded": false,
+      "threshold_details": null,
+      "error": null
+    },
+    {
+      "name": "AADGroup.DisplayName",
+      "surface": "template",
+      "table_name": "AADGroup",
+      "column_name": "DisplayName",
+      "column_uid": "AAD-3847B321CEE6464E89389B1B84217CB6",
+      "has_template": true,
+      "template_preview": "If Not CBool(Connection.Variables(\"Fullsync\")) AndAlso Not String.IsNullOrEmpty($UID_AADOrganization$) Then\r\n\t\r\n\t' if th...",
+      "warmup_count": 1,
+      "measured_run_count": 10,
+      "backend": "BuiltinSampler",
+      "avg_ms": 46.347,
+      "stddev_ms": 52.444,
+      "min_ms": 2.612,
+      "max_ms": 119.726,
+      "p95_ms": 119.726,
+      "avg_mem_bytes": 155796,
+      "min_mem_bytes": 155024,
+      "max_mem_bytes": 161944,
+      "avg_cpu_ms": 40.625,
+      "min_cpu_ms": 0.0,
+      "max_cpu_ms": 125.0,
+      "raw_samples": [
+        {
+          "elapsed_ms": 104.94,
+          "memory_delta_bytes": 161944,
+          "cpu_delta_ms": 109.375
+        },
+        {
+          "elapsed_ms": 4.286,
+          "memory_delta_bytes": 155424,
+          "cpu_delta_ms": 0.0
+        },
+        {
+          "elapsed_ms": 3.049,
+          "memory_delta_bytes": 155040,
+          "cpu_delta_ms": 0.0
+        },
+        {
+          "elapsed_ms": 2.612,
+          "memory_delta_bytes": 155040,
+          "cpu_delta_ms": 0.0
+        },
+        {
+          "elapsed_ms": 111.872,
+          "memory_delta_bytes": 155040,
+          "cpu_delta_ms": 109.375
+        },
+        {
+          "elapsed_ms": 3.899,
+          "memory_delta_bytes": 155184,
+          "cpu_delta_ms": 46.875
+        },
+        {
+          "elapsed_ms": 3.407,
+          "memory_delta_bytes": 155080,
+          "cpu_delta_ms": 0.0
+        },
+        {
+          "elapsed_ms": 119.726,
+          "memory_delta_bytes": 155040,
+          "cpu_delta_ms": 125.0
+        },
+        {
+          "elapsed_ms": 4.608,
+          "memory_delta_bytes": 155024,
+          "cpu_delta_ms": 0.0
+        },
+        {
+          "elapsed_ms": 105.069,
+          "memory_delta_bytes": 155144,
+          "cpu_delta_ms": 15.625
+        }
+      ],
+      "threshold_exceeded": false,
+      "threshold_details": null,
+      "error": null
+    },
+    {
+      "name": "Person.FirstName",
+      "surface": "template",
+      "table_name": "Person",
+      "column_name": "FirstName",
+      "column_uid": "QER-8F03B89FA2F7451597EAAED8E9B9057B",
+      "has_template": false,
+      "template_preview": "",
+      "warmup_count": 1,
+      "measured_run_count": 10,
+      "backend": "BuiltinSampler",
+      "avg_ms": 46.217,
+      "stddev_ms": 50.735,
+      "min_ms": 3.859,
+      "max_ms": 110.893,
+      "p95_ms": 110.893,
+      "avg_mem_bytes": 171592,
+      "min_mem_bytes": 155792,
+      "max_mem_bytes": 254136,
+      "avg_cpu_ms": 17.188,
+      "min_cpu_ms": 0.0,
+      "max_cpu_ms": 109.375,
+      "raw_samples": [
+        {
+          "elapsed_ms": 106.262,
+          "memory_delta_bytes": 155792,
+          "cpu_delta_ms": 0.0
+        },
+        {
+          "elapsed_ms": 4.828,
+          "memory_delta_bytes": 156040,
+          "cpu_delta_ms": 0.0
+        },
+        {
+          "elapsed_ms": 107.21,
+          "memory_delta_bytes": 156208,
+          "cpu_delta_ms": 109.375
+        },
+        {
+          "elapsed_ms": 110.893,
+          "memory_delta_bytes": 156128,
+          "cpu_delta_ms": 0.0
+        },
+        {
+          "elapsed_ms": 7.842,
+          "memory_delta_bytes": 156072,
+          "cpu_delta_ms": 0.0
+        },
+        {
+          "elapsed_ms": 3.859,
+          "memory_delta_bytes": 254136,
+          "cpu_delta_ms": 0.0
+        },
+        {
+          "elapsed_ms": 4.005,
+          "memory_delta_bytes": 213320,
+          "cpu_delta_ms": 62.5
+        },
+        {
+          "elapsed_ms": 4.134,
+          "memory_delta_bytes": 156200,
+          "cpu_delta_ms": 0.0
+        },
+        {
+          "elapsed_ms": 4.201,
+          "memory_delta_bytes": 155832,
+          "cpu_delta_ms": 0.0
+        },
+        {
+          "elapsed_ms": 108.938,
+          "memory_delta_bytes": 156192,
+          "cpu_delta_ms": 0.0
+        }
+      ],
+      "threshold_exceeded": false,
+      "threshold_details": null,
+      "error": null
+    }
+  ]
+}

@@ -1,0 +1,119 @@
+{
+  "report_metadata": {
+    "generated_at": "2026-03-25T15:03:57.3480303+00:00",
+    "backend": "BuiltinSampler",
+    "warmup_count": 1,
+    "measured_run_count": 5,
+    "access_mode": "Auto",
+    "project_config_path": "C:\\Users\\aiuser\\Documents\\DMWorkshop2\\Config\\Example\\projectConfig.xml",
+    "schema_snapshot_path": "C:\\Users\\aiuser\\Desktop\\System_Debugger_Libary\\.agents\\skills\\oneim-vbnet-auditor\\output\\oneim-schema\\AIplayground_OneIM931\\schema-snapshot.json",
+    "thresholds_file": null
+  },
+  "summary": {
+    "total_benchmarks": 3,
+    "total_errors": 1,
+    "threshold_failures": 0
+  },
+  "results": [
+    {
+      "name": "Person.FirstName",
+      "surface": "template",
+      "table_name": "Person",
+      "column_name": "FirstName",
+      "column_uid": "QER-8F03B89FA2F7451597EAAED8E9B9057B",
+      "has_template": false,
+      "template_preview": "",
+      "warmup_count": 1,
+      "measured_run_count": 5,
+      "backend": "BuiltinSampler",
+      "avg_ms": 86.895,
+      "stddev_ms": 40.514,
+      "min_ms": 5.916,
+      "max_ms": 109.778,
+      "p95_ms": 109.778,
+      "raw_samples": [
+        {
+          "elapsed_ms": 5.916,
+          "memory_delta_bytes": 533864,
+          "cpu_delta_ms": 15.625
+        },
+        {
+          "elapsed_ms": 109.778,
+          "memory_delta_bytes": 156088,
+          "cpu_delta_ms": 0.0
+        },
+        {
+          "elapsed_ms": 106.747,
+          "memory_delta_bytes": 156176,
+          "cpu_delta_ms": 78.125
+        },
+        {
+          "elapsed_ms": 105.688,
+          "memory_delta_bytes": 172592,
+          "cpu_delta_ms": 31.25
+        },
+        {
+          "elapsed_ms": 106.344,
+          "memory_delta_bytes": 156192,
+          "cpu_delta_ms": 0.0
+        }
+      ],
+      "threshold_exceeded": false,
+      "threshold_details": null,
+      "error": null
+    },
+    {
+      "name": "Person.LastName",
+      "surface": "template",
+      "table_name": "Person",
+      "column_name": "LastName",
+      "column_uid": "QER-5BF175C7551C45FDA0A0A4F18C47B00A",
+      "has_template": false,
+      "template_preview": "",
+      "warmup_count": 1,
+      "measured_run_count": 5,
+      "backend": "BuiltinSampler",
+      "avg_ms": 3.072,
+      "stddev_ms": 0.3,
+      "min_ms": 2.702,
+      "max_ms": 3.474,
+      "p95_ms": 3.474,
+      "raw_samples": [
+        {
+          "elapsed_ms": 3.363,
+          "memory_delta_bytes": 164368,
+          "cpu_delta_ms": 0.0
+        },
+        {
+          "elapsed_ms": 3.474,
+          "memory_delta_bytes": 156200,
+          "cpu_delta_ms": 0.0
+        },
+        {
+          "elapsed_ms": 2.824,
+          "memory_delta_bytes": 155856,
+          "cpu_delta_ms": 0.0
+        },
+        {
+          "elapsed_ms": 2.995,
+          "memory_delta_bytes": 156176,
+          "cpu_delta_ms": 0.0
+        },
+        {
+          "elapsed_ms": 2.702,
+          "memory_delta_bytes": 164344,
+          "cpu_delta_ms": 0.0
+        }
+      ],
+      "threshold_exceeded": false,
+      "threshold_details": null,
+      "error": null
+    },
+    {
+      "name": "VI_Person_Rename",
+      "surface": "method",
+      "threshold_exceeded": false,
+      "error": "Parameter set cannot be resolved using the specified named parameters. One or more parameters issued cannot be used together or an insufficient number of parameters were provided."
+    }
+  ]
+}
