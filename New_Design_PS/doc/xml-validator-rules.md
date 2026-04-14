@@ -246,6 +246,7 @@ These checks are AI-driven and focus on the uploaded PowerShell script itself. T
 | `ps.security.remote-filter-injection` | warning | REST, cloud, or other remote-system filters, paths, headers, or request bodies appear to insert untrusted input directly in a way that could alter query meaning or scope. |
 | `ps.security.tls-weakened` | error | The script appears to weaken transport security, such as disabling certificate checks, forcing insecure protocols, or using plain HTTP for sensitive traffic. |
 | `ps.security.http-request.insecure` | warning | HTTP or cloud requests appear to omit important security precautions such as safe authentication handling, explicit HTTPS usage, request validation, or controlled redirect behavior. |
+| `ps.quality.encoding.missing` | warning | Web requests (Invoke-WebRequest / Invoke-RestMethod / HttpClient) do not specify UTF-8 encoding explicitly in the Content-Type header or body serialization, and the context does not require a different charset. Expect `charset=utf-8` in the Content-Type header and UTF-8-aware body serialization unless the API documentation explicitly requires otherwise. |
 | `ps.performance.repeated-import` | warning | The script appears to repeat module imports, expensive initialization, or setup logic unnecessarily. |
 | `ps.performance.loop-remote-call` | warning | The script appears to perform repeated remote/API calls inside loops without batching, caching, or early filtering. |
 | `ps.performance.unbounded-processing` | warning | The script appears to process large result sets without paging, filtering, or early exit where that would be expected. |
@@ -270,6 +271,7 @@ Notes:
 - For transport security, look for weak TLS settings, certificate-validation bypasses, insecure protocol downgrades, or use of non-HTTPS endpoints for sensitive traffic.
 - Also evaluate clean-code maintainability: enough useful comments, readable function size, understandable naming, and structure that can be changed or extended without excessive risk.
 - These clean-code findings should normally be warnings with practical tips and suggestions for improvement rather than hard failures.
+- For web request encoding: any `Invoke-WebRequest`, `Invoke-RestMethod`, or `HttpClient` call that sends or receives a body should include `; charset=utf-8` in the `Content-Type` header and should use UTF-8-aware body serialization (e.g. `[System.Text.Encoding]::UTF8.GetBytes(...)` or `ConvertTo-Json` piped with explicit encoding). Flag as `ps.quality.encoding.missing` when the script omits encoding specification and the context does not require a different charset.
 
 ### Hardcoded Secret Rules
 

@@ -56,6 +56,12 @@ Prefer small, testable helpers; add retry wrappers for I/O where reasonable.
 
 For REST/SOAP: build headers carefully, set timeouts, check status codes, handle errors with try/catch and rethrow with a clear message.
 
+For all web requests (REST, SOAP, SCIM, or any Invoke-WebRequest / Invoke-RestMethod call): always set UTF-8 encoding explicitly unless the context specifies a different encoding. Apply this in two places:
+  1. Request body: when serializing JSON or XML, use [System.Text.Encoding]::UTF8 or pass -ContentType 'application/json; charset=utf-8'.
+  2. Response body: after receiving raw bytes, decode with [System.Text.Encoding]::UTF8.GetString() or rely on Invoke-RestMethod automatic decoding — but add an explicit charset to the Content-Type header so the server side knows what to expect.
+  Example pattern: $headers['Content-Type'] = 'application/json; charset=utf-8'
+  Only deviate from UTF-8 when the API documentation or context explicitly requires a different charset.
+
 Do not hardcode endpoints or credentials unless explicitly given in context.
 
 Return clean objects ([pscustomobject]) or booleans as appropriate to the verb (Get/Create/Modify/Remove).
