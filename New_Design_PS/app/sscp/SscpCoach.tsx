@@ -534,13 +534,28 @@ function QuestionCard({
   onSubmit: () => void;
 }) {
   const isChoice = question.format === "single_select" || question.format === "multi_select";
+  const isMulti = question.format === "multi_select";
   const currentSelections = Array.isArray(answer) ? answer : answer ? [answer] : [];
   return (
-    <article className="rounded-[26px] border border-stone-900/10 bg-white/85 p-5">
+    <article className={clsx(
+      "rounded-[26px] border p-5",
+      isMulti
+        ? "border-violet-300 bg-violet-50/60"
+        : "border-stone-900/10 bg-white/85",
+    )}>
       <div className="flex flex-wrap items-center gap-2">
         <span className="rounded-full border border-stone-900/10 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-stone-500">
-          {question.format === "single_select" || question.format === "multi_select" ? "Scenario" : question.format.replace("_", " ")}
+          Scenario
         </span>
+        {isMulti ? (
+          <span className="rounded-full border border-violet-400 bg-violet-600 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.16em] text-white">
+            Multi-select · pick 2
+          </span>
+        ) : (
+          <span className="rounded-full border border-sky-300 bg-sky-100 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-sky-800">
+            Single answer
+          </span>
+        )}
         <span className="rounded-full border border-amber-700/20 bg-amber-50 px-2.5 py-1 text-[11px] font-semibold text-amber-900">
           {question.difficultyLabel}
         </span>
@@ -552,6 +567,14 @@ function QuestionCard({
           />
         ))}
       </div>
+      {isMulti ? (
+        <div className="mt-3 flex items-center gap-2 rounded-[14px] border border-violet-300 bg-violet-100 px-4 py-2.5">
+          <span className="text-base">☑</span>
+          <p className="text-sm font-semibold text-violet-800">
+            Select <strong>two</strong> correct answers — this is a multi-select question.
+          </p>
+        </div>
+      ) : null}
       <h4 className="mt-3 text-xl font-semibold text-stone-900">{question.title}</h4>
       <p className="mt-3 text-sm leading-7 text-stone-700">{question.prompt}</p>
       {question.scenarioContext ? (
@@ -562,11 +585,6 @@ function QuestionCard({
       <div className="mt-4">
         <SscpReaderControls text={`${question.title}. ${question.prompt}. ${question.scenarioContext ?? ""}`} label="question" />
       </div>
-      {question.format === "multi_select" ? (
-        <p className="mt-3 text-xs font-semibold uppercase tracking-[0.2em] text-amber-700">
-          Select all that apply
-        </p>
-      ) : null}
       <div className="mt-5 space-y-3">
         {isChoice ? (
           question.options?.map((option) => {
@@ -577,21 +595,26 @@ function QuestionCard({
                 ? "border-emerald-700/25 bg-emerald-50"
                 : checked
                   ? "border-rose-700/20 bg-rose-50"
-                  : "border-stone-900/10 bg-stone-50"
-              : "border-stone-900/10 bg-stone-50";
+                  : isMulti
+                    ? "border-violet-200 bg-violet-50"
+                    : "border-stone-900/10 bg-stone-50"
+              : isMulti
+                ? "border-violet-200 bg-violet-50"
+                : "border-stone-900/10 bg-stone-50";
             return (
               <label
                 key={option.id}
                 className={clsx(
-                  "flex items-start gap-3 rounded-[18px] border px-4 py-3 text-sm text-stone-700",
+                  "flex cursor-pointer items-start gap-3 rounded-[18px] border px-4 py-3 text-sm text-stone-700 transition hover:border-violet-300",
                   optionTone,
                 )}
               >
                 <input
-                  type={question.format === "single_select" ? "radio" : "checkbox"}
+                  type={isMulti ? "checkbox" : "radio"}
                   checked={checked}
+                  className={clsx("mt-0.5 h-4 w-4 shrink-0", isMulti ? "accent-violet-600" : "accent-sky-600")}
                   onChange={() => {
-                    if (question.format === "single_select") {
+                    if (!isMulti) {
                       onAnswerChange(option.id);
                       return;
                     }
@@ -941,7 +964,7 @@ export default function SscpCoach() {
         body: JSON.stringify({
           domainIds: [selectedDomain],
           mode,
-          count: mode === "scenario" ? 3 : 4,
+          count: mode === "scenario" ? 4 : 6,
           difficulty: mode === "scenario" ? "bridge" : "pressure",
         }),
       });

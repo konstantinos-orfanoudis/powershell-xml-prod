@@ -6,7 +6,29 @@
       "Bash(node scripts/_patch-assistant.mjs)",
       "Bash(node -e \"const p = require\\('./node_modules/openai/package.json'\\); console.log\\(p.version\\)\")",
       "Bash(node -e \"const OpenAI = require\\('./node_modules/openai'\\).default; const o = new OpenAI\\({apiKey:'test'}\\); console.log\\('responses' in o, typeof o.responses\\)\")",
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "Bash(python3 -)",
+      "Bash(python3 C:/Temp/patch_sscp_tutor.py)",
+      "Bash(powershell.exe -Command \"python C:\\\\Temp\\\\patch_sscp_tutor.py\")",
+      "Bash(powershell.exe -Command \"Select-String -Path 'C:\\\\Users\\\\aiuser\\\\Desktop\\\\SSCP-Study-Tutor\\\\app\\\\api\\\\questions\\\\route.ts' -Pattern 'enforceFormatDistribution'\")",
+      "Bash(powershell.exe -Command \"Select-String -Path 'C:\\\\Users\\\\aiuser\\\\Desktop\\\\SSCP-Study-Tutor\\\\app\\\\api\\\\questions\\\\route.ts' -Pattern 'function enforceFormat'\")",
+      "Bash(powershell.exe -Command \"Get-Content 'C:\\\\Users\\\\aiuser\\\\Desktop\\\\SSCP-Study-Tutor\\\\app\\\\api\\\\questions\\\\route.ts' | Select-Object -Last 30\")",
+      "Bash(powershell.exe -Command \"Select-String -Path 'C:\\\\Users\\\\aiuser\\\\Desktop\\\\SSCP-Study-Tutor\\\\app\\\\api\\\\questions\\\\route.ts' -Pattern 'Route handler'\")",
+      "Bash(powershell.exe -Command \"python C:\\\\Temp\\\\patch_route.py\")",
+      "Bash(powershell.exe -Command 'Select-String -Path '\\\\''C:\\\\Users\\\\aiuser\\\\Desktop\\\\SSCP-Study-Tutor\\\\app\\\\api\\\\questions\\\\route.ts'\\\\'' -Pattern '\\\\''enforceFormat'\\\\'' | ForEach-Object { $_.LineNumber.ToString\\(\\) + '\\\\'': '\\\\'' + $_.Line }')",
+      "Bash(powershell.exe -Command \"python C:\\\\Temp\\\\patch_route2.py\")",
+      "Bash(powershell.exe -Command 'Select-String -Path '\\\\''C:\\\\Users\\\\aiuser\\\\Desktop\\\\SSCP-Study-Tutor\\\\app\\\\api\\\\questions\\\\route.ts'\\\\'' -Pattern '\\\\''function enforceFormat|const distributed|single_select|multi_select'\\\\'' | ForEach-Object { $_.LineNumber.ToString\\(\\) + '\\\\'': '\\\\'' + $_.Line.Trim\\(\\) }')",
+      "Bash(powershell.exe -Command 'Select-String -Path '\\\\''C:\\\\Users\\\\aiuser\\\\Desktop\\\\SSCP-Study-Tutor\\\\app\\\\SscpTutor.tsx'\\\\'' -Pattern '\\\\''selectedIds|isMulti|correctIds|multi_select|Multi-select'\\\\'' | ForEach-Object { $_.LineNumber.ToString\\(\\) + '\\\\'': '\\\\'' + $_.Line.Trim\\(\\) }')",
+      "Bash(powershell.exe -Command \"python C:\\\\Temp\\\\patch_explanation.py\")",
+      "Bash(powershell.exe -Command \"\\(Get-Content 'C:\\\\Users\\\\aiuser\\\\Desktop\\\\SSCP-Study-Tutor\\\\app\\\\SscpTutor.tsx'\\)[638..652]\")",
+      "Bash(powershell.exe -Command \"python C:\\\\Temp\\\\patch_explanation2.py\")",
+      "Bash(powershell.exe -Command 'Select-String -Path '\\\\''C:\\\\Users\\\\aiuser\\\\Desktop\\\\SSCP-Study-Tutor\\\\app\\\\SscpTutor.tsx'\\\\'' -Pattern '\\\\''\\\\bselected\\\\b'\\\\'' | Where-Object { $_.Line -notmatch '\\\\''selectedIds|selectedOptionIds|reviewCorrectIds'\\\\'' } | ForEach-Object { $_.LineNumber.ToString\\(\\) + '\\\\'': '\\\\'' + $_.Line.Trim\\(\\) }')",
+      "WebFetch(domain:nvlpubs.nist.gov)",
+      "WebFetch(domain:csrc.nist.gov)"
+    ],
+    "additionalDirectories": [
+      "C:\\Temp",
+      "C:\\Users\\aiuser\\Desktop\\SSCP-Study-Tutor\\app"
     ]
   }
 }

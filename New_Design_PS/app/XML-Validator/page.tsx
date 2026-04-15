@@ -13,30 +13,39 @@ import type {
 function severityTheme(severity: ValidatorIssue["severity"]) {
   if (severity === "error") {
     return {
-      bubble: "border-rose-200 bg-rose-50 text-rose-800",
-      dot: "bg-rose-500",
-      inline: "bg-rose-200",
-      row: "bg-rose-950/35",
-      panel: "border-rose-200 bg-rose-50 text-rose-800",
+      bubble: "border border-slate-200 border-l-[3px] border-l-red-600 bg-white text-slate-800",
+      dot: "bg-red-600",
+      inline: "bg-red-600",
+      row: "bg-white",
+      panel: "border border-slate-200 bg-white text-slate-800",
+      badge: "bg-red-600 text-white",
+      accent: "text-red-700",
+      label: "text-red-600",
     };
   }
 
   if (severity === "warning") {
     return {
-      bubble: "border-amber-200 bg-amber-50 text-amber-800",
-      dot: "bg-amber-500",
-      inline: "bg-amber-200",
-      row: "bg-amber-950/30",
-      panel: "border-amber-200 bg-amber-50 text-amber-800",
+      bubble: "border border-slate-200 border-l-[3px] border-l-yellow-500 bg-white text-slate-800",
+      dot: "bg-yellow-500",
+      inline: "bg-yellow-500",
+      row: "bg-white",
+      panel: "border border-slate-200 bg-white text-slate-800",
+      badge: "bg-yellow-600 text-white",
+      accent: "text-yellow-700",
+      label: "text-yellow-600",
     };
   }
 
   return {
-    bubble: "border-sky-200 bg-sky-50 text-sky-800",
-    dot: "bg-sky-500",
-    inline: "bg-sky-200",
-    row: "bg-sky-950/30",
-    panel: "border-sky-200 bg-sky-50 text-sky-800",
+    bubble: "border border-slate-200 border-l-[3px] border-l-blue-500 bg-white text-slate-800",
+    dot: "bg-blue-500",
+    inline: "bg-blue-500",
+    row: "bg-white",
+    panel: "border border-slate-200 bg-white text-slate-800",
+    badge: "bg-blue-600 text-white",
+    accent: "text-blue-700",
+    label: "text-blue-600",
   };
 }
 
@@ -76,32 +85,36 @@ const severityOrder: Array<ValidatorIssue["severity"]> = ["error", "warning", "i
 function scriptRuleTheme(severity: ScriptRuleSeverity) {
   if (severity === "critical") {
     return {
-      card: "border-rose-300 bg-rose-50 text-rose-900",
+      card: "border-rose-200 bg-white text-slate-900",
       badge: "bg-rose-600 text-white",
       dot: "bg-rose-600",
+      bar: "bg-rose-600",
     };
   }
 
   if (severity === "high") {
     return {
-      card: "border-orange-300 bg-orange-50 text-orange-900",
+      card: "border-orange-200 bg-white text-slate-900",
       badge: "bg-orange-500 text-white",
       dot: "bg-orange-500",
+      bar: "bg-orange-500",
     };
   }
 
   if (severity === "medium") {
     return {
-      card: "border-amber-300 bg-amber-50 text-amber-900",
+      card: "border-amber-200 bg-white text-slate-900",
       badge: "bg-amber-500 text-white",
       dot: "bg-amber-500",
+      bar: "bg-amber-500",
     };
   }
 
   return {
-    card: "border-sky-300 bg-sky-50 text-sky-900",
-    badge: "bg-sky-500 text-white",
-    dot: "bg-sky-500",
+    card: "border-slate-200 bg-white text-slate-900",
+    badge: "bg-slate-500 text-white",
+    dot: "bg-slate-400",
+    bar: "bg-slate-400",
   };
 }
 
@@ -256,6 +269,11 @@ export default function XmlValidatorPage() {
   const [validationBusy, setValidationBusy] = useState(false);
   const [focusedIssueId, setFocusedIssueId] = useState<string>("");
   const [activeSeverity, setActiveSeverity] = useState<ValidatorIssue["severity"]>("error");
+  const [detailItem, setDetailItem] = useState<
+    | { kind: "violation"; data: NonNullable<ValidationReport["scriptAudit"]["violatedRules"]>[number] }
+    | { kind: "issue"; data: ValidatorIssue }
+    | null
+  >(null);
 
   const lineRefs = useRef<Map<number, HTMLDivElement>>(new Map());
 
@@ -263,7 +281,10 @@ export default function XmlValidatorPage() {
     if (!resultsOpen) return;
 
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setResultsOpen(false);
+      if (event.key === "Escape") {
+        if (detailItem) { setDetailItem(null); return; }
+        setResultsOpen(false);
+      }
     };
 
     window.addEventListener("keydown", onKeyDown);
@@ -720,6 +741,128 @@ export default function XmlValidatorPage() {
     );
   }, [findings.length, findingsBySeverity]);
 
+  // ── Detail popup ──────────────────────────────────────────────────────────────
+  function DetailPopup() {
+    if (!detailItem) return null;
+
+    const closeBtn = (
+      <button
+        onClick={() => setDetailItem(null)}
+        className="ml-auto shrink-0 rounded-full border border-slate-200 px-3 py-1 text-xs font-semibold text-slate-500 transition hover:bg-slate-100"
+      >
+        Close
+      </button>
+    );
+
+    if (detailItem.kind === "violation") {
+      const rule = detailItem.data;
+      const theme = scriptRuleTheme(rule.severity);
+      return (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+          <button
+            className="absolute inset-0 bg-slate-950/60 backdrop-blur-sm"
+            onClick={() => setDetailItem(null)}
+          />
+          <div className="relative z-10 flex max-h-[85vh] w-full max-w-xl flex-col overflow-hidden rounded-[1.75rem] border border-slate-200 bg-white shadow-[0_24px_64px_rgba(15,23,42,0.35)]">
+            <div className={`flex items-center gap-2 border-b border-slate-100 px-5 py-4`}>
+              <span className={`rounded-full px-2.5 py-1 text-[11px] font-bold uppercase tracking-widest ${theme.badge}`}>
+                {rule.severity}
+              </span>
+              <span className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-widest text-slate-500">
+                {formatScriptCategory(rule.category)}
+              </span>
+              <span className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-[11px] font-semibold text-slate-500">
+                -{rule.scoreImpact} pts
+              </span>
+              {rule.line ? (
+                <span className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-[11px] font-semibold text-slate-500">
+                  PS line {rule.line}
+                </span>
+              ) : null}
+              {closeBtn}
+            </div>
+            <div className="overflow-y-auto px-5 py-4">
+              <h3 className="text-base font-semibold text-slate-900">{rule.title}</h3>
+              <div className="mt-1 text-[11px] font-medium uppercase tracking-widest text-slate-400">{rule.code}</div>
+              <div className="mt-4">
+                <div className="mb-1 text-[11px] font-semibold uppercase tracking-widest text-slate-400">Evidence</div>
+                <p className="text-sm leading-6 text-slate-700">{rule.evidence}</p>
+              </div>
+              <div className="mt-4 rounded-2xl border border-slate-100 bg-slate-50 px-4 py-3">
+                <div className="mb-1 text-[11px] font-semibold uppercase tracking-widest text-slate-400">Suggested Fix</div>
+                <p className="text-sm leading-6 text-slate-700">{rule.fix}</p>
+              </div>
+              {rule.references && rule.references.length > 0 ? (
+                <div className="mt-4">
+                  <div className="mb-2 text-[11px] font-semibold uppercase tracking-widest text-slate-400">References</div>
+                  <div className="space-y-2">
+                    {rule.references.map((ref) => (
+                      <a
+                        key={ref.id}
+                        href={ref.url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="block rounded-2xl border border-slate-200 bg-white px-4 py-3 transition hover:border-slate-300 hover:bg-slate-50"
+                      >
+                        <div className="flex flex-wrap gap-2">
+                          <span className="rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-[10px] font-semibold uppercase text-slate-500">
+                            {formatReferenceKind(ref.kind)}
+                          </span>
+                          <span className="rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-[10px] font-semibold uppercase text-slate-500">
+                            {formatReferenceConfidence(ref.confidence)}
+                          </span>
+                        </div>
+                        <div className="mt-2 text-sm font-semibold text-slate-900">{ref.title}</div>
+                        <div className="mt-0.5 text-xs text-slate-500">{ref.authority}</div>
+                        <div className="mt-1.5 break-all text-xs text-sky-700">{ref.url}</div>
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // issue popup
+    const issue = detailItem.data;
+    const theme = severityTheme(issue.severity);
+    return (
+      <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+        <button
+          className="absolute inset-0 bg-slate-950/60 backdrop-blur-sm"
+          onClick={() => setDetailItem(null)}
+        />
+        <div className="relative z-10 flex max-h-[75vh] w-full max-w-lg flex-col overflow-hidden rounded-[1.75rem] border border-slate-200 bg-white shadow-[0_24px_64px_rgba(15,23,42,0.35)]">
+          <div className="flex items-center gap-2 border-b border-slate-100 px-5 py-4">
+            <span className={`h-2.5 w-2.5 rounded-full ${theme.dot}`} />
+            <span className={`rounded-full px-2.5 py-1 text-[11px] font-bold uppercase tracking-widest ${theme.badge}`}>
+              {formatSeverityLabel(issue.severity)}
+            </span>
+            <span className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-[11px] font-semibold text-slate-500">
+              Line {issue.line}
+            </span>
+            {closeBtn}
+          </div>
+          <div className="overflow-y-auto px-5 py-4">
+            <p className="text-sm leading-6 text-slate-800">{issue.message}</p>
+            {issue.code ? (
+              <div className="mt-3 rounded-2xl border border-slate-100 bg-slate-50 px-4 py-2.5">
+                <div className="mb-1 text-[11px] font-semibold uppercase tracking-widest text-slate-400">Rule Code</div>
+                <div className="font-mono text-xs text-slate-700">{issue.code}</div>
+              </div>
+            ) : null}
+            {issue.relatedPath ? (
+              <div className="mt-3 text-xs text-slate-500">Path: {issue.relatedPath}</div>
+            ) : null}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <main className="min-h-screen bg-[linear-gradient(180deg,#f8fafc_0%,#eef2ff_52%,#ffffff_100%)]">
       <div className="mx-auto max-w-5xl px-4 py-8">
@@ -842,6 +985,8 @@ export default function XmlValidatorPage() {
           ) : null}
         </section>
       </div>
+
+      <DetailPopup />
 
       {resultsOpen && report ? (
         <div className="fixed inset-0 z-50 bg-slate-950/72 backdrop-blur-sm">
@@ -1041,110 +1186,56 @@ export default function XmlValidatorPage() {
                     ) : null}
                   </div>
 
+                  {/* ── PS Violations — compact click-to-expand rows ── */}
                   <div className="mt-4">
                     <div className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">
                       PowerShell Rule Violations
+                      <span className="ml-2 font-normal normal-case tracking-normal text-slate-400">
+                        — click any row for details
+                      </span>
                     </div>
-                    <div className="mt-3 space-y-3">
+                    <div className="mt-2 divide-y divide-slate-100 overflow-hidden rounded-2xl border border-slate-200 bg-white">
                       {scriptViolations.length > 0 ? (
                         scriptViolations.map((rule) => {
                           const theme = scriptRuleTheme(rule.severity);
-
                           return (
-                            <div
+                            <button
                               key={rule.id}
-                              className={`rounded-[1.35rem] border px-4 py-4 shadow-sm ${theme.card}`}
+                              onClick={() => setDetailItem({ kind: "violation", data: rule })}
+                              className="flex w-full items-center gap-3 px-4 py-3 text-left transition hover:bg-slate-50 active:bg-slate-100"
                             >
-                              <div className="flex items-start justify-between gap-3">
-                                <div className="flex min-w-0 flex-wrap gap-2">
-                                  <span
-                                    className={`rounded-full px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] ${theme.badge}`}
-                                  >
-                                    {rule.severity}
-                                  </span>
-                                  <span className="rounded-full border border-current/15 bg-white/70 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.16em]">
-                                    {formatScriptCategory(rule.category)}
-                                  </span>
-                                </div>
-                                <span className="rounded-full border border-current/15 bg-white/70 px-3 py-1 text-xs font-semibold">
-                                  -{rule.scoreImpact} pts
-                                </span>
-                              </div>
-
-                              <h3 className="mt-3 text-sm font-semibold">{rule.title}</h3>
-                              <div className="mt-1 text-[11px] font-medium uppercase tracking-[0.16em] text-slate-500">
-                                {rule.code}
-                                {rule.line ? ` • PS line ${rule.line}` : ""}
-                              </div>
-                              <p className="mt-3 text-sm leading-6">{rule.evidence}</p>
-
-                              <div className="mt-3 rounded-2xl border border-white/80 bg-white/80 px-3 py-3">
-                                <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">
-                                  Suggested Fix
-                                </div>
-                                <p className="mt-2 text-sm leading-6 text-slate-700">
-                                  {rule.fix}
-                                </p>
-                              </div>
-
-                              {rule.references && rule.references.length > 0 ? (
-                                <div className="mt-3 rounded-2xl border border-white/80 bg-white/80 px-3 py-3">
-                                  <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">
-                                    Related References
-                                  </div>
-                                  <div className="mt-3 space-y-2">
-                                    {rule.references.map((reference) => (
-                                      <a
-                                        key={reference.id}
-                                        href={reference.url}
-                                        target="_blank"
-                                        rel="noreferrer"
-                                        className="block rounded-2xl border border-slate-200 bg-white px-3 py-3 transition hover:border-slate-300 hover:bg-slate-50"
-                                      >
-                                        <div className="flex flex-wrap items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
-                                          <span className="rounded-full border border-slate-200 bg-slate-50 px-2 py-1">
-                                            {formatReferenceKind(reference.kind)}
-                                          </span>
-                                          <span className="rounded-full border border-slate-200 bg-slate-50 px-2 py-1">
-                                            {formatReferenceConfidence(reference.confidence)}
-                                          </span>
-                                        </div>
-                                        <div className="mt-2 text-sm font-semibold text-slate-900">
-                                          {reference.title}
-                                        </div>
-                                        <div className="mt-1 text-xs text-slate-500">
-                                          {reference.authority}
-                                        </div>
-                                        <div className="mt-2 break-all text-xs text-sky-700">
-                                          {reference.url}
-                                        </div>
-                                      </a>
-                                    ))}
-                                  </div>
-                                </div>
-                              ) : null}
-                            </div>
+                              <span className={`h-2 w-2 shrink-0 rounded-full ${theme.dot}`} />
+                              <span className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest ${theme.badge}`}>
+                                {rule.severity}
+                              </span>
+                              <span className="min-w-0 flex-1 truncate text-sm font-medium text-slate-800">
+                                {rule.title}
+                              </span>
+                              <span className="shrink-0 text-xs font-semibold text-slate-400">
+                                -{rule.scoreImpact} pts
+                              </span>
+                            </button>
                           );
                         })
                       ) : (
-                        <div className="rounded-[1.4rem] border border-emerald-200 bg-emerald-50 px-4 py-4 text-sm leading-6 text-emerald-800">
-                          No PowerShell security or performance rule violations were returned for
-                          this upload pair.
+                        <div className="px-4 py-4 text-sm text-emerald-700">
+                          No rule violations found.
                         </div>
                       )}
                     </div>
                   </div>
 
-                  <div className="mt-4">
+                  {/* ── XML Findings — severity tabs + compact click rows ── */}
+                  <div className="mt-5">
                     <div className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">
                       XML Findings
                     </div>
-                    <div className="mt-3 grid gap-2">
+                    {/* severity tabs */}
+                    <div className="mt-2 flex gap-1.5">
                       {severityOrder.map((severity) => {
                         const theme = severityTheme(severity);
-                        const issueCount = findingsBySeverity[severity].length;
+                        const count = findingsBySeverity[severity].length;
                         const isActive = activeSeverity === severity;
-
                         return (
                           <button
                             key={severity}
@@ -1152,89 +1243,64 @@ export default function XmlValidatorPage() {
                               setActiveSeverity(severity);
                               setFocusedIssueId(findingsBySeverity[severity][0]?.id ?? "");
                             }}
-                            className={`rounded-[1.35rem] border px-4 py-3 text-left transition ${
+                            className={`flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
                               isActive
-                                ? `${theme.panel} ring-2 ring-sky-200`
-                                : "border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50"
+                                ? `${theme.badge} border-transparent`
+                                : "border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50"
                             }`}
                           >
-                            <div className="flex items-center justify-between gap-3">
-                              <div className="flex items-center gap-3">
-                                <span
-                                  className={`h-2.5 w-2.5 rounded-full ${theme.dot}`}
-                                />
-                                <div>
-                                  <div className="text-[11px] font-semibold uppercase tracking-[0.18em]">
-                                    {formatSeverityLabel(severity)}
-                                  </div>
-                                  <div className="mt-1 text-sm text-slate-500">
-                                    {issueCount === 0
-                                      ? "No messages in this list"
-                                      : `${issueCount} ${issueCount === 1 ? "message" : "messages"}`}
-                                  </div>
-                                </div>
-                              </div>
-                              <span className="rounded-full border border-current/10 bg-white/70 px-3 py-1 text-xs font-semibold">
-                                {issueCount}
-                              </span>
-                            </div>
+                            <span className={`h-1.5 w-1.5 rounded-full ${isActive ? "bg-white/80" : theme.dot}`} />
+                            {formatSeverityLabel(severity)}
+                            <span className={`rounded-full px-1.5 py-0.5 text-[10px] font-bold ${isActive ? "bg-white/20 text-white" : "bg-slate-100 text-slate-500"}`}>
+                              {count}
+                            </span>
                           </button>
                         );
                       })}
                     </div>
 
-                    <div className="mt-4">
-                      <div className="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-400">
-                        Showing {formatSeverityLabel(activeSeverity)} Messages
-                      </div>
-                      <div className="mt-3 space-y-3">
-                        {activeFindings.length > 0 ? (
-                          activeFindings.map((issue) => {
+                    {/* compact issue rows */}
+                    <div className="mt-2 divide-y divide-slate-100 overflow-hidden rounded-2xl border border-slate-200 bg-white">
+                      {activeFindings.length > 0 ? (
+                        activeFindings.map((issue) => {
                           const theme = severityTheme(issue.severity);
                           const isFocused = focusedIssueId === issue.id;
-
                           return (
                             <button
                               key={issue.id}
-                              onClick={() => jumpToIssue(issue)}
-                              className={`w-full rounded-[1.4rem] border px-4 py-3 text-left transition ${theme.panel} ${
-                                isFocused ? "ring-2 ring-sky-300" : ""
+                              onClick={() => {
+                                jumpToIssue(issue);
+                                setDetailItem({ kind: "issue", data: issue });
+                              }}
+                              className={`flex w-full items-start gap-3 px-4 py-3 text-left transition hover:bg-slate-50 active:bg-slate-100 ${
+                                isFocused ? "bg-sky-50" : ""
                               }`}
                             >
-                              <div className="flex items-start gap-3">
-                                <span
-                                  className={`mt-1 h-2.5 w-2.5 shrink-0 rounded-full ${theme.dot}`}
-                                />
-                                <div className="min-w-0 flex-1">
-                                  <div className="flex flex-wrap items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em]">
-                                    <span>{formatSeverityLabel(issue.severity)}</span>
-                                    <span className="text-slate-500">Line {issue.line}</span>
-                                  </div>
-                                  <p className="mt-2 text-sm leading-6">{issue.message}</p>
-                                  {issue.code ? (
-                                    <div className="mt-2 text-[11px] font-medium text-slate-500">
-                                      {issue.code}
-                                    </div>
-                                  ) : null}
+                              <span className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${theme.dot}`} />
+                              <div className="min-w-0 flex-1">
+                                <div className="flex items-center gap-2 text-[11px] font-semibold text-slate-400">
+                                  <span>Line {issue.line}</span>
+                                  {issue.code ? <span className="truncate font-mono">{issue.code}</span> : null}
                                 </div>
+                                <p className="mt-0.5 line-clamp-2 text-sm text-slate-800">
+                                  {issue.message}
+                                </p>
                               </div>
                             </button>
                           );
                         })
-                        ) : (
-                          <div className="rounded-[1.4rem] border border-slate-200 bg-slate-50 px-4 py-4 text-sm leading-6 text-slate-600">
-                            No {formatSeverityLabel(activeSeverity).toLowerCase()} messages were
-                            returned for this validation run.
-                          </div>
-                        )}
-                      </div>
+                      ) : (
+                        <div className="px-4 py-4 text-sm text-slate-500">
+                          No {formatSeverityLabel(activeSeverity).toLowerCase()} messages.
+                        </div>
+                      )}
                     </div>
 
                     {findings.length === 0 ? (
-                        <div className="rounded-[1.4rem] border border-emerald-200 bg-emerald-50 px-4 py-4 text-sm leading-6 text-emerald-800">
-                          The current XML passed the rule engine checks for this upload pair.
-                        </div>
-                      ) : null}
+                      <div className="mt-2 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
+                        XML passed all rule checks.
+                      </div>
+                    ) : null}
                   </div>
 
                   <div className="mt-4 rounded-[1.5rem] border border-slate-200 bg-white px-4 py-4">

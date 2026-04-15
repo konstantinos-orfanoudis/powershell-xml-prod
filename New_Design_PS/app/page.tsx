@@ -28,19 +28,6 @@ export default function HomePage() {
     padding: "40px 16px 56px",
   };
 
-  // Header card WITHOUT the right-side buttons (per your screenshot request)
-  const headerCard: React.CSSProperties = {
-    background: tokens.panel,
-    border: `1px solid ${tokens.border}`,
-    borderRadius: tokens.radius,
-    boxShadow: tokens.shadow,
-    padding: 22,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "flex-start",
-    gap: 16,
-  };
-
   const grid: React.CSSProperties = {
     marginTop: 16,
     display: "grid",
@@ -126,6 +113,7 @@ export default function HomePage() {
               <span style={primaryBtn as any}>Open →</span>
             </div>
           </Link>
+
         </div>
 
         
