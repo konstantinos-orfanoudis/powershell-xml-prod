@@ -1,0 +1,98 @@
+
+> powershell-parser@0.1.0 dev
+> next dev -p 3000
+
+   ▲ Next.js 15.5.2
+   - Local:        http://localhost:3000
+   - Network:      http://10.0.0.46:3000
+   - Environments: .env.local
+
+ ✓ Starting...
+ ✓ Ready in 13.7s
+ ○ Compiling / ...
+ ✓ Compiled / in 15.8s (639 modules)
+ ✓ Compiled in 3.1s (237 modules)
+ ✓ Compiled in 1764ms (237 modules)
+ ✓ Compiled in 1584ms (237 modules)
+ GET / 200 in 281ms
+ GET / 200 in 157ms
+ ○ Compiling /favicon.ico ...
+ ✓ Compiled /favicon.ico in 693ms (401 modules)
+ GET /favicon.ico 200 in 1842ms
+ ○ Compiling /Powershell-ConnectorsTool ...
+ ✓ Compiled /Powershell-ConnectorsTool in 1495ms (637 modules)
+ GET /Powershell-ConnectorsTool 200 in 2004ms
+ ○ Compiling /UploadFilesForSchemaCreation ...
+ ✓ Compiled /UploadFilesForSchemaCreation in 3.3s (972 modules)
+ GET /UploadFilesForSchemaCreation 200 in 4175ms
+ ○ Compiling /api/ai/submitFile ...
+ ✓ Compiled /api/ai/submitFile in 1868ms (1092 modules)
+ POST /api/ai/submitFile 200 in 3976ms
+ ○ Compiling /api/ai/resultFiles ...
+ ✓ Compiled /api/ai/resultFiles in 635ms (1094 modules)
+ GET /api/ai/resultFiles?id=ZXTB0IFS0VBgBlAgngZ0oQPJ2R0IVT 200 in 886ms
+ ✓ Compiled in 2.5s (412 modules)
+ ✓ Compiled in 2s (412 modules)
+ GET /UploadFilesForSchemaCreation 200 in 2005ms
+ GET /UploadFilesForSchemaCreation 200 in 63ms
+ ✓ Compiled in 4.4s (911 modules)
+ GET /UploadFilesForSchemaCreation 200 in 310ms
+ GET /UploadFilesForSchemaCreation 200 in 454ms
+ ○ Compiling /favicon.ico ...
+ ✓ Compiled /favicon.ico in 1037ms (515 modules)
+ GET /favicon.ico 200 in 1325ms
+ ✓ Compiled /api/ai/submitFile in 299ms (635 modules)
+ POST /api/ai/submitFile 200 in 617ms
+ GET /UploadFilesForSchemaCreation 200 in 182ms
+ ✓ Compiled /api/ai/resultFiles in 393ms (637 modules)
+ GET /api/ai/resultFiles?id=O46QvMSLF3cxQpfHS1OG44li7wUJGx 200 in 493ms
+ ○ Compiling / ...
+ ✓ Compiled / in 935ms (692 modules)
+ GET / 200 in 1695ms
+ ✓ Compiled /Powershell-ConnectorsTool in 353ms (698 modules)
+ GET /Powershell-ConnectorsTool 200 in 709ms
+ ○ Compiling /powershell-XML ...
+ ✓ Compiled /powershell-XML in 2.3s (1128 modules)
+ GET /powershell-XML 200 in 3169ms
+ GET /powershell-XML 200 in 161ms
+ ✓ Compiled in 3.2s (1003 modules)
+ GET /powershell-XML 200 in 361ms
+ GET /Powershell-ConnectorsTool 200 in 334ms
+ ○ Compiling /XML-Validator ...
+ ✓ Compiled /XML-Validator in 1960ms (996 modules)
+ GET /XML-Validator 200 in 2625ms
+ ○ Compiling /api/ai/xml-validator ...
+ ✓ Compiled /api/ai/xml-validator in 1874ms (1133 modules)
+ POST /api/ai/xml-validator 200 in 112237ms
+ ✓ Compiled in 2.4s (430 modules)
+ ✓ Compiled in 1806ms (430 modules)
+ GET /XML-Validator 200 in 1816ms
+ GET /XML-Validator 200 in 54ms
+ ✓ Compiled in 4.8s (1010 modules)
+ GET /XML-Validator 200 in 357ms
+ ✓ Compiled in 1967ms (430 modules)
+ GET /XML-Validator 200 in 59ms
+ GET /XML-Validator 200 in 308ms
+ ○ Compiling /favicon.ico ...
+ ✓ Compiled /favicon.ico in 1109ms (597 modules)
+ GET /favicon.ico 200 in 1423ms
+ ✓ Compiled in 4.7s (1010 modules)
+ GET /XML-Validator 200 in 320ms
+ ✓ Compiled in 1956ms (430 modules)
+ ✓ Compiled in 1685ms (430 modules)
+ GET /XML-Validator 200 in 1666ms
+ GET /XML-Validator 200 in 54ms
+ ○ Compiling /api/ai/xml-validator ...
+ ✓ Compiled /api/ai/xml-validator in 747ms (718 modules)
+ GET /XML-Validator 200 in 1483ms
+ POST /api/ai/xml-validator 200 in 68498ms
+ ✓ Compiled in 2.8s (1010 modules)
+ GET /XML-Validator 200 in 397ms
+ ✓ Compiled in 1449ms (430 modules)
+ GET /XML-Validator 200 in 125ms
+ ✓ Compiled in 1924ms (430 modules)
+ GET /XML-Validator 200 in 57ms
+ ✓ Compiled in 1561ms (430 modules)
+ GET /XML-Validator 200 in 60ms
+ ✓ Compiled in 1793ms (430 modules)
+ GET /XML-Validator 200 in 70ms

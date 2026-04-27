@@ -7,6 +7,7 @@ import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
 import { extractPdfText } from "../../../../lib/pdf/extractFromPdf";
 import { putResult } from "../../../../lib/resultbus";
+import { fileNameToEntityHint } from "../../../../lib/schemaEntityNames";
 
 export const runtime = "nodejs";
 
@@ -57,6 +58,7 @@ CRITICAL RULES
 
 5) Naming
 - Entity names: TitleCase, singular (e.g., Users → User, user_roles → UserRole). Avoid generic collisions; prefer concrete names visible in the inputs.
+- Never append raw file-format suffixes such as Json, Xml, Yaml, Csv, Pdf, Wsdl, or Xsd just because they appear in a filename.
 - Attribute names: preserve source keys if clear; otherwise snake_case from the path (e.g., profile.firstName → profile_firstName → profile_first_name if needed).
 
 6) Keys
@@ -142,6 +144,7 @@ async function processFile(
   try {
     const openai = new OpenAI({ apiKey: OPENAI_API_KEY, ...(OPENAI_BASE_URL ? { baseURL: OPENAI_BASE_URL } : {}) });
     let userMessage = "";
+    const entityHint = fileNameToEntityHint(fileName);
 
     if (fileType === "application/json") {
       // Mirror: Json node → Code in JavaScript → Messages For Json → AI Agent
@@ -154,12 +157,13 @@ async function processFile(
       }
 
       const attrs = extractAttrsFromJson(data);
-      const requiredEntities = [{ name: fileName, attributes: attrs.sort() }];
+      const requiredEntities = [{ name: entityHint, attributes: attrs.sort() }];
       const content = JSON.stringify({ requiredEntities }, null, 2);
 
       userMessage = [
         `File: ${fileName}`,
         `Type: ${fileType}`,
+        `Entity name hint: ${entityHint}`,
         `Infer entities and attributes from this JSON sample using the system rules.`,
         `Content:`,
         content,
@@ -169,18 +173,24 @@ async function processFile(
       const bytes = await file.arrayBuffer();
       const text = await extractPdfText(bytes);
       userMessage =
+        `File: ${fileName}\n` +
+        `Entity name hint: ${entityHint}\n` +
         `Infer entities and attributes from this file using the system rules.\n` +
         `Content:\n${text}`;
     } else if (fileType === "application/xml" || fileType === "text/xml") {
       // Mirror: Extract from XML → Messages for XML → AI Agent
       const text = await file.text();
       userMessage =
+        `File: ${fileName}\n` +
+        `Entity name hint: ${entityHint}\n` +
         `Infer entities and attributes from this file using the system rules.\n` +
         `Content:\n${text}`;
     } else {
       // Fallback: treat as plain text
       const text = await file.text();
       userMessage =
+        `File: ${fileName}\n` +
+        `Entity name hint: ${entityHint}\n` +
         `Infer entities and attributes from this file using the system rules.\n` +
         `Content:\n${text}`;
     }

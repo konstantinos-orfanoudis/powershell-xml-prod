@@ -6,6 +6,7 @@ import { detectUploadKind } from "@/lib/detectUpload";
 import { scimToSchema } from "@/lib/scim/scimToConnectorSchema";
 import { detectFormat } from "@/lib/detect/detectFormat";
 import { openApiToConnectorSchemaFromText } from "@/lib/openapitoconnectorschema/openapiToConnectorSchema";
+import { sanitizeSchemaEntityNames } from "@/lib/schemaEntityNames";
 
 /* ---------------- Upload types ---------------- */
 
@@ -171,9 +172,12 @@ export default function UploadPage() {
   const [expanded, setExpanded] = useState(false);
 
   /* ---------- helper to apply schema to both states ---------- */
-  function applySchema(obj: unknown) {
+  function applySchema(obj: unknown, options?: { sanitizeEntityNames?: boolean }) {
     if (!obj || typeof obj !== "object") return;
-    const normalized = withStableIds(obj as Schema);
+    const prepared = options?.sanitizeEntityNames
+      ? sanitizeSchemaEntityNames(obj as Schema)
+      : (obj as Schema);
+    const normalized = withStableIds(prepared);
     setSchema(normalized);
     const replacer = (k: string, v: any) => (k.startsWith("__") || k === "MultiValue" ? undefined : v);
     setSchemaText(JSON.stringify(normalized, replacer, 2));
@@ -495,8 +499,8 @@ function isJsonOrYaml(file: File): boolean {
       const text = typeof out.result === "string" ? out.result : JSON.stringify(out.result, null, 2);
       const docs = JSON.parse(text);
 
-      const merged = withStableIds(mergeSchemas(docs));
-      applySchema(merged);
+      const merged = mergeSchemas(docs);
+      applySchema(merged, { sanitizeEntityNames: true });
 
       setItems((prev) =>
         prev.map((i) => {

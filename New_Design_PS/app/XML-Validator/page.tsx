@@ -229,7 +229,8 @@ function UploadButton(props: {
   label: string;
   detail: string;
   accept: string;
-  onUpload: (file: File) => Promise<void> | void;
+  multiple?: boolean;
+  onUpload: (files: File[]) => Promise<void> | void;
 }) {
   return (
     <label className="group flex min-h-[120px] cursor-pointer flex-col justify-between rounded-[1.75rem] border border-slate-200 bg-white px-5 py-4 shadow-sm transition hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md">
@@ -246,23 +247,28 @@ function UploadButton(props: {
       <input
         type="file"
         accept={props.accept}
+        multiple={props.multiple}
         className="hidden"
         onChange={async (event) => {
-          const file = event.target.files?.[0];
+          const files = Array.from(event.target.files || []);
           event.target.value = "";
-          if (!file) return;
-          await props.onUpload(file);
+          if (!files.length) return;
+          await props.onUpload(files);
         }}
       />
     </label>
   );
 }
 
+type UploadedPsFile = {
+  name: string;
+  text: string;
+};
+
 export default function XmlValidatorPage() {
   const [xmlText, setXmlText] = useState("");
-  const [psText, setPsText] = useState("");
   const [xmlFileName, setXmlFileName] = useState("");
-  const [psFileName, setPsFileName] = useState("");
+  const [psFiles, setPsFiles] = useState<UploadedPsFile[]>([]);
   const [pageError, setPageError] = useState("");
   const [report, setReport] = useState<ValidationReport | null>(null);
   const [resultsOpen, setResultsOpen] = useState(false);
@@ -303,6 +309,18 @@ export default function XmlValidatorPage() {
 
   const findings = report?.issues ?? [];
   const xmlLines = useMemo(() => (xmlText ? xmlText.split(/\r?\n/) : [""]), [xmlText]);
+  const psText = useMemo(
+    () =>
+      psFiles
+        .map((file) => `# File: ${file.name}\n${file.text}`)
+        .join("\n\n"),
+    [psFiles]
+  );
+  const psFileName = useMemo(() => {
+    if (psFiles.length === 0) return "";
+    if (psFiles.length === 1) return psFiles[0].name;
+    return `${psFiles.length} files: ${psFiles.map((file) => file.name).join(", ")}`;
+  }, [psFiles]);
 
   const counts = useMemo(
     () =>
@@ -382,7 +400,9 @@ export default function XmlValidatorPage() {
     [scriptViolations]
   );
 
-  async function loadXmlFile(file: File) {
+  async function loadXmlFile(files: File[]) {
+    const file = files[0];
+    if (!file) return;
     setXmlText(await file.text());
     setXmlFileName(file.name);
     setPageError("");
@@ -391,9 +411,21 @@ export default function XmlValidatorPage() {
     setActiveSeverity("error");
   }
 
-  async function loadPsFile(file: File) {
-    setPsText(await file.text());
-    setPsFileName(file.name);
+  async function loadPsFile(files: File[]) {
+    const nextFiles = await Promise.all(
+      files.map(async (file) => ({
+        name: file.name,
+        text: await file.text(),
+      }))
+    );
+
+    setPsFiles((current) => {
+      const byName = new Map(current.map((file) => [file.name.toLowerCase(), file]));
+      for (const file of nextFiles) {
+        byName.set(file.name.toLowerCase(), file);
+      }
+      return Array.from(byName.values());
+    });
     setPageError("");
     setReport(null);
     setFocusedIssueId("");
@@ -403,8 +435,8 @@ export default function XmlValidatorPage() {
   async function runValidation() {
     setPageError("");
 
-    if (!xmlText.trim() || !psText.trim()) {
-      setPageError("Upload both the connector XML and the PowerShell file before validating.");
+    if (!xmlText.trim() || psFiles.length === 0 || !psText.trim()) {
+      setPageError("Upload the connector XML and at least one PowerShell file before validating.");
       return null;
     }
 
@@ -417,6 +449,8 @@ export default function XmlValidatorPage() {
         body: JSON.stringify({
           xmlText,
           psText,
+          psFileName,
+          psFiles,
           schemaText: JSON.stringify(readWorkspaceSchemaEntities(), null, 2),
         }),
       });
@@ -891,11 +925,12 @@ export default function XmlValidatorPage() {
             onUpload={loadXmlFile}
           />
           <UploadButton
-            label="PowerShell Script"
+            label="PowerShell Files"
             detail={
-              psFileName || "Select the .ps1 or .psm1 file that defines the command signatures."
+              psFileName || "Select one or more .ps1, .psm1, and/or .psd1 files that define the command signatures."
             }
-            accept=".ps1,.psm1,.txt,text/plain"
+            accept=".ps1,.psm1,.psd1,.txt,text/plain"
+            multiple
             onUpload={loadPsFile}
           />
         </section>

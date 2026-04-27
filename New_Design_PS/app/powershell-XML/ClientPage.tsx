@@ -3856,9 +3856,9 @@ ${selected!.script || ""}`;
   <input
     value={nlogPath}
     onChange={(e) => setNlogPath(e.target.value)}
-    className="rounded-md border border-white/30 bg-black/20 text-white placeholder-white/50
-             px-3 py-1.5 text-sm hover:border-white/40
-              focus:outline-none focus:ring-2 focus:ring-white/30 focus:border-white/60"
+    className="rounded-md border border-white/40 bg-white/95 px-3 py-1.5 text-sm text-slate-900
+             placeholder:text-slate-500 hover:border-white/60
+             focus:outline-none focus:ring-2 focus:ring-white/40 focus:border-white"
    placeholder="C:\Program Files\One Identity\One Identity Manager\NLog.dll"
   />
 </div>

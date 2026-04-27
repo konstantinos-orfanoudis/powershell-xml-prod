@@ -13,14 +13,9 @@
 
 /* Light/Dark tokens */
 :root {
+  color-scheme: light;
   --background: #ffffff;
   --foreground: #171717;
-}
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
 }
 
 /* Make interactive things use a pointer by default */
@@ -59,4 +54,17 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+input,
+textarea,
+select,
+option {
+  color: #171717;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #6b7280;
+  opacity: 1;
 }
